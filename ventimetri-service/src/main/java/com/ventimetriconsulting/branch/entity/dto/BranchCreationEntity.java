@@ -22,4 +22,5 @@ public class BranchCreationEntity {
     private String vat;
     private BranchType type;
     private byte[] logoImage;
+    private String fcmToken;
 }

@@ -1,6 +1,6 @@
 package com.ventimetriconsulting.inventario.entity.extra;
 
-public enum TransactionType {
+public enum OperationType {
     CREATION,
     INSERTION,
     REMOVAL

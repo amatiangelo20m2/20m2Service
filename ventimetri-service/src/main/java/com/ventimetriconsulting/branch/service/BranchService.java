@@ -58,9 +58,10 @@ public class BranchService {
                     .branch(savedBranch)
                     .userCode(branchCreationEntity.getUserCode())
                     .role(Role.PROPRIETARIO)
+                    .authorized(true)
+                    .fMCToken(branchCreationEntity.getFcmToken())
                     .build());
 
-//            branchUserRepository.flush();
 
             return BranchResponseEntity.builder()
                     .branchId(savedBranch.getBranchId())
@@ -72,6 +73,7 @@ public class BranchService {
                     .type(savedBranch.getType())
                     .name(savedBranch.getName())
                     .role(Role.PROPRIETARIO)
+                    .authorized(true)
                     .logoImage(savedBranch.getLogoImage())
                     .build();
 
@@ -85,38 +87,41 @@ public class BranchService {
     public List<BranchResponseEntity> getBranchesByUserCode(String userCode) {
 
         log.info("Retrieve branches for user with code {}", userCode);
-        List<BranchUser> branchesByUserCode = branchUserRepository.findBranchesByUserCode(userCode).orElseThrow(() -> new BranchNotFoundException("Exception thowed while getting data for user with code : " + userCode + ". Cannot associate the storage" ));;
+        List<BranchUser> branchesByUserCode = branchUserRepository
+                .findBranchesByUserCode(userCode).orElseThrow(() -> new BranchNotFoundException("Exception thowed while getting data for user with code : " + userCode + ". Cannot associate the storage" ));;
 
+        if(branchesByUserCode.isEmpty()) {
+            return new ArrayList<>();
+        }else{
+            return branchesByUserCode.stream()
+                    .map(this::convertToBranchResponseEntity)
+                    .collect(Collectors.toList());
 
-            if(branchesByUserCode.isEmpty()) {
-
-                Optional<Branch> branch1 = branchRepository.findById(1L);
-                branch1.ifPresent(branch -> branchUserRepository.save(BranchUser.builder()
-                        .id(0)
-                        .branch(branch)
-                        .userCode(userCode)
-                        .role(Role.RESPONSABILE)
-                        .build()));
-
-                branchesByUserCode = branchUserRepository.findBranchesByUserCode(userCode).orElseThrow(() -> new BranchNotFoundException("Exception thowed while getting data for user with code : " + userCode + ". Cannot associate the storage" ));;
-
-                if(!branchesByUserCode.isEmpty()) {
-                    return branchesByUserCode.stream()
-                            .map(this::convertToBranchResponseEntity)
-                            .collect(Collectors.toList());
-                }
-
-
-            }else{
-                return branchesByUserCode.stream()
-                        .map(this::convertToBranchResponseEntity)
-                        .collect(Collectors.toList());
-
-            }
-
-        return new ArrayList<>();
+        }
     }
 
+    @Transactional
+    public List<BranchResponseEntity> linkUserToBranch(String userCode,
+                                                       List<String> branchCodes,
+                                                       Role role,
+                                                       String fcmToken){
+
+        log.info("Link branches list with codes {} to the user with code {} that selected role {}", branchCodes, userCode, role);
+
+        for(String branchCode : branchCodes){
+            Optional<Branch> byBranchCode = branchRepository.findByBranchCode(branchCode);
+            byBranchCode.ifPresent(branch -> branchUserRepository.save(BranchUser.builder()
+                    .id(0)
+                    .branch(branch)
+                    .userCode(userCode)
+                    .authorized(false)
+                    .role(role)
+                    .fMCToken(fcmToken)
+                    .build()));
+        }
+
+        return getBranchesByUserCode(userCode);
+    }
     private BranchResponseEntity convertToBranchResponseEntity(BranchUser branchUser) {
         log.info("Convert Branch User object to a dto");
         return BranchResponseEntity.builder()
@@ -130,6 +135,7 @@ public class BranchService {
                 .branchCode(branchUser.getBranch().getBranchCode())
                 .logoImage(branchUser.getBranch().getLogoImage())
                 .role(branchUser.getRole())
+                .authorized(branchUser.isAuthorized())
                 .supplierDTOList(SupplierDTO.toDTOList(branchUser.getBranch().getSuppliers()))
                 .storageDTOS(StorageDTO.toDTOList(branchUser.getBranch().getStorages()))
                 .build();
@@ -159,6 +165,7 @@ public class BranchService {
                     .logoImage(byBranchCode.get().getLogoImage())
                     .phone(byBranchCode.get().getPhoneNumber())
                     .email(byBranchCode.get().getEmail())
+                    .authorized(true)
                     .build();
         }else{
             log.error("GetBranchData method give error. No branch found with branch code " + branchCode);
@@ -167,7 +174,9 @@ public class BranchService {
     }
 
     @Transactional
-    public void setFcmToken(String userCode, String branchCode, String fcmToken) {
+    public void setFcmToken(String userCode,
+                            String branchCode,
+                            String fcmToken) {
         log.info("Configure fcm token for branch code {}. User Code {}. FCM Token: {}", branchCode, userCode, fcmToken);
 
         Optional<List<BranchUser>> branchesByUserCode = branchUserRepository.findBranchesByUserCode(userCode);
@@ -180,4 +189,8 @@ public class BranchService {
             }
         }
     }
+
+
+
+
 }

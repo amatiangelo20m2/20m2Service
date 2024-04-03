@@ -9,10 +9,12 @@ import lombok.Data;
 @Data
 @Builder
 public class UserResponseEntity {
+
     private String name;
     private String phone;
     private String email;
     private String avatar;
     private ProfileStatus status;
     private String userCode;
+    private String fcmToken;
 }

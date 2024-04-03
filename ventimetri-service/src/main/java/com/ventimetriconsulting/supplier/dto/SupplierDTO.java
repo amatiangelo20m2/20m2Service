@@ -29,6 +29,7 @@ public class SupplierDTO {
     private String phoneNumber;
     private String email;
     private String pec;
+    private String supplierCode;
     private String country;
     private List<ProductDTO> productDTOList;
 
@@ -45,6 +46,7 @@ public class SupplierDTO {
                 .phoneNumber(supplierDTO.getPhoneNumber())
                 .email(supplierDTO.getEmail())
                 .pec(supplierDTO.getPec())
+                .supplierCode(supplierDTO.getSupplierCode())
                 .country(supplierDTO.getCountry())
                 .build();
     }
@@ -61,6 +63,7 @@ public class SupplierDTO {
         dto.setEmail(supplier.getEmail());
         dto.setPec(supplier.getPec());
         dto.setCf(supplier.getCf());
+        dto.setSupplierCode(supplier.getSupplierCode());
         dto.setCountry(supplier.getCountry());
         dto.setProductDTOList(ProductDTO.toDTOList(supplier.getProducts()));
         return dto;

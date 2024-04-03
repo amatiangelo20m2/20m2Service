@@ -70,6 +70,9 @@ public class AuthService {
         log.info("Sign in user by google: " + credentials.getEmail());
         Optional<UserEntity> userByEmail = userRepository.findByEmail(credentials.getEmail());
         if(userByEmail.isPresent()){
+            log.info("Refresh token for user: {}. New Token [{}]", userByEmail.get(), credentials.getFmcToken());
+            userByEmail.get().setFmcToken(credentials.getFmcToken());
+
             return AuthResponseEntity.builder()
                     .user(UserResponseEntity
                             .builder()
@@ -79,6 +82,7 @@ public class AuthService {
                             .avatar(userByEmail.get().getAvatar())
                             .userCode(userByEmail.get().getUserCode())
                             .status(userByEmail.get().getProfileStatus())
+                            .fcmToken(credentials.getFmcToken())
                             .build())
 
                     .accessToken(jwtService.generateToken(credentials.getEmail(), userByEmail.get().getUserCode()))
@@ -93,6 +97,7 @@ public class AuthService {
                     .profileStatus(ProfileStatus.ONLINE)
                     .signInMethod(SignInMethod.GOOGLE)
                     .avatar(credentials.getAvatar())
+                    .fmcToken(credentials.getFmcToken())
                     .id(0)
                     .build();
 
@@ -106,6 +111,7 @@ public class AuthService {
                             .avatar(userEntity.getAvatar())
                             .userCode(userEntity.getUserCode())
                             .status(userEntity.getProfileStatus())
+                            .fcmToken(userEntity.getFmcToken())
                             .build())
 
                     .accessToken(jwtService.generateToken(credentials.getEmail(),
@@ -235,5 +241,14 @@ public class AuthService {
             throw new UserNotFoundException("Utente non trovato con la seguente mail [" + jwtService.extractUsername(accessToken.getAccessToken()) + "] dopo autenticatione con jwt");
         }
 
+    }
+
+    public String retrieveFcmTokenByUserCode(String email) {
+        log.info("Retrieve FCM Token by user with email: " + email);
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(()
+                -> new UserNotFoundException("Utente non trovato con la seguente mail [" + email + "]"));
+
+        return userEntity.getFmcToken();
     }
 }

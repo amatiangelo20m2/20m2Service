@@ -26,7 +26,7 @@ public class InventoryAction {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
-    private TransactionType transactionType;
+    private OperationType operationType;
 
     @Column(name = "modified_by_user", nullable = false)
     private String modifiedByUser;

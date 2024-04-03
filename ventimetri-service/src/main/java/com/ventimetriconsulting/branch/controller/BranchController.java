@@ -1,6 +1,7 @@
 package com.ventimetriconsulting.branch.controller;
 
 import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.BranchResponseEntity;
+import com.ventimetriconsulting.branch.entity.Role;
 import com.ventimetriconsulting.branch.entity.dto.VentiMetriQuadriData;
 import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
@@ -30,6 +31,22 @@ public class BranchController {
                         .build());
     }
 
+    @PutMapping(path = "/linkusertobranch")
+    public ResponseEntity<VentiMetriQuadriData> linkUserToBranch(@RequestParam String userCode,
+                                                                 @RequestParam List<String> branchCodes,
+                                                                 @RequestParam Role role,
+                                                                 @RequestParam String fcmToken){
+
+        List<BranchResponseEntity> branchesByUserCode = branchService
+                .linkUserToBranch(userCode, branchCodes, role, fcmToken);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(VentiMetriQuadriData
+                        .builder()
+                        .branches(branchesByUserCode)
+                        .build());
+    }
+
     @PostMapping(path = "/branch/save")
     public ResponseEntity<BranchResponseEntity> save(@RequestBody BranchCreationEntity branchCreationEntity) {
         BranchResponseEntity branchResponseEntity = branchService.createBranch(branchCreationEntity);
@@ -39,7 +56,8 @@ public class BranchController {
     }
 
     @GetMapping(path = "/branch")
-    public ResponseEntity<BranchResponseEntity> getBranch(@RequestParam String userCode, @RequestParam String branchCode) {
+    public ResponseEntity<BranchResponseEntity> getBranch(@RequestParam String userCode,
+                                                          @RequestParam String branchCode) {
         BranchResponseEntity branch = branchService.getBranch(userCode, branchCode);
         return ResponseEntity
                 .status(HttpStatus.OK)

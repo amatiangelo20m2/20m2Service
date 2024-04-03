@@ -7,7 +7,7 @@ import lombok.*;
 @Entity(name = "BranchUser")
 @Table(name = "BRANCH_USER",
         uniqueConstraints=
-        @UniqueConstraint(columnNames={"branch_code", "user_code", "role"}))
+        @UniqueConstraint(columnNames={"user_code", "branch_code"}))
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -36,17 +36,16 @@ public class BranchUser {
     private Branch branch;
 
     @Size(min = 10, max = 10)
-    @Column(
-            name = "user_code",
-            unique = true,
-            length = 10
-    )
+    @Column(name = "user_code")
     private String userCode;
 
+    @Column(name = "role")
     private Role role;
 
     //to this token we will send the notification push in case they have app installed
     @Column(name = "fmc_token")
     private String fMCToken;
 
+    @Column(name = "authorized")
+    private boolean authorized;
 }

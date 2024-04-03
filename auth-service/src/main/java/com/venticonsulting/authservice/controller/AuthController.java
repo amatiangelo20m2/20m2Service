@@ -5,6 +5,7 @@ import com.venticonsulting.authservice.entity.dto.*;
 import com.venticonsulting.authservice.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -55,6 +56,13 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public void updateUser(@RequestBody UpdateUserEntity userEntity){
         userService.updateUser(userEntity);
+    }
+
+    @GetMapping(path = "/getfcmtoken")
+    public ResponseEntity<String> getFcmTokenByUserCode(@RequestParam String userCode){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.retrieveFcmTokenByUserCode(userCode));
     }
 
 

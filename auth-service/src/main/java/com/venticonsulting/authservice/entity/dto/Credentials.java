@@ -15,4 +15,5 @@ public class Credentials {
     private String company;
     private String avatar;
     private String phone;
+    private String fmcToken;
 }

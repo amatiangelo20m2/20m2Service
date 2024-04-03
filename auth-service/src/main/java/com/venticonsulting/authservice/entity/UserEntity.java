@@ -52,6 +52,7 @@ public class UserEntity {
         @Column(length = 60)
         private String password;
         private SignInMethod signInMethod;
+        private String fmcToken;
 
         @PrePersist
         public void generateUniqueCode() {

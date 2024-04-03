@@ -25,6 +25,9 @@ public class BranchResponseEntity {
     private String branchCode;
     private Role role;
     private byte[] logoImage;
+
+    private boolean authorized;
+
     private BranchConfigurationDTO branchConfigurationDTO;
     private List<SupplierDTO> supplierDTOList;
     private List<StorageDTO> storageDTOS;

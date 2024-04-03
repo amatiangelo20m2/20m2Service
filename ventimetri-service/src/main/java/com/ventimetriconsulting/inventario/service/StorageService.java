@@ -11,7 +11,7 @@ import com.ventimetriconsulting.inventario.entity.dto.InventarioDTO;
 import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
 import com.ventimetriconsulting.inventario.entity.dto.TransactionInventoryRequest;
 import com.ventimetriconsulting.inventario.entity.extra.InventoryAction;
-import com.ventimetriconsulting.inventario.entity.extra.TransactionType;
+import com.ventimetriconsulting.inventario.entity.extra.OperationType;
 import com.ventimetriconsulting.inventario.repository.InventarioRepository;
 import com.ventimetriconsulting.inventario.repository.StorageRepository;
 import com.ventimetriconsulting.supplier.dto.ProductDTO;
@@ -81,7 +81,7 @@ public class StorageService {
                         .insertionDate(LocalDate.now())
                         .modifiedByUser(userName)
                         .amount(0)
-                        .transactionType(TransactionType.CREATION)
+                        .operationType(OperationType.CREATION)
                         .build())))
                 .build();
 
@@ -120,7 +120,7 @@ public class StorageService {
                             .insertionDate(LocalDate.now())
                             .modifiedByUser(userName)
                             .amount(0)
-                            .transactionType(TransactionType.CREATION)
+                            .operationType(OperationType.CREATION)
                             .build())))
                     .build();
 
@@ -152,7 +152,7 @@ public class StorageService {
                 .amount(removedAmount)
                 .modifiedByUser(userName)
                 .insertionDate(LocalDate.now())
-                .transactionType(TransactionType.CREATION)
+                .operationType(OperationType.CREATION)
                 .build());
 
 
@@ -166,7 +166,7 @@ public class StorageService {
 
         Inventario inventario = inventarioRepository
                 .findById(inventarioId).orElseThrow(()
-                        -> new StorageNotFoundException("Inventario not found with id: " + inventarioId + ". Cannot update inventario"));;
+                        -> new StorageNotFoundException("Inventario not found with id: " + inventarioId + ". Cannot update inventario"));
 
         log.info("Delete product from inventario. " +
                         "Inventario id {}, product {}, updating delete date to today",
@@ -194,7 +194,7 @@ public class StorageService {
 
 
             if (inventario != null) {
-                if(transactionInventoryRequest.getTransactionType() == TransactionType.INSERTION){
+                if(transactionInventoryRequest.getOperationType() == OperationType.INSERTION){
                     inventario.setStock(inventario.getStock() + transactionItem.getAmount());
                 }else{
                     inventario.setStock(inventario.getStock() - transactionItem.getAmount());
@@ -202,7 +202,7 @@ public class StorageService {
 
                 inventario.getInventoryActions().add(InventoryAction
                         .builder()
-                        .transactionType(transactionInventoryRequest.getTransactionType())
+                        .operationType(transactionInventoryRequest.getOperationType())
                         .amount(transactionItem.getAmount())
                         .modifiedByUser(transactionInventoryRequest.getUser())
                         .insertionDate(LocalDate.now())
