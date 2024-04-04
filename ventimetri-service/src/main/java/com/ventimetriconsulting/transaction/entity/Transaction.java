@@ -4,6 +4,9 @@ import com.ventimetriconsulting.inventario.entity.extra.OperationType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Entity(name = "Transaction")
 @Table(name = "transaction",
         uniqueConstraints=
@@ -32,14 +35,18 @@ public class Transaction {
     )
     private long transactionId;
 
-    private String branchCode;
+    private String fromBranchCode;
+
+    private String toBranchCode;
 
     private String fromUserCode;
-
-    private String toUserCode;
 
     private TransactionType operationType;
 
     private boolean accepted;
+
+    private LocalDate requestDate;
+
+    private LocalTime requestTime;
 
 }

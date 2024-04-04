@@ -123,7 +123,7 @@ public class BranchService {
         return getBranchesByUserCode(userCode);
     }
     private BranchResponseEntity convertToBranchResponseEntity(BranchUser branchUser) {
-        log.info("Convert Branch User object to a dto");
+        log.info("Convert Branch User object to a dto" + branchUser.toString());
         return BranchResponseEntity.builder()
                 .branchId(branchUser.getBranch().getBranchId())
                 .name(branchUser.getBranch().getName())
