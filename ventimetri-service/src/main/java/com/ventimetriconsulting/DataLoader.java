@@ -82,6 +82,20 @@ public class DataLoader implements CommandLineRunner {
                 .logoImage(new byte[]{})
                 .build();
 
+        BranchCreationEntity _osteriaPiattiChiari = BranchCreationEntity.builder()
+                .branchCode("")
+                .userCode(userCode)
+                .name("Osteria Piatti Chiari")
+                .email("20m2official@gmail.com")
+                .address("Via G. D'Amico 11, Cisternino BR")
+                .city("Cisternino")
+                .cap("72014")
+                .phoneNumber("3454937047")
+                .vat("VAT123456")
+                .type(BranchType.RESTAURANT)
+                .logoImage(new byte[]{})
+                .build();
+
         BranchCreationEntity _20m2branchLocorotondo = BranchCreationEntity.builder()
                 .branchCode("")
                 .userCode(userCode)
@@ -110,11 +124,14 @@ public class DataLoader implements CommandLineRunner {
                 .logoImage(new byte[]{})
                 .build();
 
+
+
         ResponseEntity<BranchResponseEntity> savedBranch = branchController.save(_20m2branch);
         ResponseEntity<BranchResponseEntity> savedBranchCisternino = branchController.save(_20m2branchCisternino);
         ResponseEntity<BranchResponseEntity> savedBranchLocorotondo = branchController.save(_20m2branchLocorotondo);
         ResponseEntity<BranchResponseEntity> savedBranchMonopoli = branchController.save(_20m2branchMonopoli);
         ResponseEntity<BranchResponseEntity> saved20m2Catering = branchController.save(_20m2branchCatering);
+        ResponseEntity<BranchResponseEntity> saveOsteriaPiattiChiari = branchController.save(_osteriaPiattiChiari);
 
         storageController.addStorage(StorageDTO.builder()
                         .storageId(0)
@@ -125,6 +142,17 @@ public class DataLoader implements CommandLineRunner {
                         .cap("72014")
                         .build(),
                 Objects.requireNonNull(savedBranch.getBody()).getBranchCode());
+
+
+        storageController.addStorage(StorageDTO.builder()
+                        .storageId(0)
+                        .creationTime(new Date())
+                        .name("Magazzino Osteria Piatti Chiari")
+                        .city("Cisternino")
+                        .address("Via 4 novembre 12")
+                        .cap("72014")
+                        .build(),
+                Objects.requireNonNull(saveOsteriaPiattiChiari.getBody()).getBranchCode());
 
         storageController.addStorage(StorageDTO.builder()
                         .storageId(0)
