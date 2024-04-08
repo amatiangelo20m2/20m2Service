@@ -26,6 +26,13 @@ import com.ventimetriconsulting.inventario.entity.extra.OperationType;
 import com.ventimetriconsulting.inventario.repository.InventarioRepository;
 import com.ventimetriconsulting.inventario.repository.StorageRepository;
 import com.ventimetriconsulting.inventario.service.StorageService;
+import com.ventimetriconsulting.order.controller.OrderController;
+import com.ventimetriconsulting.order.entIty.OrderTarget;
+import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
+import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
+import com.ventimetriconsulting.order.repository.OrderEntityRepository;
+import com.ventimetriconsulting.order.repository.OrderItemRepository;
+import com.ventimetriconsulting.order.service.OrderService;
 import com.ventimetriconsulting.supplier.controller.SupplierController;
 import com.ventimetriconsulting.supplier.dto.ProductDTO;
 import com.ventimetriconsulting.supplier.dto.SupplierDTO;
@@ -102,11 +109,19 @@ public class TestSuiteVentiMetriQuadriService {
     @Autowired
     private InventarioRepository inventarioRepository;
 
+    @Autowired
+    private OrderEntityRepository orderEntityRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
     private BookingController bookingController;
     private BranchController  branchController;
 
     private StorageController storageController;
     private SupplierController supplierController;
+
+    private OrderController orderController;
 
     @BeforeEach
     public void init(){
@@ -129,6 +144,9 @@ public class TestSuiteVentiMetriQuadriService {
 
         StorageService storageService = new StorageService(storageRepository, supplierRepository, branchRepository, inventarioRepository);
         storageController = new StorageController(storageService);
+
+        OrderService orderService = new OrderService(orderEntityRepository, orderItemRepository, branchRepository, productRepository);
+        orderController = new OrderController(orderService);
     }
 
     private final String INSTANCE_CODE = "9999";
@@ -345,8 +363,9 @@ public class TestSuiteVentiMetriQuadriService {
         assertEquals(supplierDTOResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
         assertEquals(Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getAddress(), "123 Test Address");
 
-        ResponseEntity<ProductDTO> productDTOResponseEntity = supplierController.insertProduct(createRandomInstance("Product Name"),
-                Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId());
+        ResponseEntity<ProductDTO> productDTOResponseEntity = supplierController
+                .insertProduct(createRandomInstance("Product Name"),
+                        Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId());
 
         assertEquals("Product Name", Objects.requireNonNull(productDTOResponseEntity.getBody()).getName() );
         Optional<Product> productOptional = productRepository.findById(productDTOResponseEntity.getBody().getProductId());
@@ -359,7 +378,7 @@ public class TestSuiteVentiMetriQuadriService {
 
         assertEquals(1, byBranchCode.get().getSuppliers().stream().toList().get(0).getProducts().size());
 
-        ResponseEntity<BranchResponseEntity> branchResponseEntityResponseEntity = branchController.getBranch(userCode, branchCode);
+        ResponseEntity<BranchResponseEntity> branchResponseEntityResponseEntity = branchController.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
         assertEquals(1, Objects.requireNonNull(branchResponseEntityResponseEntity.getBody()).getSupplierDTOList().size());
 
         long supplierId = branchResponseEntityResponseEntity.getBody().getSupplierDTOList().get(0).getSupplierId();
@@ -374,11 +393,11 @@ public class TestSuiteVentiMetriQuadriService {
         assertEquals(HttpStatusCode.valueOf(200),
                 booleanResponseEntity.getStatusCode());
 
-        ResponseEntity<BranchResponseEntity> branchResponseEntityResponseEntity1 = branchController.getBranch(userCode, branchCode);
+        ResponseEntity<BranchResponseEntity> branchResponseEntityResponseEntity1 = branchController.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
         assertEquals(0, Objects.requireNonNull(branchResponseEntityResponseEntity1.getBody()).getSupplierDTOList().size());
 
         supplierController.associateSupplierToBranch(supplierId, branchId);
-        branchResponseEntityResponseEntity1 = branchController.getBranch(userCode, branchCode);
+        branchResponseEntityResponseEntity1 = branchController.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
         assertEquals(1, Objects.requireNonNull(branchResponseEntityResponseEntity1.getBody()).getSupplierDTOList().size());
         assertEquals(1, Objects.requireNonNull(branchResponseEntityResponseEntity1.getBody()).getSupplierDTOList().get(0).getProductDTOList().size());
 
@@ -400,7 +419,7 @@ public class TestSuiteVentiMetriQuadriService {
 
         supplierController.updateProduct(productDTO);
 
-        productDTO = Objects.requireNonNull(branchController.getBranch(userCode, branchCode).getBody()).getSupplierDTOList().get(0).getProductDTOList().get(0);
+        productDTO = Objects.requireNonNull(branchController.getBranchDataByBranchCodeAndUserCode(userCode, branchCode).getBody()).getSupplierDTOList().get(0).getProductDTOList().get(0);
 
         assertEquals("NEW PROD CODE", productDTO.getProductCode());
         assertEquals("NEW DESCRIPTION", productDTO.getDescription());
@@ -410,7 +429,7 @@ public class TestSuiteVentiMetriQuadriService {
 
         supplierController.deleteProductById(productDTO.getProductId(), supplierId);
 
-        branchResponseEntityResponseEntity1 = branchController.getBranch(userCode, branchCode);
+        branchResponseEntityResponseEntity1 = branchController.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
         assertEquals(0, branchResponseEntityResponseEntity1.getBody().getSupplierDTOList().get(0).getProductDTOList().size());
 
 
@@ -441,7 +460,7 @@ public class TestSuiteVentiMetriQuadriService {
                     Objects.requireNonNull(supplierDTOResponseEntity1.getBody()).getSupplierId());
         }
 
-        branchResponseEntityResponseEntity1 = branchController.getBranch(userCode, branchCode);
+        branchResponseEntityResponseEntity1 = branchController.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
         assertEquals(29, Objects.requireNonNull(branchResponseEntityResponseEntity1.getBody()).getSupplierDTOList().size());
 
         for(SupplierDTO supplierDTO : branchResponseEntityResponseEntity1.getBody().getSupplierDTOList()){
@@ -477,8 +496,37 @@ public class TestSuiteVentiMetriQuadriService {
                         .transactionItemList(transactionItemList)
                         .build());
 
-                System.out.println("zxxz");
 
+                ResponseEntity<ProductDTO> prod1 = supplierController
+                        .insertProduct(createRandomInstance("Product1"),
+                                Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId());
+
+                ResponseEntity<ProductDTO> prod2 = supplierController
+                        .insertProduct(createRandomInstance("Product2"),
+                                Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId());
+
+                Map<Long, Double> integerDoubleMap = new HashMap<>();
+
+                integerDoubleMap.put(prod1.getBody().getProductId(), 4.0);
+                integerDoubleMap.put(prod2.getBody().getProductId(), 65.0);
+
+                ResponseEntity<OrderDTO> orderDTO = orderController.createOrder(CreateOrderEntity
+                        .builder()
+                        .branchCode(branchCode)
+                        .userName("Angelo Amati")
+                        .orderTarget(OrderTarget.BRANCH)
+                        .incomingDate(LocalDate.now())
+                        .insertedDate(LocalDate.now())
+                        .branchCodeTarget("TARGETCODE")
+                        .supplierCodeTarget("")
+                        .orderItemAmountMap(integerDoubleMap)
+                        .build());
+
+                assertEquals("Angelo Amati", orderDTO.getBody().getCreatedBy());
+
+                assertEquals(2, orderDTO.getBody().getOrderItemDtoList().size());
+
+                System.out.println("");
             }
         }
     }

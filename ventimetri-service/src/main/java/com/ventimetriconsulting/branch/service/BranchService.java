@@ -3,11 +3,13 @@ package com.ventimetriconsulting.branch.service;
 import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.BranchResponseEntity;
 import com.ventimetriconsulting.branch.entity.*;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
+import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.branch.exception.customexceptions.GlobalException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
 import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
 import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
+import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
 import com.ventimetriconsulting.supplier.dto.SupplierDTO;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -141,8 +143,8 @@ public class BranchService {
                 .build();
     }
 
-    public BranchResponseEntity getBranch(String userCode,
-                                          String branchCode) {
+    public BranchResponseEntity getBranchDataByBranchCodeAndUserCode(String userCode,
+                                                                     String branchCode) {
 
         log.info("Retrieve branch for user with code {} and branch with code {}", userCode, branchCode);
         Optional<BranchUser> branchByUserCodeAndBranchCode = branchUserRepository.findBranchesByUserCodeAndBranchCode(userCode, branchCode);
@@ -153,7 +155,7 @@ public class BranchService {
         throw new BranchNotFoundException("Branch not found for user with code [" + userCode + "] and branch with code [" + branchCode + "] ");
     }
 
-    public BranchResponseEntity getBranchData(String branchCode) {
+    public BranchResponseEntity getBranchDataByBranchCode(String branchCode) {
         log.info("Retrieve branch info by code {}", branchCode);
         Optional<Branch> byBranchCode = branchRepository.findByBranchCode(branchCode);
         if(byBranchCode.isPresent()){
@@ -191,6 +193,31 @@ public class BranchService {
     }
 
 
+    public List<BranchResponseEntity> getBranchDataByBranchType(BranchType branchType) {
 
+        log.info("Get branch list by type {}", branchType);
+        List<BranchResponseEntity> branchResponseEntities = new ArrayList<>();
 
+        List<Branch> branchByTypeList = branchRepository.findByType(branchType);
+
+        for(Branch branch : branchByTypeList) {
+
+            branchResponseEntities.add(BranchResponseEntity.builder()
+                            .branchId(branch.getBranchId())
+                            .name(branch.getName())
+                            .address(branch.getAddress())
+                            .email(branch.getEmail())
+                            .phone(branch.getPhoneNumber())
+                            .vat(branch.getVat())
+                            .type(branch.getType())
+                            .branchCode(branch.getBranchCode())
+                            .logoImage(branch.getLogoImage())
+                            .role(null)
+                            .authorized(false)
+                            .supplierDTOList(new ArrayList<>())
+                            .storageDTOS(StorageDTO.toDTOList(branch.getStorages()))
+                            .build());
+        }
+        return branchResponseEntities;
+    }
 }

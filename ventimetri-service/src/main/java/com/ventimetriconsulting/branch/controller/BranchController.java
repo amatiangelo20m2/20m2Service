@@ -2,10 +2,10 @@ package com.ventimetriconsulting.branch.controller;
 
 import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.BranchResponseEntity;
 import com.ventimetriconsulting.branch.entity.Role;
+import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.branch.entity.dto.VentiMetriQuadriData;
 import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
-import com.ventimetriconsulting.supplier.dto.SupplierDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,21 +55,29 @@ public class BranchController {
                 .body(branchResponseEntity);
     }
 
-    @GetMapping(path = "/branch")
-    public ResponseEntity<BranchResponseEntity> getBranch(@RequestParam String userCode,
+    @GetMapping(path = "/branchdatabybranchcodeanduser")
+    public ResponseEntity<BranchResponseEntity> getBranchDataByBranchCodeAndUserCode(@RequestParam String userCode,
                                                           @RequestParam String branchCode) {
-        BranchResponseEntity branch = branchService.getBranch(userCode, branchCode);
+        BranchResponseEntity branch = branchService.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(branch);
     }
 
-    @GetMapping(path = "/getbranchdata")
-    public ResponseEntity<BranchResponseEntity> getBranchData(@RequestParam String branchCode) {
-        BranchResponseEntity branchData = branchService.getBranchData(branchCode);
+    @GetMapping(path = "/branchdatabybranchcode")
+    public ResponseEntity<BranchResponseEntity> getBranchDataByBranchCode(@RequestParam String branchCode) {
+        BranchResponseEntity branchData = branchService.getBranchDataByBranchCode(branchCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(branchData);
+    }
+
+    @GetMapping(path = "/branchdatabybranchtype")
+    public ResponseEntity<List<BranchResponseEntity>> getBranchDataByBranchType(@RequestParam BranchType branchType) {
+        List<BranchResponseEntity> branchDataByBranchType = branchService.getBranchDataByBranchType(branchType);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(branchDataByBranchType);
     }
 
     @PostMapping(path = "/setfmctoken")

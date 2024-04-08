@@ -4,15 +4,13 @@ import com.ventimetriconsulting.branch.configuration.bookingconf.entity.BranchCo
 import com.ventimetriconsulting.branch.configuration.bookingconf.entity.booking.Booking;
 import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.inventario.entity.Storage;
+import com.ventimetriconsulting.order.entIty.Order;
 import com.ventimetriconsulting.supplier.entity.Supplier;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "Branch")
 @Table(name = "BRANCH",
@@ -61,7 +59,8 @@ public class Branch {
     @Enumerated
     private BranchType type;
 
-    @Column(name = "logo_image", columnDefinition = "bytea")
+    @Column(name = "logo_image",
+            columnDefinition = "bytea")
     private byte[] logoImage;
 
     @OneToOne(mappedBy = "branch",
@@ -70,17 +69,26 @@ public class Branch {
             optional = true)
     private BranchConfiguration branchConfiguration;
 
-    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "branch",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
     private Set<Booking> bookings;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @OneToMany(mappedBy = "branch",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private Set<Order> orders;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE })
     @JoinTable(
             name = "branch_supplier",
             joinColumns = @JoinColumn(name = "branch_id"),
             inverseJoinColumns = @JoinColumn(name = "supplier_id"))
     private Set<Supplier> suppliers;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE })
     @JoinTable(
             name = "branch_storage",
             joinColumns = @JoinColumn(name = "branch_id"),

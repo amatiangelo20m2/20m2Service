@@ -87,7 +87,7 @@ public class Booking {
     private boolean isArrived = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id", nullable = true) // Assuming a booking might not always have a branch assigned
+    @JoinColumn(name = "branch_id", nullable = true)
     private Branch branch;
 
     @PrePersist

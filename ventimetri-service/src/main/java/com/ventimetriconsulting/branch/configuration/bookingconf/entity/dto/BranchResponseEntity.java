@@ -3,6 +3,7 @@ package com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto;
 import com.ventimetriconsulting.branch.entity.Role;
 import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
+import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
 import com.ventimetriconsulting.supplier.dto.SupplierDTO;
 import lombok.*;
 
@@ -25,7 +26,6 @@ public class BranchResponseEntity {
     private String branchCode;
     private Role role;
     private byte[] logoImage;
-
     private boolean authorized;
 
     private BranchConfigurationDTO branchConfigurationDTO;
