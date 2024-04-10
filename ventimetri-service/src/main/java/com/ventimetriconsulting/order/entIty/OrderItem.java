@@ -4,40 +4,23 @@ import com.ventimetriconsulting.supplier.entity.UnitMeasure;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity(name = "OrderItem")
-@Table(name = "order_item",
-        uniqueConstraints=
-        @UniqueConstraint(columnNames={"order_item_id"}))
-@AllArgsConstructor
+import java.io.Serializable;
+
+@Embeddable
 @Data
-@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class OrderItem {
+@Builder
+public class OrderItem implements Serializable {
 
-    @Id
-    @SequenceGenerator(
-            name = "order_item_id",
-            sequenceName = "order_item_id",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "order_item_id"
-    )
-    @Column(
-            name = "order_item_id",
-            updatable = false
-    )
-    private long orderItemId;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private long orderItemId;
 
-
-    private String productId;
+    private long productId;
     private String productName;
     private double quantity;
     private UnitMeasure unitMeasure;
     private double price;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
 }

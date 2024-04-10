@@ -13,6 +13,8 @@ public interface OrderEntityRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByBranchBranchCodeAndInsertedDateBetween(String branchCode, LocalDate startDate, LocalDate endDate);
 
+    List<Order> findByCodeTargetAndIncomingDateBetween(String branchCodeTarget, LocalDate startDate, LocalDate endDate);
+
 //    @Query("SELECT o FROM Order_Entity o WHERE o.branch = ?1 AND o.incomingDate = ?2")
 //    List<Order> findOrdersByIncomingDate(Branch branch, LocalDate incomingDate);
 

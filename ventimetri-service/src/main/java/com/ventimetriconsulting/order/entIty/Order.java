@@ -34,8 +34,9 @@ public class Order {
     )
     private long orderId;
 
-    private String createdBy;
+    private String createdByUser;
     private String userCode;
+    private String createdByBranchName;
 
     private LocalDate insertedDate;
     private LocalDate incomingDate;
@@ -48,39 +49,29 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderTarget orderTarget;
 
-    //valorized if orderTarget is SUPPLIER
-    private String supplierCodeTarget;
-
-    //valorized if orderTarget is BRANCH
-    private String branchCodeTarget;
+    private String codeTarget;
+    private String nameTarget;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = true)
     private Branch branch;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ElementCollection
+    @CollectionTable(
+            name = "order_items",
+            joinColumns = @JoinColumn(name = "order_id")
+    )
+    @OrderColumn(name = "position")
     private Set<OrderItem> orderItems;
 
+
+//    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    private Set<OrderItem> orderItems;
+//
     public Set<OrderItem> getOrderItems() {
         if (this.orderItems == null) {
             this.orderItems = new HashSet<>();
         }
         return this.orderItems;
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "orderId=" + orderId +
-                ", createdBy='" + createdBy + '\'' +
-                ", userCode='" + userCode + '\'' +
-                ", insertedDate=" + insertedDate +
-                ", incomingDate=" + incomingDate +
-                ", orderStatus=" + orderStatus +
-                ", orderTarget=" + orderTarget +
-                ", supplierCodeTarget='" + supplierCodeTarget + '\'' +
-                ", branchCodeTarget='" + branchCodeTarget + '\'' +
-                ", branch=" + branch +
-                '}';
     }
 }

@@ -16,4 +16,8 @@ public interface BranchUserRepository  extends JpaRepository<BranchUser, Long> {
 
     @Query("SELECT bu FROM BranchUser bu WHERE bu.userCode = ?1 AND bu.branch.branchCode = ?2")
     Optional<BranchUser> findBranchesByUserCodeAndBranchCode(String userCode, String branchCode);
+
+    @Query("SELECT bu.fMCToken FROM BranchUser bu WHERE bu.branch.branchCode = :branchCode AND bu.fMCToken IS NOT NULL")
+    List<String> findFMCTokensByBranchCode(String branchCode);
+
 }

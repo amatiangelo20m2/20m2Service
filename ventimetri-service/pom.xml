@@ -7,7 +7,7 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>ventimetri-service</artifactId>
-    <name>BusinessService</name>
+    <name>ventimetri-service</name>
 
 
     <dependencies>
@@ -77,6 +77,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
     </dependencies>
     <build>

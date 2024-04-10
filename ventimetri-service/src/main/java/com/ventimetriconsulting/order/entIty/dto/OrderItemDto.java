@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class OrderItemDto {
 
-    private long orderItemId;
+//    private long orderItemId;
     private long productId;
     private String productName;
     private double quantity;
@@ -26,8 +26,8 @@ public class OrderItemDto {
 
     public static OrderItemDto fromEntity(OrderItem orderItem) {
         return OrderItemDto.builder()
-                .orderItemId(orderItem.getOrderItemId())
-                .productId(orderItem.getOrderItemId())
+//                .orderItemId(orderItem.getOrderItemId())
+                .productId(orderItem.getProductId())
                 .quantity(orderItem.getQuantity())
                 .productName(orderItem.getProductName())
                 .unitMeasure(orderItem.getUnitMeasure())
@@ -37,7 +37,8 @@ public class OrderItemDto {
 
     public static OrderItem toEntity(OrderItemDto orderItemDto) {
         return OrderItem.builder()
-                .orderItemId(orderItemDto.getOrderItemId())
+//                .orderItemId(orderItemDto.getOrderItemId())
+                .productId(orderItemDto.getProductId())
                 .productName(orderItemDto.getProductName())
                 .quantity(orderItemDto.getQuantity())
                 .unitMeasure(orderItemDto.getUnitMeasure())

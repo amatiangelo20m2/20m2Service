@@ -10,3 +10,5 @@ select * from supplier;
 
 select * from branch_supplier;
 
+select * from order_entity;
+

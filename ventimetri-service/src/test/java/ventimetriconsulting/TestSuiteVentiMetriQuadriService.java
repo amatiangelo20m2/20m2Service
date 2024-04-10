@@ -31,7 +31,6 @@ import com.ventimetriconsulting.order.entIty.OrderTarget;
 import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
 import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
 import com.ventimetriconsulting.order.repository.OrderEntityRepository;
-import com.ventimetriconsulting.order.repository.OrderItemRepository;
 import com.ventimetriconsulting.order.service.OrderService;
 import com.ventimetriconsulting.supplier.controller.SupplierController;
 import com.ventimetriconsulting.supplier.dto.ProductDTO;
@@ -54,6 +53,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.ventimetriconsulting.branch.configuration.bookingconf.entity.BookingForm.FormType.BOOKING_FORM;
@@ -112,9 +112,6 @@ public class TestSuiteVentiMetriQuadriService {
     @Autowired
     private OrderEntityRepository orderEntityRepository;
 
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
     private BookingController bookingController;
     private BranchController  branchController;
 
@@ -145,7 +142,7 @@ public class TestSuiteVentiMetriQuadriService {
         StorageService storageService = new StorageService(storageRepository, supplierRepository, branchRepository, inventarioRepository);
         storageController = new StorageController(storageService);
 
-        OrderService orderService = new OrderService(orderEntityRepository, orderItemRepository, branchRepository, productRepository);
+        OrderService orderService = new OrderService(orderEntityRepository, branchRepository, productRepository, branchUserRepository);
         orderController = new OrderController(orderService);
     }
 
@@ -522,9 +519,50 @@ public class TestSuiteVentiMetriQuadriService {
                         .orderItemAmountMap(integerDoubleMap)
                         .build());
 
-                assertEquals("Angelo Amati", orderDTO.getBody().getCreatedBy());
+                assertEquals("Angelo Amati", orderDTO.getBody().getCreatedByUser());
 
                 assertEquals(2, orderDTO.getBody().getOrderItemDtoList().size());
+
+                System.out.println("");
+
+                LocalDate today = LocalDate.now();
+
+                // Define the date format pattern
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                // Calculate 3 days before today
+                LocalDate threeDaysBefore = today.minusDays(3);
+
+                // Calculate 3 days after today
+                LocalDate threeDaysAfter = today.plusDays(3);
+
+                String threeDaysBeforeString = threeDaysBefore.format(formatter);
+                String threeDaysAfterString = threeDaysAfter.format(formatter);
+
+                ResponseEntity<List<OrderDTO>> orderByBrancCode = orderController
+                        .getOrderByBrancCode(branchCode, threeDaysBeforeString, threeDaysAfterString);
+
+                assertEquals(1, orderByBrancCode.getBody().size());
+                assertEquals(2, orderByBrancCode.getBody().get(0).getOrderItemDtoList().size());
+
+                orderController.deleteOrderItemFromOrder(orderByBrancCode.getBody().get(0).getOrderId(),
+                        orderByBrancCode.getBody().get(0).getOrderItemDtoList().stream().toList().get(0).getProductId());
+
+                orderByBrancCode = orderController
+                        .getOrderByBrancCode(branchCode, threeDaysBeforeString, threeDaysAfterString);
+
+                assertEquals(1, orderByBrancCode.getBody().size());
+                assertEquals(1, orderByBrancCode.getBody().get(0).getOrderItemDtoList().size());
+
+
+
+                orderController.deleteOrder(orderByBrancCode.getBody().get(0).getOrderId());
+
+                orderByBrancCode = orderController
+                        .getOrderByBrancCode(branchCode, threeDaysBeforeString, threeDaysAfterString);
+
+                assertEquals(0, orderByBrancCode.getBody().size());
+
 
                 System.out.println("");
             }
