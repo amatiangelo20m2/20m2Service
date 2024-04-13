@@ -6,11 +6,14 @@ import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.branch.entity.dto.VentiMetriQuadriData;
 import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
+import com.ventimetriconsulting.notification.entity.MessageSender;
+import com.ventimetriconsulting.notification.entity.NotificationEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,6 +22,8 @@ import java.util.List;
 public class BranchController {
 
     private BranchService branchService;
+
+    private MessageSender messageSender;
 
     @GetMapping(path = "/retrievedata")
     public ResponseEntity<VentiMetriQuadriData> retrieveData(@RequestParam String userCode){
@@ -57,7 +62,7 @@ public class BranchController {
 
     @GetMapping(path = "/branchdatabybranchcodeanduser")
     public ResponseEntity<BranchResponseEntity> getBranchDataByBranchCodeAndUserCode(@RequestParam String userCode,
-                                                          @RequestParam String branchCode) {
+                                                                                     @RequestParam String branchCode) {
         BranchResponseEntity branch = branchService.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -83,7 +88,24 @@ public class BranchController {
     @PostMapping(path = "/setfmctoken")
     public ResponseEntity<Void> setFcmToken(@RequestParam String userCode, @RequestParam String branchCode,
                                             @RequestParam String fcmToken) {
-        branchService.setFcmToken(userCode, branchCode, fcmToken);
+        branchService.setFcmToken(userCode,
+                branchCode,
+                fcmToken);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping(path = "/publishqueue")
+    public void publishMessage() {
+
+        ArrayList<String> tokens = new ArrayList<>();
+        tokens.add("ddGCaygpRISFxQJ8omYY70:APA91bEHG8hGWW6TSnDiK7iuBCaifm6fdAVtdxQY5zbzvAOQuQ_hrjO5rozAuGPBatv3BC1PiEoSsIwyYW3glk1czdZe69787bLzgyB-dQXSq6e6vznQ73FMkG1KpfGvONT2n_SJD2UO");
+
+        messageSender.enqueMessage(NotificationEntity
+                .builder()
+                .title("sadasdasdsad")
+                .message("asdfsdfsdfsdfsfdsdfsdf sdfsd fsdfsdf sd f")
+                .fmcToken(tokens)
+                .notificationType(NotificationEntity.NotificationType.IN_APP_NOTIFICATION)
+                .build());
     }
 }

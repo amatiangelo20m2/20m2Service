@@ -90,8 +90,6 @@ public class OrderService {
 
         savedOrder.setOrderStatus(OrderStatus.CREATED);
 
-//        Order orderAfterSaving = orderEntityRepository.findById(
-//                savedOrder.getOrderId()).orElseThrow(() -> new OrderNotFound("Exception thowed while getting data. No order found with id  : " + savedOrder.getOrderId() + ". Cannot retrieve order."));
 
         return OrderDTO.toDTO(savedOrder);
     }
