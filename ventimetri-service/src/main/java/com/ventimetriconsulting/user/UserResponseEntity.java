@@ -1,13 +1,12 @@
-package com.venticonsulting.authservice.entity.dto;
+package com.ventimetriconsulting.user;
 
-import com.venticonsulting.authservice.entity.ProfileStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @AllArgsConstructor
 @Data
 @Builder
+@NoArgsConstructor
+@ToString
 public class UserResponseEntity {
 
     private String name;
@@ -16,7 +15,9 @@ public class UserResponseEntity {
     private String avatar;
     private ProfileStatus status;
     private String userCode;
-
-    //TODO : fcm token here is useless - remove
     private String fcmToken;
+
+    public enum ProfileStatus {
+        ONLINE, AWAY, BUSY, INVISIBLE
+    }
 }

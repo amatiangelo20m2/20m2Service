@@ -1,9 +1,12 @@
 package com.ventimetriconsulting.branch.repository;
 
 import com.ventimetriconsulting.branch.entity.BranchUser;
+import com.ventimetriconsulting.branch.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +20,17 @@ public interface BranchUserRepository  extends JpaRepository<BranchUser, Long> {
     @Query("SELECT bu FROM BranchUser bu WHERE bu.userCode = ?1 AND bu.branch.branchCode = ?2")
     Optional<BranchUser> findBranchesByUserCodeAndBranchCode(String userCode, String branchCode);
 
-    @Query("SELECT bu.fMCToken FROM BranchUser bu WHERE bu.branch.branchCode = :branchCode AND bu.fMCToken IS NOT NULL")
+    @Query("SELECT bu.fMCToken FROM BranchUser bu WHERE " +
+            "bu.branch.branchCode = :branchCode AND bu.fMCToken IS NOT NULL")
     List<String> findFMCTokensByBranchCode(String branchCode);
+
+    @Query("SELECT bu.fMCToken FROM BranchUser bu WHERE " +
+            "bu.branch.branchCode = :branchCode " +
+            "AND bu.fMCToken IS NOT NULL AND bu.role = :role")
+    List<String> findFMCTokensByBranchCodeAndRole(String branchCode, Role role);
+
+    @Query("SELECT bu FROM BranchUser bu WHERE bu.branch.branchCode = ?1")
+    Optional<List<BranchUser>> findBranchesEmployee(String branchCode);
+
 
 }

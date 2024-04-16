@@ -1,5 +1,8 @@
 package com.ventimetriconsulting.branch.entity.dto;
 
 public enum BranchType {
-    RESTAURANT, SUPPLIER, CATERING, STORAGE
+    RESTAURANT,
+    SUPPLIER,
+    CATERING,
+    STORAGE
 }

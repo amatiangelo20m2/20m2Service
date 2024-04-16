@@ -177,6 +177,25 @@ public class AuthService {
         }
     }
 
+    public UserResponseEntity retrieveUserByUserCode(String userCode) {
+        log.info("Retrieve user by code : {}", userCode);
+
+        Optional<UserEntity> userOpt = userRepository.findByUserCode(userCode);
+        if(userOpt.isPresent()){
+            return UserResponseEntity
+                    .builder()
+                    .email(userOpt.get().getEmail())
+                    .name(userOpt.get().getName())
+                    .phone(userOpt.get().getPhone())
+                    .status(userOpt.get().getProfileStatus())
+                    .avatar(userOpt.get().getAvatar())
+                    .userCode(userOpt.get().getUserCode())
+                    .build();
+        }else{
+            log.error("User not found with the following code [{}] ", userCode);
+            throw new UserNotFoundException("User not found with the following userCode: " + userCode);
+        }
+    }
     public void deleteUserByEmail(String email) {
         log.info("Delete user by email : {}", email);
         if(userRepository.findByEmail(email).isPresent()){
@@ -251,4 +270,6 @@ public class AuthService {
 
         return userEntity.getFmcToken();
     }
+
+
 }

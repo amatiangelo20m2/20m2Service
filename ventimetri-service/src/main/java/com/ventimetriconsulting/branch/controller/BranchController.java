@@ -8,6 +8,7 @@ import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
 import com.ventimetriconsulting.notification.entity.MessageSender;
 import com.ventimetriconsulting.notification.entity.NotificationEntity;
+import com.ventimetriconsulting.user.EmployeeEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,6 @@ public class BranchController {
 
     private BranchService branchService;
 
-    private MessageSender messageSender;
-
     @GetMapping(path = "/retrievedata")
     public ResponseEntity<VentiMetriQuadriData> retrieveData(@RequestParam String userCode){
         List<BranchResponseEntity> branchesByUserCode = branchService.getBranchesByUserCode(userCode);
@@ -37,13 +36,20 @@ public class BranchController {
     }
 
     @PutMapping(path = "/linkusertobranch")
-    public ResponseEntity<VentiMetriQuadriData> linkUserToBranch(@RequestParam String userCode,
-                                                                 @RequestParam List<String> branchCodes,
-                                                                 @RequestParam Role role,
-                                                                 @RequestParam String fcmToken){
+    public ResponseEntity<VentiMetriQuadriData> linkUserToBranch(
+            @RequestParam String userName,
+            @RequestParam String userCode,
+            @RequestParam List<String> branchCodes,
+            @RequestParam Role role,
+            @RequestParam String fcmToken){
 
         List<BranchResponseEntity> branchesByUserCode = branchService
-                .linkUserToBranch(userCode, branchCodes, role, fcmToken);
+                .linkUserToBranch(
+                        userName,
+                        userCode,
+                        branchCodes,
+                        role,
+                        fcmToken);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(VentiMetriQuadriData
@@ -94,18 +100,21 @@ public class BranchController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping(path = "/publishqueue")
-    public void publishMessage() {
+    @GetMapping(path = "/retrieveemployeebybranchcode")
+    public ResponseEntity<List<EmployeeEntity>> getEmployeeByBranchCode(@RequestParam String branchCode){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(branchService
+                        .getEmployeeByBranchCode(branchCode));
+    }
 
-        ArrayList<String> tokens = new ArrayList<>();
-        tokens.add("ddGCaygpRISFxQJ8omYY70:APA91bEHG8hGWW6TSnDiK7iuBCaifm6fdAVtdxQY5zbzvAOQuQ_hrjO5rozAuGPBatv3BC1PiEoSsIwyYW3glk1czdZe69787bLzgyB-dQXSq6e6vznQ73FMkG1KpfGvONT2n_SJD2UO");
+    @PutMapping(path = "/confirmemployee")
+    public ResponseEntity<Void> confirmEmployee(@RequestParam String branchCode, @RequestParam String userCode){
 
-        messageSender.enqueMessage(NotificationEntity
-                .builder()
-                .title("sadasdasdsad")
-                .message("asdfsdfsdfsdfsfdsdfsdf sdfsd fsdfsdf sd f")
-                .fmcToken(tokens)
-                .notificationType(NotificationEntity.NotificationType.IN_APP_NOTIFICATION)
-                .build());
+        branchService.confirmEmployee(branchCode, userCode);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(null);
     }
 }

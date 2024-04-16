@@ -12,3 +12,9 @@ select * from branch_supplier;
 
 select * from order_entity;
 
+delete
+from branch_user
+where authorized = false;
+delete
+from branch_user
+where authorized = false;

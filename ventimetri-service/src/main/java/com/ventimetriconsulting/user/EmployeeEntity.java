@@ -1,22 +1,26 @@
-package com.venticonsulting.authservice.entity.dto;
+package com.ventimetriconsulting.user;
 
-import com.venticonsulting.authservice.entity.ProfileStatus;
+import com.ventimetriconsulting.branch.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Data
 @Builder
-public class UserResponseEntity {
+@NoArgsConstructor
+public class EmployeeEntity {
 
     private String name;
     private String phone;
     private String email;
     private String avatar;
-    private ProfileStatus status;
+    private UserResponseEntity.ProfileStatus status;
     private String userCode;
-
     //TODO : fcm token here is useless - remove
     private String fcmToken;
+    private String branchCode;
+    private Role role;
+    private boolean authorized;
 }

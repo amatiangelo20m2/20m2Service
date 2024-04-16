@@ -5,6 +5,8 @@ import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFound
 import com.ventimetriconsulting.branch.exception.customexceptions.ProductNotFoundException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
+import com.ventimetriconsulting.notification.entity.MessageSender;
+import com.ventimetriconsulting.notification.entity.NotificationEntity;
 import com.ventimetriconsulting.order.entIty.Order;
 import com.ventimetriconsulting.order.entIty.OrderItem;
 import com.ventimetriconsulting.order.entIty.OrderStatus;
@@ -34,6 +36,7 @@ public class OrderService {
     private BranchRepository branchRepository;
     private ProductRepository productRepository;
     private BranchUserRepository branchUserRepository;
+    private MessageSender messageSender;
 
     @Transactional
     public OrderDTO createOrder(CreateOrderEntity createOrderEntity) {
@@ -68,28 +71,49 @@ public class OrderService {
 
         log.info("Add to order created in a DRAFT satus the product: ");
 
+        StringBuilder productsForNotification = new StringBuilder();
+
         createOrderEntity.getOrderItemAmountMap().forEach((prodId, prodAmount) -> {
 
             Product product = productRepository.findById(prodId)
                     .orElseThrow(() -> new ProductNotFoundException("Exception thowed while getting data. No product found with id  : " + prodId + ". Cannot create order." ));
 
-            log.info(" - {} x {} {}", product.getName(), prodAmount, product.getUnitMeasure());
+            log.info(" - {} x {} {}", product.getName(), prodAmount , product.getUnitMeasure());
+            productsForNotification
+                    .append("\n - ")
+                    .append(prodAmount.toString())
+                    .append(" ")
+                    .append(product.getUnitMeasure())
+                            .append(" ").append(product.getName());
+
             savedOrder.getOrderItems().add(OrderItem.builder()
-//                    .orderItemId(0L)
                     .productId(product.getProductId())
                     .productName(product.getName())
                     .quantity(prodAmount)
                     .price(product.getPrice())
                     .unitMeasure(product.getUnitMeasure())
                     .build());
+
+
         });
 
         log.info("Save order with status SENT");
 
-        //TODO: send app notification
 
         savedOrder.setOrderStatus(OrderStatus.CREATED);
 
+        //TODO: send app notification
+
+        List<String> fmcTokensByBranchCode
+                = branchUserRepository.findFMCTokensByBranchCode(createOrderEntity.getBranchCodeTarget());
+
+        messageSender.enqueMessage(NotificationEntity
+                .builder()
+                        .title("\uD83D\uDCE6 Ordine da " + byBranchCode.getName() +" eseguito da " + createOrderEntity.getUserName())
+                        .message(productsForNotification.toString())
+                        .fmcToken(fmcTokensByBranchCode)
+                        .notificationType(NotificationEntity.NotificationType.IN_APP_NOTIFICATION)
+                .build());
 
         return OrderDTO.toDTO(savedOrder);
     }

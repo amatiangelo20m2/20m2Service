@@ -42,6 +42,7 @@ public class FirebaseNotificationService {
                     response.getStatusCode(),
                     response.getBody(),
                     response.getClass());
+
             FCMResponse body1 = response.getBody();
 
             log.info("Body casted: {}", body1 );

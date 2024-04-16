@@ -34,6 +34,12 @@ public class AuthController {
         return userService.retrieveUserByEmail(email);
     }
 
+    @GetMapping(path = "/retrievebyusercode")
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponseEntity retrieveUserByUserCode(@RequestParam(name="userCode") String userCode){
+        return userService.retrieveUserByUserCode(userCode);
+    }
+
     @PostMapping(path = "/sign-in")
     @ResponseStatus(HttpStatus.OK)
     public AuthResponseEntity signIn(@RequestBody Credentials credentials){

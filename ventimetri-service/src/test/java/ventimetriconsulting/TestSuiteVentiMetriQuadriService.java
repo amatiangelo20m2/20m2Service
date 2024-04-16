@@ -26,6 +26,7 @@ import com.ventimetriconsulting.inventario.entity.extra.OperationType;
 import com.ventimetriconsulting.inventario.repository.InventarioRepository;
 import com.ventimetriconsulting.inventario.repository.StorageRepository;
 import com.ventimetriconsulting.inventario.service.StorageService;
+import com.ventimetriconsulting.notification.entity.MessageSender;
 import com.ventimetriconsulting.order.controller.OrderController;
 import com.ventimetriconsulting.order.entIty.OrderTarget;
 import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
@@ -50,6 +51,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -123,7 +125,13 @@ public class TestSuiteVentiMetriQuadriService {
     @BeforeEach
     public void init(){
 
-        BranchService branchService = new BranchService(branchRepository, branchUserRepository);
+        MessageSender messageSender = new MessageSender(null);
+
+        BranchService branchService = new BranchService(
+                branchRepository,
+                branchUserRepository,
+                messageSender,
+                WebClient.builder().build());
         branchController = new BranchController(branchService);
 
         BookingService bookingService = new BookingService(
@@ -142,7 +150,12 @@ public class TestSuiteVentiMetriQuadriService {
         StorageService storageService = new StorageService(storageRepository, supplierRepository, branchRepository, inventarioRepository);
         storageController = new StorageController(storageService);
 
-        OrderService orderService = new OrderService(orderEntityRepository, branchRepository, productRepository, branchUserRepository);
+
+        OrderService orderService = new OrderService(orderEntityRepository,
+                branchRepository,
+                productRepository,
+                branchUserRepository,
+                messageSender);
         orderController = new OrderController(orderService);
     }
 
@@ -157,7 +170,7 @@ public class TestSuiteVentiMetriQuadriService {
                 = branchController.save(createFakeBranchCreationEntity(userCode));
 
         assertTrue(saveBranchResponseEntityResponseEntity.getStatusCode().is2xxSuccessful());
-        assertEquals(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getRole(), Role.PROPRIETARIO);
+        assertEquals(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getRole(), Role.AMMINISTRATORE);
         assertEquals(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getEmail(), "testbranch@example.com");
         assertEquals(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getName(), "Test Branch");
         assertEquals(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getBranchCode().length(), 10 );

@@ -79,6 +79,16 @@ services:
 #      - zipkin
 #      - discovery-server
 #      - api-gw
+#  notification-service:
+#    image: amatiangelo1990/20m2:notification-service
+#    container_name: notification-service
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#      - api-gw
 #  ventimetri-service:
 #    image: amatiangelo1990/20m2:ventimetri-service
 #    container_name: ventimetri-service
@@ -88,7 +98,8 @@ services:
 #    depends_on:
 #      - zipkin
 #      - discovery-server
-#      - api-gw
+#      - api-gw#
+#      - notification-service
 
 volumes:
   data: {}

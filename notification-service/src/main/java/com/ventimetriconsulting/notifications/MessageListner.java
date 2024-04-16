@@ -20,8 +20,14 @@ public class MessageListner {
 
         log.info("Received message: {}", notificationEntity);
         for(String fcmToken : notificationEntity.getFmcToken()){
+
             log.info("send notification: {}", fcmToken);
-            notificationService.sendNotification(fcmToken, notificationEntity.getMessage(), notificationEntity.getMessage());
+
+            notificationService.sendNotification(fcmToken,
+                    notificationEntity.getTitle(),
+                    notificationEntity.getMessage());
+
+
         }
     }
 }
