@@ -19,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -94,12 +93,26 @@ public class BranchService {
         }
     }
 
+    public List<BranchResponseEntity> retrieveAll() {
+        log.info("Retrieve all branches..");
+        List<Branch> branches = branchRepository
+                .findAll();
+        if(branches.isEmpty()) {
+            return new ArrayList<>();
+        }else{
+            return branches.stream()
+                    .map(this::convertToBranchResponseEntity)
+                    .collect(Collectors.toList());
+        }
+    }
+
     @Transactional
     public List<BranchResponseEntity> getBranchesByUserCode(String userCode) {
 
         log.info("Retrieve branches for user with code {}", userCode);
         List<BranchUser> branchesByUserCode = branchUserRepository
-                .findBranchesByUserCode(userCode).orElseThrow(() -> new BranchNotFoundException("Exception thowed while getting data for user with code : " + userCode + ". Cannot associate the storage" ));;
+                .findBranchesByUserCode(userCode).orElseThrow(()
+                        -> new BranchNotFoundException("Exception thowed while getting data for user with code : " + userCode + ". Cannot associate the storage" ));;
 
         if(branchesByUserCode.isEmpty()) {
             return new ArrayList<>();
@@ -151,8 +164,6 @@ public class BranchService {
             messageSender.enqueMessage(notificationEntity);
         }
 
-
-
         return getBranchesByUserCode(userCode);
     }
     private BranchResponseEntity convertToBranchResponseEntity(BranchUser branchUser) {
@@ -171,6 +182,25 @@ public class BranchService {
                 .authorized(branchUser.isAuthorized())
                 .supplierDTOList(SupplierDTO.toDTOList(branchUser.getBranch().getSuppliers()))
                 .storageDTOS(StorageDTO.toDTOList(branchUser.getBranch().getStorages()))
+                .build();
+    }
+
+    private BranchResponseEntity convertToBranchResponseEntity(Branch branch) {
+        log.info("Convert Branch object to a dto" + branch.toString());
+        return BranchResponseEntity.builder()
+                .branchId(branch.getBranchId())
+                .name(branch.getName())
+                .address(branch.getAddress())
+                .email(branch.getEmail())
+                .phone(branch.getPhoneNumber())
+                .vat(branch.getVat())
+                .type(branch.getType())
+                .branchCode(branch.getBranchCode())
+                .logoImage(branch.getLogoImage())
+                .role(null)
+                .authorized(false)
+                .supplierDTOList(new ArrayList<>())
+                .storageDTOS(new ArrayList<>())
                 .build();
     }
 
@@ -242,6 +272,8 @@ public class BranchService {
                     .logoImage(byBranchCode.get().getLogoImage())
                     .phone(byBranchCode.get().getPhoneNumber())
                     .email(byBranchCode.get().getEmail())
+                    .storageDTOS(StorageDTO.toDTOList(byBranchCode.get().getStorages()))
+                    .supplierDTOList(SupplierDTO.toDTOList(byBranchCode.get().getSuppliers()))
                     .authorized(true)
                     .build();
         }else{
@@ -307,5 +339,31 @@ public class BranchService {
             log.info("Updating authorization for {}", branchesByUserCodeAndBranchCode.get());
             branchesByUserCodeAndBranchCode.get().setAuthorized(true);
         }
+    }
+
+
+    public BranchResponseEntity getBranchesByUserCodeAndBranchCode(String userCode,
+                                                                         String branchCode) {
+
+        log.info("Retrieve branch for user with code [{}] and branch code [{}]", userCode, branchCode);
+
+        BranchUser retrievedBranch = branchUserRepository.findByUserCodeAndBranchCode(userCode, branchCode).orElseThrow(()
+                -> new BranchNotFoundException("Branch user relation not found for branch with code: "
+                + branchCode + " and user code " + userCode));
+
+
+        return BranchResponseEntity.builder()
+                .branchId(retrievedBranch.getBranch().getBranchId())
+                .branchCode(retrievedBranch.getBranch().getBranchCode())
+                .phone(retrievedBranch.getBranch().getPhoneNumber())
+                .email(retrievedBranch.getBranch().getEmail())
+                .address(retrievedBranch.getBranch().getAddress())
+                .vat(retrievedBranch.getBranch().getVat())
+                .type(retrievedBranch.getBranch().getType())
+                .name(retrievedBranch.getBranch().getName())
+                .role(retrievedBranch.getRole())
+                .authorized(retrievedBranch.isAuthorized())
+                .logoImage(retrievedBranch.getBranch().getLogoImage())
+                .build();
     }
 }

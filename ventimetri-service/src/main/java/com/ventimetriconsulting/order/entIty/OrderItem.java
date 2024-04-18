@@ -22,5 +22,7 @@ public class OrderItem implements Serializable {
     private double quantity;
     private UnitMeasure unitMeasure;
     private double price;
+    private boolean isDoneBySupplier;
+    private boolean isReceived;
 
 }

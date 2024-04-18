@@ -44,6 +44,9 @@ import com.ventimetriconsulting.supplier.service.SupplierService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -60,7 +63,9 @@ import java.util.*;
 
 import static com.ventimetriconsulting.branch.configuration.bookingconf.entity.BookingForm.FormType.BOOKING_FORM;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @DataJpaTest
@@ -122,16 +127,27 @@ public class TestSuiteVentiMetriQuadriService {
 
     private OrderController orderController;
 
+    private WebClient.Builder loadBalancedWebClientBuilder;
+
+    @Mock
+    private RabbitTemplate rabbitTemplate;
+
+    @InjectMocks
+    private MessageSender messageSender;
+
     @BeforeEach
     public void init(){
 
-        MessageSender messageSender = new MessageSender(null);
+        doNothing().when(rabbitTemplate).convertAndSend(any());
+
+        messageSender = new MessageSender(rabbitTemplate);
 
         BranchService branchService = new BranchService(
                 branchRepository,
                 branchUserRepository,
                 messageSender,
-                WebClient.builder().build());
+                loadBalancedWebClientBuilder);
+
         branchController = new BranchController(branchService);
 
         BookingService bookingService = new BookingService(
@@ -166,6 +182,7 @@ public class TestSuiteVentiMetriQuadriService {
     public void testBranchCreation() {
 
         String userCode = "USERCODE10";
+        String userCode1 = "USERCODE11";
         ResponseEntity<BranchResponseEntity> saveBranchResponseEntityResponseEntity
                 = branchController.save(createFakeBranchCreationEntity(userCode));
 
@@ -290,15 +307,12 @@ public class TestSuiteVentiMetriQuadriService {
             assertFalse(branchTimeRangeDTO.isClosed());
         }
 
-
         assertEquals(2, branchConfigurationAfterConfigureOpening.getTags().size());
         assertEquals(13, branchConfigurationAfterConfigureOpening.getGuests());
         assertEquals(20, branchConfigurationAfterConfigureOpening.getGuestReceivingAuthConfirm());
         assertEquals(30, branchConfigurationAfterConfigureOpening.getMinBeforeSendConfirmMessage());
         assertEquals(30, branchConfigurationAfterConfigureOpening.getMaxTableNumber());
         assertTrue(branchConfigurationAfterConfigureOpening.isReservationConfirmedManually());
-
-
 
         BranchResponseEntity mockResponse = BranchResponseEntity.builder()
                 .branchId(0)
@@ -520,6 +534,12 @@ public class TestSuiteVentiMetriQuadriService {
                 integerDoubleMap.put(prod1.getBody().getProductId(), 4.0);
                 integerDoubleMap.put(prod2.getBody().getProductId(), 65.0);
 
+                ResponseEntity<BranchResponseEntity> targetBranch = branchController.save(createFakeBranchCreationEntity(userCode1));
+
+
+
+
+
                 ResponseEntity<OrderDTO> orderDTO = orderController.createOrder(CreateOrderEntity
                         .builder()
                         .branchCode(branchCode)
@@ -527,7 +547,7 @@ public class TestSuiteVentiMetriQuadriService {
                         .orderTarget(OrderTarget.BRANCH)
                         .incomingDate(LocalDate.now())
                         .insertedDate(LocalDate.now())
-                        .branchCodeTarget("TARGETCODE")
+                        .branchCodeTarget(targetBranch.getBody().getBranchCode())
                         .supplierCodeTarget("")
                         .orderItemAmountMap(integerDoubleMap)
                         .build());
@@ -576,7 +596,6 @@ public class TestSuiteVentiMetriQuadriService {
 
                 assertEquals(0, orderByBrancCode.getBody().size());
 
-
                 System.out.println("");
             }
         }
@@ -623,7 +642,7 @@ public class TestSuiteVentiMetriQuadriService {
                 .cap("12345")
                 .phoneNumber("123-456-7890")
                 .vat("VAT123456")
-                .type(BranchType.RESTAURANT)
+                .type(BranchType.RISTORANTE)
                 .logoImage(new byte[]{/* byte array for logo image */})
                 .build();
     }

@@ -23,6 +23,9 @@ public class OrderItemDto {
     private double quantity;
     private UnitMeasure unitMeasure;
     private double price;
+    private boolean isDoneBySupplier;
+    private boolean isReceived;
+
 
     public static OrderItemDto fromEntity(OrderItem orderItem) {
         return OrderItemDto.builder()
@@ -32,6 +35,8 @@ public class OrderItemDto {
                 .productName(orderItem.getProductName())
                 .unitMeasure(orderItem.getUnitMeasure())
                 .price(orderItem.getPrice())
+                .isDoneBySupplier(orderItem.isDoneBySupplier())
+                .isReceived(orderItem.isReceived())
                 .build();
     }
 
@@ -43,6 +48,8 @@ public class OrderItemDto {
                 .quantity(orderItemDto.getQuantity())
                 .unitMeasure(orderItemDto.getUnitMeasure())
                 .price(orderItemDto.getPrice())
+                .isDoneBySupplier(orderItemDto.isDoneBySupplier)
+                .isReceived(orderItemDto.isReceived())
                 .build();
     }
 

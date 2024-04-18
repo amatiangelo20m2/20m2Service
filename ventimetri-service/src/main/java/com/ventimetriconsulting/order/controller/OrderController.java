@@ -22,8 +22,6 @@ public class OrderController {
 
     private OrderService orderService;
 
-
-
     @PostMapping(path = "/create")
     public ResponseEntity<OrderDTO> createOrder(@RequestBody CreateOrderEntity createOrderEntity){
         OrderDTO orderDTO = orderService.createOrder(createOrderEntity);
@@ -62,16 +60,12 @@ public class OrderController {
 
     @PutMapping(path = "/update")
     public ResponseEntity<OrderDTO> updateOrder(@RequestParam long orderId,
-                                                @RequestBody OrderItemDto orderItemDto) {
+                                                @RequestBody List<OrderItemDto> orderItemDtoList) {
         try {
             orderService.updateOrderItem(orderId,
-                    orderItemDto.getProductId(),
-                    orderItemDto.getProductName(),
-                    orderItemDto.getQuantity(),
-                    orderItemDto.getUnitMeasure(),
-                    orderItemDto.getPrice());
+                    orderItemDtoList);
 
-            return ResponseEntity.status(HttpStatus.OK).body(null);
+            return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }

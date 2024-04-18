@@ -32,5 +32,8 @@ public interface BranchUserRepository  extends JpaRepository<BranchUser, Long> {
     @Query("SELECT bu FROM BranchUser bu WHERE bu.branch.branchCode = ?1")
     Optional<List<BranchUser>> findBranchesEmployee(String branchCode);
 
+    @Query("SELECT bu FROM BranchUser bu WHERE bu.userCode = ?1 AND bu.branch.branchCode = ?2")
+    Optional<BranchUser> findByUserCodeAndBranchCode(String userCode, String branchCode);
+
 
 }

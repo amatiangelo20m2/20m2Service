@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface OrderEntityRepository extends JpaRepository<Order, Long> {
 
-    List<Order> findByBranchBranchCodeAndInsertedDateBetween(String branchCode, LocalDate startDate, LocalDate endDate);
+    List<Order> findByBranchBranchCodeAndIncomingDateBetween(String branchCode, LocalDate startDate, LocalDate endDate);
 
     List<Order> findByCodeTargetAndIncomingDateBetween(String branchCodeTarget, LocalDate startDate, LocalDate endDate);
 

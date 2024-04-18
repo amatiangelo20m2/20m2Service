@@ -35,6 +35,25 @@ public class BranchController {
                         .build());
     }
 
+    @GetMapping(path = "/retrievebranchbyusercodeandbranchcode")
+    public ResponseEntity<BranchResponseEntity> retrieveBranchByUserCodeAndBranchCode(@RequestParam String userCode, @RequestParam String branchCode){
+        BranchResponseEntity branchesByUserCode = branchService.getBranchesByUserCodeAndBranchCode(userCode, branchCode);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(branchesByUserCode);
+    }
+
+    @GetMapping(path = "/retrieveall")
+    public ResponseEntity<VentiMetriQuadriData> retrieveAll(){
+        List<BranchResponseEntity> branchesByUserCode = branchService.retrieveAll();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(VentiMetriQuadriData
+                        .builder()
+                        .branches(branchesByUserCode)
+                        .build());
+    }
+
     @PutMapping(path = "/linkusertobranch")
     public ResponseEntity<VentiMetriQuadriData> linkUserToBranch(
             @RequestParam String userName,

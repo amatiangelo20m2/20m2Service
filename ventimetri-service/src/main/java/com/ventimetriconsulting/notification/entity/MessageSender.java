@@ -19,9 +19,11 @@ public class MessageSender {
 
         log.info("Sending notification message {}", notificationEntity);
 
-        rabbitTemplate.convertAndSend("queue_20m2", notificationEntity, message -> {
-            message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
-            return message;
-        });
+        if(rabbitTemplate != null){
+            rabbitTemplate.convertAndSend("queue_20m2", notificationEntity, message -> {
+                message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                return message;
+            });
+        }
     }
 }

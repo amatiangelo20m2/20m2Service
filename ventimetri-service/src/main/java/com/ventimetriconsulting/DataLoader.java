@@ -50,7 +50,7 @@
 //                .cap("72014")
 //                .phoneNumber("3454937047")
 //                .vat("VAT123456")
-//                .type(BranchType.STORAGE)
+//                .type(BranchType.MAGAZZINO)
 //                .logoImage(new byte[]{})
 //                .build();
 //
@@ -78,7 +78,7 @@
 //                .cap("72014")
 //                .phoneNumber("3454937047")
 //                .vat("VAT123456")
-//                .type(BranchType.RESTAURANT)
+//                .type(BranchType.RISTORANTE)
 //                .logoImage(new byte[]{})
 //                .build();
 //
@@ -92,7 +92,7 @@
 //                .cap("72014")
 //                .phoneNumber("3454937047")
 //                .vat("VAT123456")
-//                .type(BranchType.RESTAURANT)
+//                .type(BranchType.RISTORANTE)
 //                .logoImage(new byte[]{})
 //                .build();
 //
@@ -106,7 +106,7 @@
 //                .cap("70010")
 //                .phoneNumber("3454937047")
 //                .vat("VAT123456")
-//                .type(BranchType.RESTAURANT)
+//                .type(BranchType.RISTORANTE)
 //                .logoImage(new byte[]{})
 //                .build();
 //
@@ -120,7 +120,7 @@
 //                .cap("70043")
 //                .phoneNumber("3454937047")
 //                .vat("VAT123456")
-//                .type(BranchType.RESTAURANT)
+//                .type(BranchType.RISTORANTE)
 //                .logoImage(new byte[]{})
 //                .build();
 //
