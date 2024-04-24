@@ -26,7 +26,7 @@ import com.ventimetriconsulting.inventario.entity.extra.OperationType;
 import com.ventimetriconsulting.inventario.repository.InventarioRepository;
 import com.ventimetriconsulting.inventario.repository.StorageRepository;
 import com.ventimetriconsulting.inventario.service.StorageService;
-import com.ventimetriconsulting.notification.entity.MessageSender;
+import com.ventimetriconsulting.notification.service.MessageSender;
 import com.ventimetriconsulting.order.controller.OrderController;
 import com.ventimetriconsulting.order.entIty.OrderTarget;
 import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
@@ -140,7 +140,7 @@ public class TestSuiteVentiMetriQuadriService {
 
         doNothing().when(rabbitTemplate).convertAndSend(any());
 
-        messageSender = new MessageSender(rabbitTemplate);
+        messageSender = new MessageSender(rabbitTemplate, null);
 
         BranchService branchService = new BranchService(
                 branchRepository,

@@ -20,9 +20,15 @@ public class OrderItem implements Serializable {
     private long productId;
     private String productName;
     private double quantity;
+
+    private double receivedQuantity;
+    private double sentQuantity;
+
     private UnitMeasure unitMeasure;
     private double price;
     private boolean isDoneBySupplier;
     private boolean isReceived;
+
+
 
 }

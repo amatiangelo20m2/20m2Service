@@ -50,7 +50,7 @@
 //                .cap("72014")
 //                .phoneNumber("3454937047")
 //                .vat("VAT123456")
-//                .type(BranchType.MAGAZZINO)
+//                .type(BranchType.FORNITORE)
 //                .logoImage(new byte[]{})
 //                .build();
 //

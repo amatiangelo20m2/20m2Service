@@ -34,8 +34,7 @@ public class FirebaseNotificationService {
                 firebaseUrl,
                 HttpMethod.POST,
                 request,
-                FCMResponse.class
-        );
+                FCMResponse.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             log.info("Notification sent successfully. Status code: {}, Response body: {} - Class {}",
@@ -45,10 +44,14 @@ public class FirebaseNotificationService {
 
             FCMResponse body1 = response.getBody();
 
-            log.info("Body casted: {}", body1 );
+            log.info("Response body notification: {}", body1 );
+
+
 
         } else {
-            log.error("Failed to send notification. Status code: {}, Response body: {}", response.getStatusCode(), response.getBody());
+            log.error("Failed to send notification. " +
+                    "Status code: {}, " +
+                    "Response body: {}", response.getStatusCode(), response.getBody());
         }
     }
 

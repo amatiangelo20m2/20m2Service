@@ -23,7 +23,8 @@ public class MessageListner {
 
             log.info("send notification: {}", fcmToken);
 
-            notificationService.sendNotification(fcmToken,
+            notificationService.sendNotification(
+                    fcmToken,
                     notificationEntity.getTitle(),
                     notificationEntity.getMessage());
 

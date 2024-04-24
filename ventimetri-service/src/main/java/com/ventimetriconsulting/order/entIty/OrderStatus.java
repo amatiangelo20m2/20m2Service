@@ -1,10 +1,13 @@
 package com.ventimetriconsulting.order.entIty;
 
-public enum OrderStatus {
+import java.io.Serializable;
+
+public enum OrderStatus implements Serializable {
 
     DRAFT,
     CREATED,
     SENT,
     ACCEPTED,
-    REFUSED
+    REFUSED,
+    ARCHIVED
 }

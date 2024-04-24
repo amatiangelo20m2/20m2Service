@@ -10,12 +10,11 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class NotificationEntity {
-    String title;
-    String message;
-    List<String> fmcToken;
-    NotificationType notificationType;
 
-    public enum NotificationType {
-        IN_APP_NOTIFICATION, EMAIL, SMS, WHATSAPP
-    }
+    private String title;
+    private String message;
+    private List<String> fmcToken;
+    private RedirectPage redirectPage;
+
+
 }

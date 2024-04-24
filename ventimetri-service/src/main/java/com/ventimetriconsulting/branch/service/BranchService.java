@@ -9,7 +9,8 @@ import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
 import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
 import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
-import com.ventimetriconsulting.notification.entity.MessageSender;
+import com.ventimetriconsulting.notification.entity.RedirectPage;
+import com.ventimetriconsulting.notification.service.MessageSender;
 import com.ventimetriconsulting.notification.entity.NotificationEntity;
 import com.ventimetriconsulting.supplier.dto.SupplierDTO;
 import com.ventimetriconsulting.user.EmployeeEntity;
@@ -19,10 +20,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -107,9 +106,11 @@ public class BranchService {
     }
 
     @Transactional
-    public List<BranchResponseEntity> getBranchesByUserCode(String userCode) {
+    public List<BranchResponseEntity> getBranchesByUserCode(String userCode, String fcmToken) {
 
-        log.info("Retrieve branches for user with code {}", userCode);
+
+        log.info("Retrieve branches for user with code {}. If need it it will update the fcmToken to send notification, new token [{}]", userCode, fcmToken);
+
         List<BranchUser> branchesByUserCode = branchUserRepository
                 .findBranchesByUserCode(userCode).orElseThrow(()
                         -> new BranchNotFoundException("Exception thowed while getting data for user with code : " + userCode + ". Cannot associate the storage" ));;
@@ -117,6 +118,12 @@ public class BranchService {
         if(branchesByUserCode.isEmpty()) {
             return new ArrayList<>();
         }else{
+            for(BranchUser branchByUserCode : branchesByUserCode){
+                if(!Objects.equals(branchByUserCode.getFMCToken(), fcmToken)){
+                    branchByUserCode.setFMCToken(fcmToken);
+                }
+            }
+
             return branchesByUserCode.stream()
                     .map(this::convertToBranchResponseEntity)
                     .collect(Collectors.toList());
@@ -154,7 +161,7 @@ public class BranchService {
                     .builder()
                     .title("\uD83E\uDEC2 " + userName + " vuole lavorare con te")
                     .message("L'utente " + userName + " ha richiesto di essere confermato come " + role + " per " + byBranchCode.get().getName())
-                    .notificationType(NotificationEntity.NotificationType.IN_APP_NOTIFICATION)
+                    .redirectPage(RedirectPage.EMPLOYEE)
                     .fmcToken(fmcTokensByBranchCodeAndRole)
                     .build());
         }
@@ -164,7 +171,7 @@ public class BranchService {
             messageSender.enqueMessage(notificationEntity);
         }
 
-        return getBranchesByUserCode(userCode);
+        return getBranchesByUserCode(userCode, fcmToken);
     }
     private BranchResponseEntity convertToBranchResponseEntity(BranchUser branchUser) {
         log.info("Convert Branch User object to a dto" + branchUser.toString());
@@ -251,12 +258,32 @@ public class BranchService {
                         .phone(userResponseEntity.getPhone())
                         .fcmToken(branchUser.getFMCToken())
                         .name(userResponseEntity.getName())
+                        .branchName(branchUser.getBranch().getName())
                         .role(branchUser.getRole())
                         .authorized(branchUser.isAuthorized())
                         .build());
             }
         }
 
+        return employeeEntities;
+    }
+
+    public List<EmployeeEntity> getEmployeeByUserCode(String userCode) {
+
+        List<EmployeeEntity> employeeEntities = new ArrayList<>();
+
+        log.info("Retrieve all employee for user with code {}", userCode);
+
+        Optional<List<BranchUser>> branchesByUserCode = branchUserRepository.findBranchesByUserCode(userCode);
+
+        if(branchesByUserCode.isPresent()){
+            for(BranchUser branchUser : branchesByUserCode.get()){
+                List<EmployeeEntity> employeeByBranchCode = getEmployeeByBranchCode(branchUser.getBranch().getBranchCode());
+                employeeEntities.addAll(employeeByBranchCode);
+            }
+        }else{
+            log.warn("No branch found for user with code {}", userCode);
+        }
         return employeeEntities;
     }
 
@@ -331,13 +358,39 @@ public class BranchService {
     @Transactional
     public void confirmEmployee(String branchCode, String userCode) {
 
+        BranchUser amministratore = branchUserRepository
+                .findByBranchCodeAndRole(branchCode, Role.AMMINISTRATORE).orElseThrow(()
+                        -> new BranchNotFoundException("Branch user relation not found for branch with code: "
+                        + branchCode + " and user role " + Role.AMMINISTRATORE));
+
+        UserResponseEntity userResponseEntity = loadBalancedWebClientBuilder.build()
+                .get()
+                .uri("http://auth-service/ventimetriauth/api/auth/retrievebyusercode",
+                        uriBuilder -> uriBuilder.queryParam("userCode", amministratore.getUserCode())
+                                .build())
+                .retrieve()
+                .bodyToMono(UserResponseEntity.class)
+                .block();
+
         log.info("Confirm employee with code {} for branch {}", userCode, branchCode);
         Optional<BranchUser> branchesByUserCodeAndBranchCode = branchUserRepository
                 .findBranchesByUserCodeAndBranchCode(userCode, branchCode);
 
         if(branchesByUserCodeAndBranchCode.isPresent()){
+
             log.info("Updating authorization for {}", branchesByUserCodeAndBranchCode.get());
+
             branchesByUserCodeAndBranchCode.get().setAuthorized(true);
+
+            messageSender.enqueMessage(NotificationEntity
+                    .builder()
+                    .fmcToken(Collections.singletonList(branchesByUserCodeAndBranchCode.get().getFMCToken()))
+                    .redirectPage(RedirectPage.DASHBOARD)
+                    .message(Objects.requireNonNull(userResponseEntity).getName()
+                            + " ha confermato il tuo ruolo come " + branchesByUserCodeAndBranchCode.get().getRole()
+                            + " in " + branchesByUserCodeAndBranchCode.get().getBranch().getName() +". Aggiorna la pagina sull\'app e buon lavoro!\uD83D\uDE0E")
+                    .title("\uD83E\uDD29 Ruolo confermato su " + branchesByUserCodeAndBranchCode.get().getBranch().getName())
+                    .build());
         }
     }
 

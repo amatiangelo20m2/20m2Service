@@ -20,7 +20,12 @@ public class EmployeeEntity {
     private String userCode;
     //TODO : fcm token here is useless - remove
     private String fcmToken;
+
     private String branchCode;
+    private String branchName;
+
     private Role role;
+
     private boolean authorized;
+
 }

@@ -15,6 +15,7 @@ public class FCMResponse {
     private int failure;
     private int canonicalIds;
     private List<FCMResult> results;
+    private String multicast_id;
 
     @Data
     @Builder
@@ -22,6 +23,6 @@ public class FCMResponse {
     @NoArgsConstructor
     @ToString
     public static class FCMResult {
-            private String error;
+            private String message_id;
     }
 }

@@ -84,7 +84,6 @@ public class AuthService {
                             .status(userByEmail.get().getProfileStatus())
                             .fcmToken(credentials.getFmcToken())
                             .build())
-
                     .accessToken(jwtService.generateToken(credentials.getEmail(), userByEmail.get().getUserCode()))
                     .build();
         }else{

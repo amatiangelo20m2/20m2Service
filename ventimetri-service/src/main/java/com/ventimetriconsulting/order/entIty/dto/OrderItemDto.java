@@ -21,6 +21,8 @@ public class OrderItemDto {
     private long productId;
     private String productName;
     private double quantity;
+    private double receivedQuantity;
+    private double sentQuantity;
     private UnitMeasure unitMeasure;
     private double price;
     private boolean isDoneBySupplier;
@@ -32,6 +34,8 @@ public class OrderItemDto {
 //                .orderItemId(orderItem.getOrderItemId())
                 .productId(orderItem.getProductId())
                 .quantity(orderItem.getQuantity())
+                .receivedQuantity(orderItem.getReceivedQuantity())
+                .sentQuantity(orderItem.getSentQuantity())
                 .productName(orderItem.getProductName())
                 .unitMeasure(orderItem.getUnitMeasure())
                 .price(orderItem.getPrice())
@@ -46,6 +50,8 @@ public class OrderItemDto {
                 .productId(orderItemDto.getProductId())
                 .productName(orderItemDto.getProductName())
                 .quantity(orderItemDto.getQuantity())
+                .receivedQuantity(orderItemDto.receivedQuantity)
+                .sentQuantity(orderItemDto.sentQuantity)
                 .unitMeasure(orderItemDto.getUnitMeasure())
                 .price(orderItemDto.getPrice())
                 .isDoneBySupplier(orderItemDto.isDoneBySupplier)

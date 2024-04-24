@@ -1,5 +1,7 @@
 package com.ventimetriconsulting.order.controller;
 
+import com.ventimetriconsulting.order.entIty.Order;
+import com.ventimetriconsulting.order.entIty.OrderStatus;
 import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
 import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
 import com.ventimetriconsulting.order.entIty.dto.OrderItemDto;
@@ -12,12 +14,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/order/")
 @AllArgsConstructor
-
 public class OrderController {
 
     private OrderService orderService;
@@ -50,7 +52,41 @@ public class OrderController {
 
         try {
             List<OrderDTO> listOrderDtos = orderService
-                    .retrieveOrders(branchCode, startDateLocalDate, endDateLocalDate);
+                    .retrieveOrders(branchCode,
+                            startDateLocalDate,
+                            endDateLocalDate,
+                            null);
+
+            return ResponseEntity.ok().body(listOrderDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(path = "/retrievearchivedorders")
+    public ResponseEntity<List<OrderDTO>> getOrderArchivedByBrancCode(
+            @RequestParam String branchCode,
+            @RequestParam String startDate,
+            @RequestParam String endDate){
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDateLocalDate = LocalDate.parse(startDate, formatter);
+        LocalDate endDateLocalDate = LocalDate.parse(endDate, formatter);
+
+        if (StringUtils.isEmpty(branchCode)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        if (startDateLocalDate.isAfter(endDateLocalDate)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        try {
+            List<OrderDTO> listOrderDtos = orderService
+                    .retrieveOrders(branchCode,
+                            startDateLocalDate,
+                            endDateLocalDate,
+                            OrderStatus.ARCHIVED);
 
             return ResponseEntity.ok().body(listOrderDtos);
         } catch (Exception e) {
@@ -64,6 +100,18 @@ public class OrderController {
         try {
             orderService.updateOrderItem(orderId,
                     orderItemDtoList);
+
+            return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(path = "/updatestatus")
+    public ResponseEntity<OrderDTO> updateOrderStatus(@RequestParam long orderId,
+                                                      @RequestParam OrderStatus orderStatus) {
+        try {
+            orderService.updateOrderStatus(orderId, orderStatus);
 
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {

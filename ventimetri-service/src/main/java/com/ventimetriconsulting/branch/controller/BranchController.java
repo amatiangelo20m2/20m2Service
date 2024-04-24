@@ -6,15 +6,12 @@ import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.branch.entity.dto.VentiMetriQuadriData;
 import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
-import com.ventimetriconsulting.notification.entity.MessageSender;
-import com.ventimetriconsulting.notification.entity.NotificationEntity;
 import com.ventimetriconsulting.user.EmployeeEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,8 +22,8 @@ public class BranchController {
     private BranchService branchService;
 
     @GetMapping(path = "/retrievedata")
-    public ResponseEntity<VentiMetriQuadriData> retrieveData(@RequestParam String userCode){
-        List<BranchResponseEntity> branchesByUserCode = branchService.getBranchesByUserCode(userCode);
+    public ResponseEntity<VentiMetriQuadriData> retrieveData(@RequestParam String userCode, @RequestParam String fcmToken){
+        List<BranchResponseEntity> branchesByUserCode = branchService.getBranchesByUserCode(userCode, fcmToken);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(VentiMetriQuadriData
@@ -127,8 +124,17 @@ public class BranchController {
                         .getEmployeeByBranchCode(branchCode));
     }
 
+    @GetMapping(path = "/retrieveemployeebyusercode")
+    public ResponseEntity<List<EmployeeEntity>> getEmployeeByUserCode(@RequestParam String userCode){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(branchService
+                        .getEmployeeByUserCode(userCode));
+    }
+
     @PutMapping(path = "/confirmemployee")
-    public ResponseEntity<Void> confirmEmployee(@RequestParam String branchCode, @RequestParam String userCode){
+    public ResponseEntity<Void> confirmEmployee(@RequestParam String branchCode,
+                                                @RequestParam String userCode){
 
         branchService.confirmEmployee(branchCode, userCode);
 

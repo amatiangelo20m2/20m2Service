@@ -1,5 +1,6 @@
 package com.ventimetriconsulting.notification.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
@@ -11,12 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 public class NotificationEntity {
 
-    String title;
-    String message;
-    List<String> fmcToken;
-    NotificationType notificationType;
+    private String title;
+    private String message;
+    private List<String> fmcToken;
+    private RedirectPage redirectPage;
 
-    public enum NotificationType {
-        IN_APP_NOTIFICATION, EMAIL, SMS, WHATSAPP
-    }
+
 }
