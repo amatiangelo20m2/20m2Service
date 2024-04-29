@@ -76,7 +76,6 @@ public class TestSuiteVentiMetriQuadriService {
 
     private static final Random RANDOM = new Random();
 
-
     @Autowired
     private BranchRepository branchRepository;
 
@@ -160,7 +159,9 @@ public class TestSuiteVentiMetriQuadriService {
                 branchConfigurationService);
         bookingController = new BookingController(bookingService);
 
-        SupplierService supplierService = new SupplierService(productRepository, supplierRepository, branchRepository);
+        SupplierService supplierService = new SupplierService(productRepository,
+                supplierRepository,
+                branchRepository);
         supplierController = new SupplierController(supplierService);
 
         StorageService storageService = new StorageService(storageRepository, supplierRepository, branchRepository, inventarioRepository);

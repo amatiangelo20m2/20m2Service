@@ -39,6 +39,7 @@
     <module>auth-service</module>
     <module>ventimetri-service</module>
     <module>notification-service</module>
+    <module>eventi-service</module>
   </modules>
 
   <dependencyManagement>

@@ -80,6 +80,10 @@ public class SupplierController {
                 .body(supplierService.updateProduct(productDTO));
     }
 
+    @GetMapping(path = "retrieveSuppliers")
+    public ResponseEntity<List<SupplierDTO>> retrieveAllSupplier(){
+        return ResponseEntity.status(HttpStatus.OK).body(supplierService.retrieveAllSuppliers());
+    }
 //    @GetMapping(path = "/retrieve/bybranchcode")
 //    public ResponseEntity<List<SupplierDTO>> retrieveByBranchCode(@RequestParam String branchCode) {
 //        return ResponseEntity.status(HttpStatus.OK).body(supplierService.retrieveByBranchCode(branchCode));

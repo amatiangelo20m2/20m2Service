@@ -5,6 +5,7 @@
       <directory url="file://$PROJECT_DIR$/discovery-server/src/main/resources/archetype-resources" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/api-geteway/src/main/resources/archetype-resources" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/ventimetri/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/notification-service/src/main/resources/archetype-resources" includeSubdirectories="true" />
     </excludeFromCompile>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
@@ -16,6 +17,8 @@
         <module name="discovery-server" />
         <module name="api-gw" />
         <module name="ventimetri-service" />
+        <module name="eventi-service" />
+        <module name="notification-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -24,6 +27,7 @@
       <module name="booking-service" target="17" />
       <module name="bookingreserve-service" target="17" />
       <module name="environment-composer" target="17" />
+      <module name="event-service" target="17" />
       <module name="inventory-service" target="17" />
       <module name="order-service" target="17" />
       <module name="supplier-service" target="17" />
@@ -40,7 +44,10 @@
       <module name="bookingreserve-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="environment-composer" options="-parameters" />
+      <module name="event-service" options="-parameters" />
+      <module name="eventi-service" options="-parameters" />
       <module name="inventory-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="supplier-service" options="-parameters" />
       <module name="ventimetri" options="-parameters" />

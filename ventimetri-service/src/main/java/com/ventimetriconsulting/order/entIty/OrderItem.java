@@ -13,10 +13,6 @@ import java.io.Serializable;
 @Builder
 public class OrderItem implements Serializable {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private long orderItemId;
-
     private long productId;
     private String productName;
     private double quantity;
@@ -28,7 +24,5 @@ public class OrderItem implements Serializable {
     private double price;
     private boolean isDoneBySupplier;
     private boolean isReceived;
-
-
 
 }

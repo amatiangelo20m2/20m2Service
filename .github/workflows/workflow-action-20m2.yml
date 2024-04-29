@@ -52,4 +52,10 @@ jobs:
         MAVEN_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
+    - name: Build and Push 20m2 microservice eventi-service
+      run: mvn package dockerfile:push --file eventi-service/pom.xml
+      env:
+        MAVEN_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
 

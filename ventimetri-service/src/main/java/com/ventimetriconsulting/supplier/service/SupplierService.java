@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -181,6 +182,15 @@ public class SupplierService {
         }
 
         return savedSuppliersDTO;
+    }
+
+    public List<SupplierDTO> retrieveAllSuppliers() {
+
+        log.info("Retrieve all suppliers..");
+        List<Supplier> allSuppliers = supplierRepository.findAll();
+
+
+        return SupplierDTO.toDTOList(new HashSet<>(allSuppliers));
     }
 
 //    public List<SupplierDTO> retrieveByBranchCode(String branchCode) {
