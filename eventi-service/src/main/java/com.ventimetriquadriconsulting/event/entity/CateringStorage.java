@@ -11,7 +11,7 @@ import java.util.Set;
 @Entity(name = "CateringStorage")
 @Table(name = "CATERING_STORAGE",
         uniqueConstraints=
-        @UniqueConstraint(columnNames={"event_id"}))
+        @UniqueConstraint(columnNames={"catering_storage_id"}))
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

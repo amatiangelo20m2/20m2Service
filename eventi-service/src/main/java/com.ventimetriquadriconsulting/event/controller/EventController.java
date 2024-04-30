@@ -46,6 +46,19 @@ public class EventController {
                 .body(eventService.createEvent(event));
     }
 
+    @PutMapping(path = "/{eventId}/createworkstation")
+    public ResponseEntity<WorkstationDTO> createWorkstation(@RequestParam("eventId") long eventId,
+                                            @RequestBody WorkstationDTO workstationDTO){
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.addWorkstationToEvent(
+                                eventId,
+                                workstationDTO));
+
+    }
+
+
     @DeleteMapping(path = "/delete/workstation")
     public ResponseEntity<Void> deleteWorkstation(long workstationId){
         eventService.deleteWorkstation(workstationId);

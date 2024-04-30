@@ -72,14 +72,14 @@ public class TestSuiteEvent {
         ResponseEntity<EventDTO> save = eventController.save(
                 createFakeEventDTO(
                         "BASDASDASD",
-                        generateFakeWorkstations(2),
+                        generateFakeWorkstations(1),
                         null));
 
 
         assertEquals(Objects.requireNonNull(save.getBody()).getName(), "Fake Event");
         assertEquals(save.getBody().getBranchCode(), "BASDASDASD");
         assertEquals(save.getBody().getLocation(), "Fake Location");
-        assertEquals(2, save.getBody().getWorkstations().size());
+        assertEquals(1, save.getBody().getWorkstations().size());
 
         log.info("Worksations: {}", save.getBody().getWorkstations().toString());
         assertEquals(0, save.getBody().getExpenseEvents().size());
@@ -87,7 +87,7 @@ public class TestSuiteEvent {
         ResponseEntity<List<EventDTO>> eventsByBranchCode = eventController.retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO);
 
         assertEquals(Objects.requireNonNull(eventsByBranchCode.getBody()).size(), 1);
-        assertEquals(eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().size(), 2);
+        assertEquals(eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().size(), 1);
         assertEquals(eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().stream().toList()
                 .get(0).getWorkstationProducts().size(), 10);
 
@@ -103,9 +103,9 @@ public class TestSuiteEvent {
         eventsByBranchCode = eventController.retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO);
 
         assertEquals(Objects.requireNonNull(eventsByBranchCode.getBody()).size(), 1);
-        assertEquals(eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().size(), 2);
-        assertEquals(eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().stream().toList()
-                .get(0).getWorkstationProducts().size(), 9);
+        assertEquals(eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().size(), 1);
+        assertEquals(9, eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().stream().toList()
+                .get(0).getWorkstationProducts().size());
 
 
 

@@ -69,7 +69,7 @@ public class EventService {
     @Transactional
     @Modifying
     public ResponseEntity<Object> deleteProduct(long workstationId, long productId) {
-        log.info("Delete product with id {} from workstation with id{}", productId, workstationId);
+        log.info("Delete product with id {} from workstation with id {}", productId, workstationId);
         Optional<Workstation> workstationOptional = workstationRepository.findById(workstationId);
         if (workstationOptional.isPresent()) {
             Workstation workstation = workstationOptional.get();
@@ -203,5 +203,27 @@ public class EventService {
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
         event.setEventStatus(EventStatus.CHIUSO);
+    }
+
+
+    @Transactional
+    public WorkstationDTO addWorkstationToEvent(long eventId, WorkstationDTO workstationDTO) {
+        log.info("Adding workstation to event with ID {}", eventId);
+
+        // Find the event entity by its ID
+        Optional<Event> eventOptional = eventRepository.findById(eventId);
+
+        // Check if the event entity exists
+        if (eventOptional.isPresent()) {
+            Workstation workstation = WorkstationDTO.toEntity(workstationDTO);
+
+            Event event = eventOptional.get();
+            event.getWorkstations().add(workstation);
+
+            event = eventRepository.save(event);
+            return WorkstationDTO.fromEntity(workstation);
+        } else {
+            return null;
+        }
     }
 }
