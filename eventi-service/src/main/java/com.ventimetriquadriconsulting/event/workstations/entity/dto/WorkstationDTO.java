@@ -1,6 +1,5 @@
 package com.ventimetriquadriconsulting.event.workstations.entity.dto;
 
-import com.ventimetriquadriconsulting.event.entity.Event;
 import com.ventimetriquadriconsulting.event.utils.WorkstationType;
 import com.ventimetriquadriconsulting.event.workstations.entity.Workstation;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ public class WorkstationDTO implements Serializable {
     private String name;
     private String responsable;
     private WorkstationType workstationType;
-    private Set<WorkstationProductDTO> workstationProducts;
+    private Set<ProductDTO> workstationProducts;
 
     public static WorkstationDTO fromEntity(Workstation workstation) {
         return WorkstationDTO.builder()
@@ -30,8 +29,8 @@ public class WorkstationDTO implements Serializable {
                 .name(workstation.getName())
                 .responsable(workstation.getResponsable())
                 .workstationType(workstation.getWorkstationType())
-                .workstationProducts(workstation.getWorkstationProducts().stream()
-                        .map(WorkstationProductDTO::fromEntity)
+                .workstationProducts(workstation.getProducts().stream()
+                        .map(ProductDTO::fromEntity)
                         .collect(Collectors.toSet()))
                 .build();
     }
@@ -42,8 +41,8 @@ public class WorkstationDTO implements Serializable {
                 .name(workstationDTO.getName())
                 .responsable(workstationDTO.getResponsable())
                 .workstationType(workstationDTO.getWorkstationType())
-                .workstationProducts(workstationDTO.getWorkstationProducts().stream()
-                        .map(WorkstationProductDTO::toEntity)
+                .products(workstationDTO.getWorkstationProducts().stream()
+                        .map(ProductDTO::toEntity)
                         .collect(Collectors.toSet()))
                 .build();
     }

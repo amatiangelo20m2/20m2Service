@@ -34,6 +34,22 @@ services:
       - "5435:5435"
     command: -p 5435
     restart: always
+  db20m2event:
+    container_name: db20m2event
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: db20m2event
+      POSTGRES_USER: WU8lVfADRqrOCFc
+      POSTGRES_PASSWORD: 6pGKe4PXo88bk2i
+      PGDATA: /data/postgresevent
+    volumes:
+      - ./db20m2dataeventi:/data/postgresevent
+    expose:
+      - "5436"
+    ports:
+      - "5436:5436"
+    command: -p 5436
+    restart: always
   pgadmin20m2:
     container_name: pgadmin20m2
     image: dpage/pgadmin4
@@ -43,6 +59,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: EM6MbK55bpHUtgVN
     depends_on:
       - db20m2
+      - db20m2event
     ports:
       - "5050:80"
 

@@ -8,6 +8,7 @@ import com.ventimetriconsulting.branch.exception.customexceptions.GlobalExceptio
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
 import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
+import com.ventimetriconsulting.inventario.entity.Storage;
 import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
 import com.ventimetriconsulting.notification.entity.RedirectPage;
 import com.ventimetriconsulting.notification.service.MessageSender;
@@ -418,5 +419,15 @@ public class BranchService {
                 .authorized(retrievedBranch.isAuthorized())
                 .logoImage(retrievedBranch.getBranch().getLogoImage())
                 .build();
+    }
+
+    public List<StorageDTO> retrieveStoragesByBranchCode(String branchCode) {
+        log.info("Retrieve storages by branch code {}", branchCode);
+        Optional<List<Storage>> storagesByBranchCode = branchRepository.findStoragesByBranchCode(branchCode);
+        if(storagesByBranchCode.isPresent()){
+            return StorageDTO.toDTOList(new HashSet<>(storagesByBranchCode.get()));
+        }else{
+            return new ArrayList<>();
+        }
     }
 }

@@ -32,3 +32,5 @@ truncate table order_entity cascade;
 select * from public.notification_entity where public.notification_entity.fmc_token
                                             = 'eObSBEUBuUpjtfuCZ_o0Db:APA91bEDdrz0VfPoiP7wUCmOT7WxooHu2QGpSN8njza5vwF_T_qLvgTbNgZdMt_mcjEzbx605PW26hrtnofJ5svj_eUN6DMa6hcq0O7BJFGh5E7REMTO0Ab-q2FcfFs5xubZfBnbkQOI'
                                     AND public.notification_entity.insertion_date >= '2024-04-20' ORDER BY notification_id DESC;
+
+delete from inventario where inventario.inventario_id = 350;

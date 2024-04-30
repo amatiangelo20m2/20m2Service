@@ -57,18 +57,18 @@ public class Workstation {
             joinColumns = @JoinColumn(name = "workstation_product_id")
     )
     @OrderColumn(name = "position")
-    private Set<WorkstationProduct> workstationProducts;
+    private Set<Product> products;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Workstation that = (Workstation) o;
-        return workstationId == that.workstationId && Objects.equals(name, that.name) && Objects.equals(responsable, that.responsable) && Objects.equals(event, that.event) && workstationType == that.workstationType && Objects.equals(workstationProducts, that.workstationProducts);
+        return workstationId == that.workstationId && Objects.equals(name, that.name) && Objects.equals(responsable, that.responsable) && Objects.equals(event, that.event) && workstationType == that.workstationType && Objects.equals(products, that.products);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workstationId, name, responsable, event, workstationType, workstationProducts);
+        return Objects.hash(workstationId, name, responsable, event, workstationType, products);
     }
 }

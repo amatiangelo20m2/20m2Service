@@ -1,5 +1,6 @@
 package com.ventimetriconsulting.inventario.controller;
 
+import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriconsulting.inventario.entity.dto.InventarioDTO;
 import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
 import com.ventimetriconsulting.inventario.entity.dto.TransactionInventoryRequest;
@@ -18,6 +19,14 @@ import java.util.List;
 public class StorageController {
 
     private StorageService storageService;
+    private BranchService branchService;
+
+    @GetMapping(path = "/retrieve/bybranchcode")
+    public ResponseEntity<List<StorageDTO>> retrieveStoragesByBranchCode(@RequestParam("branchCode") String branchCode){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(branchService.retrieveStoragesByBranchCode(branchCode));
+    }
 
     @PostMapping(path = "/create")
     public ResponseEntity<StorageDTO> addStorage(
@@ -29,14 +38,14 @@ public class StorageController {
     }
 
     @PostMapping(path = "/addproduct")
-    public ResponseEntity<InventarioDTO> appProduct(
-            @RequestBody ProductDTO productDTO,
+    public ResponseEntity<InventarioDTO> addProduct(
+            @RequestParam("productId") long productId,
             @RequestParam("storageId") long storageId,
             @RequestParam("userName") String userName) {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(storageService.insertProductToStorage(
-                        productDTO,
+                        productId,
                         storageId,
                         userName));
     }
@@ -80,10 +89,13 @@ public class StorageController {
     }
 
     @DeleteMapping(path = "/delete/product")
-    public ResponseEntity<InventarioDTO> removeProductFromStorage(
+    public ResponseEntity<?> removeProductFromStorage(
             @RequestParam("inventarioId") long inventarioId){
+
+        storageService.removeProductFromStorage(inventarioId);
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(storageService.removeProductFromStorage(inventarioId));
+                .body(null);
     }
 
     @PutMapping(path = "/insert/inventariodata")

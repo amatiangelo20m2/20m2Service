@@ -2,6 +2,7 @@ package com.ventimetriquadriconsulting.event.entity;
 
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
 import com.ventimetriquadriconsulting.event.workstations.entity.Workstation;
+import com.ventimetriquadriconsulting.event.workstations.entity.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,7 +49,6 @@ public class Event implements Serializable {
 
     @Column(
             name = "branch_code",
-            unique = true,
             length = 10
     )
     private String branchCode;
@@ -66,4 +66,5 @@ public class Event implements Serializable {
     )
     @OrderColumn(name = "position")
     private Set<ExpenseEvent> expenseEvents;
+
 }

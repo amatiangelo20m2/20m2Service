@@ -1,9 +1,9 @@
 package com.ventimetriquadriconsulting.event.entity.dto;
 
 import com.ventimetriquadriconsulting.event.entity.Event;
-import com.ventimetriquadriconsulting.event.entity.ExpenseEvent;
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
 import com.ventimetriquadriconsulting.event.workstations.entity.dto.WorkstationDTO;
+import com.ventimetriquadriconsulting.event.workstations.entity.dto.ProductDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +33,7 @@ public class EventDTO implements Serializable {
     private String location;
     private Set<WorkstationDTO> workstations;
     private Set<ExpenseEventDTO> expenseEvents;
+    private Set<ProductDTO> eventProducts;
 
     public static EventDTO fromEntity(Event event) {
         return EventDTO.builder()

@@ -1,29 +1,37 @@
 package com.ventimetriquadriconsulting.event.controller;
 
+import com.ventimetriquadriconsulting.event.entity.CateringStorage;
+import com.ventimetriquadriconsulting.event.entity.dto.CateringStorageDTO;
 import com.ventimetriquadriconsulting.event.entity.dto.EventDTO;
+import com.ventimetriquadriconsulting.event.repository.CateringStorageRepository;
+import com.ventimetriquadriconsulting.event.service.CateringStorageService;
 import com.ventimetriquadriconsulting.event.service.EventService;
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
 import com.ventimetriquadriconsulting.event.workstations.entity.dto.WorkstationDTO;
-import com.ventimetriquadriconsulting.event.workstations.entity.dto.WorkstationProductDTO;
+import com.ventimetriquadriconsulting.event.workstations.entity.dto.ProductDTO;
 import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "api/v1/app/event")
 @AllArgsConstructor
+@Slf4j
 public class EventController {
 
     private EventService eventService;
+    private CateringStorageService cateringStorageService;
 
 
-    @GetMapping(path = "/findeventbybranchid")
+    @GetMapping(path = "/findeventbybranchcode")
     public ResponseEntity<List<EventDTO>> retrieveEventsByBranchCode(@RequestParam("branchCode") String branchCode,
                                                                     @RequestParam EventStatus eventStatus){
         return ResponseEntity
@@ -46,21 +54,13 @@ public class EventController {
                 .body(null);
     }
 
-    @DeleteMapping(path = "/delete/event")
-    public ResponseEntity<Void> deleteEvent(long eventId){
-        eventService.deleteEvent(eventId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(null);
-    }
-
     @DeleteMapping("/{workstationId}/products/{productId}")
     public ResponseEntity<?> deleteWorkstationProduct(@PathVariable long workstationId, @PathVariable long productId) {
         return eventService.deleteProduct(workstationId, productId);
     }
 
     @PutMapping("/{workstationId}/products/{productId}")
-    public ResponseEntity<?> updateWorkstationProduct(@PathVariable long workstationId, @PathVariable long productId, @RequestBody WorkstationProductDTO updatedProductDTO) {
+    public ResponseEntity<?> updateWorkstationProduct(@PathVariable long workstationId, @PathVariable long productId, @RequestBody ProductDTO updatedProductDTO) {
         ResponseEntity<?> responseEntity = eventService.updateProduct(workstationId, productId, updatedProductDTO);
         return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
     }
@@ -80,7 +80,7 @@ public class EventController {
     @PostMapping("/{eventId}/workstations/{workstationId}/products")
     public ResponseEntity<?> addProductsToWorkstation(@PathVariable long eventId,
                                                       @PathVariable long workstationId,
-                                                      @RequestBody List<WorkstationProductDTO> productDTOList) {
+                                                      @RequestBody List<ProductDTO> productDTOList) {
         try {
 
             WorkstationDTO workstationDTO = eventService.addProductsToWorkstation(eventId, workstationId, productDTOList);
@@ -94,6 +94,48 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request.");
         }
     }
+
+    @DeleteMapping("/{eventId}/delete")
+    public ResponseEntity<?> deleteEvent(@PathVariable long eventId){
+        eventService.deleteEvent(eventId);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @PutMapping("/{eventId}/close")
+    public ResponseEntity<?> closeEvent(@PathVariable long eventId){
+        eventService.closeEvent(eventId);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @GetMapping("/{branchCode}/retrievecateringstorage")
+    public ResponseEntity<?> retrieveCateringStorageEvent(@PathVariable String branchCode) {
+
+        log.info("Retrieve Storage for events by branch code {}", branchCode);
+        Optional<List<CateringStorage>> byBranchCode = cateringStorageService.findByBranchCode(branchCode);
+
+        if(byBranchCode.isPresent()){
+            return ResponseEntity.status(HttpStatus.OK).body(CateringStorageDTO.fromEntityList(byBranchCode.get()));
+        }else{
+            return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>());
+        }
+    }
+
+    @PutMapping("/{cateringStorageId}/addproduct/")
+    public ResponseEntity<List<ProductDTO>> addProductToStorageCatering(@PathVariable long cateringStorageId,
+                                                         @RequestBody List<ProductDTO> productDTOList){
+
+        List<ProductDTO> productDTOS = cateringStorageService.addProducts(cateringStorageId, productDTOList);
+        return ResponseEntity.status(HttpStatus.OK).body(productDTOS);
+    }
+
+    @DeleteMapping("/{productId}/deleteproductfromcateringstorage/{cateringStorageId}")
+    public ResponseEntity<?> deleteProductFromCateringStorage(@PathVariable long productId, @PathVariable long cateringStorageId){
+        cateringStorageService.deleteProduct(productId, cateringStorageId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+
 //
 //    @DeleteMapping(path = "/delete")
 //    public void delete(@RequestParam("eventId") long eventId){

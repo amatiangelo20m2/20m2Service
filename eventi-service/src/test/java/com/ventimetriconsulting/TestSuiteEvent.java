@@ -5,13 +5,15 @@ import com.ventimetriquadriconsulting.event.EventiServiceApplication;
 import com.ventimetriquadriconsulting.event.controller.EventController;
 import com.ventimetriquadriconsulting.event.entity.dto.EventDTO;
 import com.ventimetriquadriconsulting.event.entity.dto.ExpenseEventDTO;
+import com.ventimetriquadriconsulting.event.repository.CateringStorageRepository;
 import com.ventimetriquadriconsulting.event.repository.EventRepository;
+import com.ventimetriquadriconsulting.event.service.CateringStorageService;
 import com.ventimetriquadriconsulting.event.service.EventService;
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
 import com.ventimetriquadriconsulting.event.utils.WorkstationType;
 import com.ventimetriquadriconsulting.event.workstations.entity.UnitMeasure;
 import com.ventimetriquadriconsulting.event.workstations.entity.dto.WorkstationDTO;
-import com.ventimetriquadriconsulting.event.workstations.entity.dto.WorkstationProductDTO;
+import com.ventimetriquadriconsulting.event.workstations.entity.dto.ProductDTO;
 import com.ventimetriquadriconsulting.event.workstations.repository.WorkstationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,11 +44,14 @@ public class TestSuiteEvent {
 
     private EventController eventController;
 
+    @Autowired
+    private CateringStorageRepository cateringStorageRepository;
     @BeforeEach
     public void init(){
 
+        CateringStorageService cateringStorageService = new CateringStorageService(cateringStorageRepository);
         EventService eventService = new EventService(eventRepository, workstationRepository);
-        eventController = new EventController(eventService);
+        eventController = new EventController(eventService, cateringStorageService);
     }
 
     @Test
@@ -144,7 +149,7 @@ public class TestSuiteEvent {
                 .findFirst().orElseThrow();
 
         // Retrieve the updated product from the workstation
-        WorkstationProductDTO updatedProduct = updatedWorkstation.getWorkstationProducts().stream()
+        ProductDTO updatedProduct = updatedWorkstation.getWorkstationProducts().stream()
                 .filter(product -> product.getProductId() == 1L)
                 .findFirst().orElseThrow();
 
@@ -183,12 +188,12 @@ public class TestSuiteEvent {
         return new HashSet<>(workstations);
     }
 
-    private static Set<WorkstationProductDTO> generateFakeWorkstationProducts(int prodNumber) {
-        Set<WorkstationProductDTO> workstationProducts = new HashSet<>();
+    private static Set<ProductDTO> generateFakeWorkstationProducts(int prodNumber) {
+        Set<ProductDTO> workstationProducts = new HashSet<>();
         Random random = new Random();
 
         for (int i = 0; i < prodNumber; i++) {
-            WorkstationProductDTO product = WorkstationProductDTO.builder()
+            ProductDTO product = ProductDTO.builder()
                     .productId(i + 1)
                     .productName("Product " + (i + 1))
                     .quantityInserted(random.nextDouble() * 100)

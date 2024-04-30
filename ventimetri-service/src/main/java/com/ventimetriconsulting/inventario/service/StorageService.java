@@ -17,10 +17,13 @@ import com.ventimetriconsulting.inventario.repository.StorageRepository;
 import com.ventimetriconsulting.supplier.dto.ProductDTO;
 import com.ventimetriconsulting.supplier.entity.Product;
 import com.ventimetriconsulting.supplier.entity.Supplier;
+import com.ventimetriconsulting.supplier.repository.ProductRepository;
 import com.ventimetriconsulting.supplier.repository.SupplierRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -37,6 +40,7 @@ public class StorageService {
     private final SupplierRepository supplierRepository;
     private final BranchRepository branchRepository;
     private final InventarioRepository inventarioRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
     public StorageDTO createStorage(StorageDTO storageDTO,
@@ -61,20 +65,25 @@ public class StorageService {
     }
 
     @Transactional
-    public InventarioDTO insertProductToStorage(ProductDTO productDTO,
+    public InventarioDTO insertProductToStorage(long productId,
                                                 long storageId,
                                                 String userName) {
 
-        log.info("Adding product {} to the storage with id {} - User ({})", productDTO, storageId, userName);
+
         Storage storage = storageRepository.findById(storageId)
                 .orElseThrow(() -> new BranchNotFoundException("Storage not found with id: " + storageId + ". Cannot put the product"));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BranchNotFoundException("Product not found with id: " + productId + ". Cannot update the storage"));
+
+        log.info("Adding product id {} to the storage with id {} - User ({})", product, storageId, userName);
 
         Inventario inventario = Inventario
                 .builder()
                 .inventarioId(0)
-                .product(ProductDTO.fromDTO(productDTO))
+                .product(product)
                 .storage(storage)
-                .deletionDate(null)
+                .insertionDate(LocalDate.now())
                 .stock(0L)
                 .deletionDate(null)
                 .inventoryActions(new HashSet<>(Collections.singletonList(InventoryAction.builder()
@@ -107,29 +116,30 @@ public class StorageService {
                 .orElseThrow(() -> new BranchNotFoundException("Supplier not found with id: " + supplierId + ". Cannot retrieve products to insert into storage"));;
 
         for(Product product : supplier.getProducts()){
+            boolean exists = inventarioRepository.existsByProductAndStorage(product, storage);
+            if(!exists){
+                Inventario inventario = Inventario
+                        .builder()
+                        .inventarioId(0)
+                        .product(product)
+                        .storage(storage)
+                        .stock(0L)
+                        .insertionDate(LocalDate.now())
+                        .deletionDate(null)
+                        .inventoryActions(new HashSet<>(Collections.singletonList(InventoryAction.builder()
+                                .insertionDate(LocalDate.now())
+                                .modifiedByUser(userName)
+                                .amount(0)
+                                .operationType(OperationType.CREATION)
+                                .build())))
+                        .build();
 
-            Inventario inventario = Inventario
-                    .builder()
-                    .inventarioId(0)
-                    .product(product)
-                    .storage(storage)
-                    .stock(0L)
-                    .insertionDate(LocalDate.now())
-                    .deletionDate(null)
-                    .inventoryActions(new HashSet<>(Collections.singletonList(InventoryAction.builder()
-                            .insertionDate(LocalDate.now())
-                            .modifiedByUser(userName)
-                            .amount(0)
-                            .operationType(OperationType.CREATION)
-                            .build())))
-                    .build();
 
-            Inventario inventarioSaved = inventarioRepository.save(inventario);
-            storage.getInventario().add(inventarioSaved);
-            inventarioDTOS.add(InventarioDTO.fromEntity(inventarioSaved));
+                Inventario inventarioSaved = inventarioRepository.save(inventario);
+                storage.getInventario().add(inventarioSaved);
+                inventarioDTOS.add(InventarioDTO.fromEntity(inventarioSaved));
+            }
         }
-
-
         return inventarioDTOS;
     }
 
@@ -162,18 +172,23 @@ public class StorageService {
     }
 
     @Transactional
-    public InventarioDTO removeProductFromStorage(long inventarioId) {
+    public void removeProductFromStorage(long inventarioId) {
 
-        Inventario inventario = inventarioRepository
-                .findById(inventarioId).orElseThrow(()
-                        -> new StorageNotFoundException("Inventario not found with id: " + inventarioId + ". Cannot update inventario"));
+//        Inventario inventario = inventarioRepository
+//                .findById(inventarioId).orElseThrow(()
+//                        -> new StorageNotFoundException("Inventario not found with id: " + inventarioId + ". Cannot update inventario"));
+//
+//        log.info("Delete product from inventario. " +
+//                        "Inventario id {}, product {}, updating delete date to today",
+//                inventarioId,
+//                inventario.getProduct());
+//
+//        inventario.setDeletionDate(LocalDate.now());
+//
+//        return InventarioDTO.fromEntity(inventario);
 
-        log.info("Delete product from inventario. " +
-                        "Inventario id {}, product {}, updating delete date to today",
-                inventarioId,
-                inventario.getProduct());
-        inventario.setDeletionDate(LocalDate.now());
-        return InventarioDTO.fromEntity(inventario);
+        log.info("Delete inventario by id {}", inventarioId);
+        inventarioRepository.deleteById(inventarioId);
 
     }
 
@@ -211,4 +226,5 @@ public class StorageService {
         }
         return StorageDTO.fromEntity(storage);
     }
+
 }

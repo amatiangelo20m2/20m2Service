@@ -165,7 +165,7 @@ public class TestSuiteVentiMetriQuadriService {
         supplierController = new SupplierController(supplierService);
 
         StorageService storageService = new StorageService(storageRepository, supplierRepository, branchRepository, inventarioRepository);
-        storageController = new StorageController(storageService);
+        storageController = new StorageController(storageService, branchService);
 
 
         OrderService orderService = new OrderService(orderEntityRepository,

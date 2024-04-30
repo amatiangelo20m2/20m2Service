@@ -6,9 +6,9 @@ import com.ventimetriquadriconsulting.event.entity.dto.EventDTO;
 import com.ventimetriquadriconsulting.event.repository.EventRepository;
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
 import com.ventimetriquadriconsulting.event.workstations.entity.Workstation;
-import com.ventimetriquadriconsulting.event.workstations.entity.WorkstationProduct;
+import com.ventimetriquadriconsulting.event.workstations.entity.Product;
 import com.ventimetriquadriconsulting.event.workstations.entity.dto.WorkstationDTO;
-import com.ventimetriquadriconsulting.event.workstations.entity.dto.WorkstationProductDTO;
+import com.ventimetriquadriconsulting.event.workstations.entity.dto.ProductDTO;
 import com.ventimetriquadriconsulting.event.workstations.repository.WorkstationRepository;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -43,7 +42,8 @@ public class EventService {
     public List<EventDTO> findEventByBranchCodeAndStatus(String branchCode, EventStatus eventStatus) {
 
         log.info("Retrieve events by branch code {} with status {}", branchCode, eventStatus);
-        List<Event> byBranchCodeAndEventStatus = eventRepository.findByBranchCodeAndEventStatus(branchCode, eventStatus);
+        List<Event> byBranchCodeAndEventStatus = eventRepository
+                .findByBranchCodeAndEventStatusOrderByDateEventDesc(branchCode, eventStatus);
         if(byBranchCodeAndEventStatus.isEmpty()){
             return new ArrayList<>();
         } else {
@@ -73,8 +73,8 @@ public class EventService {
         Optional<Workstation> workstationOptional = workstationRepository.findById(workstationId);
         if (workstationOptional.isPresent()) {
             Workstation workstation = workstationOptional.get();
-            Set<WorkstationProduct> workstationProducts = workstation.getWorkstationProducts();
-            workstationProducts.removeIf(product -> product.getProductId() == productId);
+            Set<Product> products = workstation.getProducts();
+            products.removeIf(product -> product.getProductId() == productId);
             workstationRepository.save(workstation);
             return ResponseEntity.ok().build();
         } else {
@@ -85,15 +85,15 @@ public class EventService {
 
     @Transactional
     @Modifying
-    public ResponseEntity<?> updateProduct(long workstationId, long productId, WorkstationProductDTO updatedProductDTO) {
+    public ResponseEntity<?> updateProduct(long workstationId, long productId, ProductDTO updatedProductDTO) {
         Optional<Event> eventOptional = eventRepository.findById(workstationId);
         if (eventOptional.isPresent()) {
             Event event = eventOptional.get();
             Set<Workstation> workstations = event.getWorkstations();
             for (Workstation workstation : workstations) {
                 if (workstation.getWorkstationId() == workstationId) {
-                    Set<WorkstationProduct> workstationProducts = workstation.getWorkstationProducts();
-                    for (WorkstationProduct product : workstationProducts) {
+                    Set<Product> products = workstation.getProducts();
+                    for (Product product : products) {
                         if (product.getProductId() == productId) {
                             // Update properties of the matched product
                             product.setProductName(updatedProductDTO.getProductName());
@@ -125,8 +125,8 @@ public class EventService {
             Set<Workstation> workstations = event.getWorkstations();
             for (Workstation workstation : workstations) {
                 if (workstation.getWorkstationId() == workstationId) {
-                    Set<WorkstationProduct> workstationProducts = workstation.getWorkstationProducts();
-                    for (WorkstationProduct product : workstationProducts) {
+                    Set<Product> products = workstation.getProducts();
+                    for (Product product : products) {
                         Long productId = product.getProductId();
                         if (quantityMap.containsKey(productId)) {
                             Double newQuantityInserted = quantityMap.get(productId);
@@ -155,8 +155,8 @@ public class EventService {
             Set<Workstation> workstations = event.getWorkstations();
             for (Workstation workstation : workstations) {
                 if (workstation.getWorkstationId() == workstationId) {
-                    Set<WorkstationProduct> workstationProducts = workstation.getWorkstationProducts();
-                    for (WorkstationProduct product : workstationProducts) {
+                    Set<Product> products = workstation.getProducts();
+                    for (Product product : products) {
                         Long productId = product.getProductId();
                         if (quantityMap.containsKey(productId)) {
                             Double newConsumedQuantity = quantityMap.get(productId);
@@ -173,7 +173,7 @@ public class EventService {
         }
     }
 
-    public WorkstationDTO addProductsToWorkstation(long eventId, long workstationId, List<WorkstationProductDTO> productDTOList) {
+    public WorkstationDTO addProductsToWorkstation(long eventId, long workstationId, List<ProductDTO> productDTOList) {
         // Retrieve the event and workstation
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
@@ -184,15 +184,24 @@ public class EventService {
                 .orElseThrow(() -> new NotFoundException("Workstation not found"));
 
         // Convert and add product DTOs to the workstation
-        List<WorkstationProduct> products = productDTOList.stream()
-                .map(WorkstationProductDTO::toEntity)
+        List<Product> products = productDTOList.stream()
+                .map(ProductDTO::toEntity)
                 .toList();
 
-        workstation.getWorkstationProducts().addAll(products);
+        workstation.getProducts().addAll(products);
 
         // Save the changes
         eventRepository.save(event);
 
         return WorkstationDTO.fromEntity(workstation);
+    }
+
+    @Transactional
+    public void closeEvent(long eventId) {
+        log.info("Close event with id {}", eventId);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found"));
+
+        event.setEventStatus(EventStatus.CHIUSO);
     }
 }

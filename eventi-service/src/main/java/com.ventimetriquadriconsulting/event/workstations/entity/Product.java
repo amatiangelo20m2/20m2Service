@@ -13,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WorkstationProduct implements Serializable {
+public class Product implements Serializable {
 
     private long productId;
     private String productName;

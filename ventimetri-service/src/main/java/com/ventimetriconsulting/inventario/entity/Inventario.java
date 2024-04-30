@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity(name = "Inventario")
 @Table(name = "inventario",
-        uniqueConstraints=@UniqueConstraint(columnNames={"inventario_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "storage_id"}))
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -35,12 +35,12 @@ public class Inventario {
     private long inventarioId;
 
 
-    @ManyToOne
-    @JoinColumn(name = "storage_id")
+    @ManyToOne(fetch = FetchType.LAZY) // Many Inventario belong to one Storage
+    @JoinColumn(name = "storage_id", referencedColumnName = "storage_id")
     private Storage storage;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
+    @ManyToOne(fetch = FetchType.LAZY) // Many Inventario belong to one Product
+    @JoinColumn(name = "product_id", referencedColumnName = "product_id")
     private Product product;
 
     private LocalDate insertionDate;

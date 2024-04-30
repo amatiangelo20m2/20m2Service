@@ -1,11 +1,13 @@
 package com.ventimetriquadriconsulting.event.workstations.entity.dto;
 
 import com.ventimetriquadriconsulting.event.workstations.entity.UnitMeasure;
-import com.ventimetriquadriconsulting.event.workstations.entity.WorkstationProduct;
+import com.ventimetriquadriconsulting.event.workstations.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,7 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WorkstationProductDTO {
+public class ProductDTO {
 
     private long productId;
     private String productName;
@@ -22,8 +24,8 @@ public class WorkstationProductDTO {
     private double price;
     private UnitMeasure unitMeasure;
 
-    public static WorkstationProductDTO fromEntity(WorkstationProduct product) {
-        return WorkstationProductDTO.builder()
+    public static ProductDTO fromEntity(Product product) {
+        return ProductDTO.builder()
                 .productId(product.getProductId())
                 .productName(product.getProductName())
                 .quantityInserted(product.getQuantityInserted())
@@ -33,8 +35,8 @@ public class WorkstationProductDTO {
                 .build();
     }
 
-    public static WorkstationProduct toEntity(WorkstationProductDTO productDTO) {
-        return WorkstationProduct.builder()
+    public static Product toEntity(ProductDTO productDTO) {
+        return Product.builder()
                 .productId(productDTO.getProductId())
                 .productName(productDTO.getProductName())
                 .quantityInserted(productDTO.getQuantityInserted())
@@ -44,15 +46,15 @@ public class WorkstationProductDTO {
                 .build();
     }
 
-    public static Set<WorkstationProductDTO> listFromEntities(Set<WorkstationProduct> products) {
+    public static Set<ProductDTO> listFromEntities(Set<Product> products) {
         return products.stream()
-                .map(WorkstationProductDTO::fromEntity)
+                .map(ProductDTO::fromEntity)
                 .collect(Collectors.toSet());
     }
 
-    public static Set<WorkstationProduct> listToEntities(Set<WorkstationProductDTO> productDTOs) {
+    public static Set<Product> listToEntities(List<ProductDTO> productDTOs) {
         return productDTOs.stream()
-                .map(WorkstationProductDTO::toEntity)
+                .map(ProductDTO::toEntity)
                 .collect(Collectors.toSet());
     }
 }
