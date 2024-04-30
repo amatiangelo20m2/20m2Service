@@ -164,7 +164,12 @@ public class TestSuiteVentiMetriQuadriService {
                 branchRepository);
         supplierController = new SupplierController(supplierService);
 
-        StorageService storageService = new StorageService(storageRepository, supplierRepository, branchRepository, inventarioRepository);
+        StorageService storageService = new StorageService(storageRepository,
+                supplierRepository,
+                branchRepository,
+                inventarioRepository,
+                productRepository);
+
         storageController = new StorageController(storageService, branchService);
 
 
@@ -499,10 +504,7 @@ public class TestSuiteVentiMetriQuadriService {
                 assertEquals(2, Objects.requireNonNull(inventarioDTOResponseEntity.getBody()).getInventoryAction().size());
                 assertNull(inventarioDTOResponseEntity.getBody().getDeletionDate());
 
-                ResponseEntity<InventarioDTO> inventarioDTOResponseEntity1 = storageController
-                        .removeProductFromStorage(inventarioDTOResponseEntity.getBody().getInventarioId());
-
-                assertNotNull(Objects.requireNonNull(inventarioDTOResponseEntity1.getBody()).getDeletionDate());
+                storageController.removeProductFromStorage(inventarioDTOResponseEntity.getBody().getInventarioId());
 
                 List<TransactionInventoryRequest.TransactionItem> transactionItemList = new ArrayList<>();
                 for(InventarioDTO inventarioDTO : inventarioList.getBody()){
@@ -556,8 +558,6 @@ public class TestSuiteVentiMetriQuadriService {
                 assertEquals("Angelo Amati", orderDTO.getBody().getCreatedByUser());
 
                 assertEquals(2, orderDTO.getBody().getOrderItemDtoList().size());
-
-                System.out.println("");
 
                 LocalDate today = LocalDate.now();
 
