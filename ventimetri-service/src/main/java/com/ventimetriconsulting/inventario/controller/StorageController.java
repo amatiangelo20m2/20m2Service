@@ -30,11 +30,11 @@ public class StorageController {
 
     @PostMapping(path = "/create")
     public ResponseEntity<StorageDTO> addStorage(
-            @RequestBody StorageDTO supplierDTO,
+            @RequestBody StorageDTO storageDTO,
             @RequestParam("branchCode") String branchCode) {
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(storageService.createStorage(supplierDTO, branchCode));
+                .body(storageService.createStorage(storageDTO, branchCode));
     }
 
     @PostMapping(path = "/addproduct")

@@ -44,9 +44,6 @@ public class Workstation {
     private String name;
     private String responsable;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
-    private Event event;
 
     @Enumerated
     private WorkstationType workstationType;
@@ -60,15 +57,13 @@ public class Workstation {
     private Set<Product> products;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Workstation that = (Workstation) o;
-        return workstationId == that.workstationId && Objects.equals(name, that.name) && Objects.equals(responsable, that.responsable) && Objects.equals(event, that.event) && workstationType == that.workstationType && Objects.equals(products, that.products);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(workstationId, name, responsable, event, workstationType, products);
+    public String toString() {
+        return "Workstation{" +
+                "workstationId=" + workstationId +
+                ", name='" + name + '\'' +
+                ", responsable='" + responsable + '\'' +
+                ", workstationType=" + workstationType +
+                ", products=" + products +
+                '}';
     }
 }

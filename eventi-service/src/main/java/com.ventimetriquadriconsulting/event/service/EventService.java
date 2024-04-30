@@ -1,8 +1,11 @@
 package com.ventimetriquadriconsulting.event.service;
 
 
+import com.ventimetriquadriconsulting.event.entity.CateringStorage;
 import com.ventimetriquadriconsulting.event.entity.Event;
+import com.ventimetriquadriconsulting.event.entity.dto.CateringStorageDTO;
 import com.ventimetriquadriconsulting.event.entity.dto.EventDTO;
+import com.ventimetriquadriconsulting.event.repository.CateringStorageRepository;
 import com.ventimetriquadriconsulting.event.repository.EventRepository;
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
 import com.ventimetriquadriconsulting.event.workstations.entity.Workstation;
@@ -27,6 +30,7 @@ public class EventService {
 
     private EventRepository eventRepository;
     private WorkstationRepository workstationRepository;
+    private CateringStorageRepository cateringStorageRepository;
 
     @Transactional
     public EventDTO createEvent(EventDTO eventDto){
@@ -53,9 +57,21 @@ public class EventService {
 
     @Transactional
     @Modifying
-    public void deleteWorkstation(long workstationId) {
+    public void deleteWorkstation(long workstationId, long eventId) {
         log.info("Delete workstation by id {}", workstationId);
+
+        Workstation workstation = workstationRepository.findById(workstationId)
+                .orElseThrow(() -> new NotFoundException("Workstation not found for id " + workstationId));
+
+
+        Event event = eventRepository
+                .findById(eventId).orElseThrow(()
+                -> new NotFoundException("Exception thowed while getting data. No event with id : "
+                        + eventId + "found. Cannot delete workstation with id " + workstationId));
+
+        event.getWorkstations().remove(workstation);
         workstationRepository.deleteById(workstationId);
+
     }
 
     @Transactional
@@ -208,22 +224,27 @@ public class EventService {
 
     @Transactional
     public WorkstationDTO addWorkstationToEvent(long eventId, WorkstationDTO workstationDTO) {
-        log.info("Adding workstation to event with ID {}", eventId);
+        log.info("Create workstation {} to event with ID {}" ,workstationDTO, eventId);
 
-        // Find the event entity by its ID
-        Optional<Event> eventOptional = eventRepository.findById(eventId);
-
-        // Check if the event entity exists
-        if (eventOptional.isPresent()) {
-            Workstation workstation = WorkstationDTO.toEntity(workstationDTO);
-
-            Event event = eventOptional.get();
-            event.getWorkstations().add(workstation);
-
-            event = eventRepository.save(event);
-            return WorkstationDTO.fromEntity(workstation);
-        } else {
-            return null;
+        if(workstationDTO.getWorkstationProducts() == null){
+            workstationDTO.setWorkstationProducts(new HashSet<>());
         }
+
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found with id: " + eventId + ". Cannot associate the workstation" ));
+        Workstation workstation = WorkstationDTO.toEntity(workstationDTO);
+
+        if(workstation.getProducts() == null) {
+            workstation.setProducts(new HashSet<>());
+        }
+
+        Workstation savedWorkstation = workstationRepository.save(workstation);
+        event.getWorkstations().add(savedWorkstation);
+
+        return WorkstationDTO.fromEntity(savedWorkstation);
+    }
+
+    public CateringStorageDTO createCateringStorage(CateringStorageDTO cateringStorageDTO) {
+        log.info("Create catering storage {}", cateringStorageDTO);
+        return CateringStorageDTO.fromEntity(cateringStorageRepository.save(CateringStorageDTO.toEntity(cateringStorageDTO)));
     }
 }

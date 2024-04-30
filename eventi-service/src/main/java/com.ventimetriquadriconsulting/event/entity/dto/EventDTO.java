@@ -33,7 +33,6 @@ public class EventDTO implements Serializable {
     private String location;
     private Set<WorkstationDTO> workstations;
     private Set<ExpenseEventDTO> expenseEvents;
-    private Set<ProductDTO> eventProducts;
 
     public static EventDTO fromEntity(Event event) {
         return EventDTO.builder()

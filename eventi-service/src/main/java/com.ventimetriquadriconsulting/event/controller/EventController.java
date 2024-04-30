@@ -16,10 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "api/v1/app/event")
@@ -33,7 +30,7 @@ public class EventController {
 
     @GetMapping(path = "/findeventbybranchcode")
     public ResponseEntity<List<EventDTO>> retrieveEventsByBranchCode(@RequestParam("branchCode") String branchCode,
-                                                                    @RequestParam EventStatus eventStatus){
+                                                                     @RequestParam EventStatus eventStatus){
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(eventService.findEventByBranchCodeAndStatus(branchCode, eventStatus));
@@ -47,21 +44,21 @@ public class EventController {
     }
 
     @PutMapping(path = "/{eventId}/createworkstation")
-    public ResponseEntity<WorkstationDTO> createWorkstation(@RequestParam("eventId") long eventId,
-                                            @RequestBody WorkstationDTO workstationDTO){
+    public ResponseEntity<WorkstationDTO> createWorkstation(@PathVariable("eventId") long eventId,
+                                                            @RequestBody WorkstationDTO workstationDTO){
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(eventService.addWorkstationToEvent(
-                                eventId,
-                                workstationDTO));
+                        eventId,
+                        workstationDTO));
 
     }
 
 
     @DeleteMapping(path = "/delete/workstation")
-    public ResponseEntity<Void> deleteWorkstation(long workstationId){
-        eventService.deleteWorkstation(workstationId);
+    public ResponseEntity<Void> deleteWorkstation(long workstationId, long eventId){
+        eventService.deleteWorkstation(workstationId, eventId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(null);
@@ -120,25 +117,39 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
+    @PostMapping("/createcateringstorage")
+    public ResponseEntity<CateringStorageDTO> createCateringStorage(@RequestBody CateringStorageDTO cateringStorageDTO) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService
+                        .createCateringStorage(cateringStorageDTO));
+    }
+
     @GetMapping("/{branchCode}/retrievecateringstorage")
-    public ResponseEntity<?> retrieveCateringStorageEvent(@PathVariable String branchCode) {
+    public ResponseEntity<List<CateringStorageDTO>> retrieveCateringStorageEvent(@PathVariable String branchCode) {
 
         log.info("Retrieve Storage for events by branch code {}", branchCode);
         Optional<List<CateringStorage>> byBranchCode = cateringStorageService.findByBranchCode(branchCode);
 
-        if(byBranchCode.isPresent()){
-            return ResponseEntity.status(HttpStatus.OK).body(CateringStorageDTO.fromEntityList(byBranchCode.get()));
-        }else{
-            return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>());
-        }
+        return byBranchCode.map(cateringStorages
+                        -> ResponseEntity.status(HttpStatus.OK).body(CateringStorageDTO.fromEntityList(cateringStorages)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.OK).body(null));
     }
 
     @PutMapping("/{cateringStorageId}/addproduct/")
     public ResponseEntity<List<ProductDTO>> addProductToStorageCatering(@PathVariable long cateringStorageId,
-                                                         @RequestBody List<ProductDTO> productDTOList){
+                                                                        @RequestBody List<ProductDTO> productDTOList){
 
         List<ProductDTO> productDTOS = cateringStorageService.addProducts(cateringStorageId, productDTOList);
         return ResponseEntity.status(HttpStatus.OK).body(productDTOS);
+    }
+
+    @DeleteMapping("/{cateringStorageId}/removeproduct/{productId}")
+    public ResponseEntity<?> removeProductFromStorageMobile(@PathVariable long cateringStorageId,
+                                                                        @PathVariable long productId){
+
+        cateringStorageService.removeProducts(cateringStorageId, productId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/{productId}/deleteproductfromcateringstorage/{cateringStorageId}")

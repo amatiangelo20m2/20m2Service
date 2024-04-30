@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity(name = "Event")
@@ -54,9 +55,12 @@ public class Event implements Serializable {
     private String branchCode;
     private String location;
 
-    @OneToMany(mappedBy = "event",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE })
+    @JoinTable(
+            name = "event_workstation",
+            joinColumns = @JoinColumn(name = "eventi_id"),
+            inverseJoinColumns = @JoinColumn(name = "workstation_id"))
     private Set<Workstation> workstations;
 
     @ElementCollection
@@ -67,4 +71,26 @@ public class Event implements Serializable {
     @OrderColumn(name = "position")
     private Set<ExpenseEvent> expenseEvents;
 
+    public Set<Workstation> getWorkstations() {
+        if (this.workstations == null) {
+            this.workstations = new HashSet<>();
+        }
+        return this.workstations;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eventId=" + eventId +
+                ", name='" + name + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", dateEvent=" + dateEvent +
+                ", dateCreation=" + dateCreation +
+                ", eventStatus=" + eventStatus +
+                ", branchCode='" + branchCode + '\'' +
+                ", location='" + location + '\'' +
+                ", workstations=" + workstations +
+                ", expenseEvents=" + expenseEvents +
+                '}';
+    }
 }

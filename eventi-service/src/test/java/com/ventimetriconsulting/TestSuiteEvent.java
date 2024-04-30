@@ -46,11 +46,12 @@ public class TestSuiteEvent {
 
     @Autowired
     private CateringStorageRepository cateringStorageRepository;
+
     @BeforeEach
     public void init(){
 
         CateringStorageService cateringStorageService = new CateringStorageService(cateringStorageRepository);
-        EventService eventService = new EventService(eventRepository, workstationRepository);
+        EventService eventService = new EventService(eventRepository, workstationRepository, cateringStorageRepository);
         eventController = new EventController(eventService, cateringStorageService);
     }
 
@@ -98,7 +99,6 @@ public class TestSuiteEvent {
                 .getWorkstations().stream().toList().get(0).getWorkstationProducts().stream().toList().get(2).getProductId();
 
         eventController.deleteWorkstationProduct(workstationId, productId);
-
 
         eventsByBranchCode = eventController.retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO);
 

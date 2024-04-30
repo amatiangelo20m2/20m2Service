@@ -19,12 +19,16 @@ import java.util.stream.Collectors;
 public class CateringStorageDTO {
     private long cateringStorageId;
     private String branchCode;
+    private String name;
+    private String carLicensePlate;
     private Set<ProductDTO> cateringStorageProducts;
 
     public static CateringStorageDTO fromEntity(CateringStorage cateringStorage) {
         return CateringStorageDTO.builder()
                 .cateringStorageId(cateringStorage.getCateringStorageId())
                 .branchCode(cateringStorage.getBranchCode())
+                .name(cateringStorage.getName())
+                .carLicensePlate(cateringStorage.getCarLicensePlate())
                 .cateringStorageProducts(cateringStorage.getCateringStorageProducts().stream()
                         .map(ProductDTO::fromEntity)
                         .collect(Collectors.toSet()))
@@ -35,16 +39,18 @@ public class CateringStorageDTO {
         return CateringStorage.builder()
                 .cateringStorageId(cateringStorageDTO.getCateringStorageId())
                 .branchCode(cateringStorageDTO.getBranchCode())
+                .name(cateringStorageDTO.getName())
+                .carLicensePlate(cateringStorageDTO.getCarLicensePlate())
                 .cateringStorageProducts(cateringStorageDTO.getCateringStorageProducts().stream()
                         .map(ProductDTO::toEntity)
                         .collect(Collectors.toSet()))
                 .build();
     }
 
-    public static Set<CateringStorageDTO> fromEntityList(List<CateringStorage> cateringStorages) {
+    public static List<CateringStorageDTO> fromEntityList(List<CateringStorage> cateringStorages) {
         return cateringStorages.stream()
                 .map(CateringStorageDTO::fromEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public static Set<CateringStorage> toEntityList(Set<CateringStorageDTO> cateringStorageDTOs) {

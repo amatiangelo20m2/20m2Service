@@ -6,15 +6,13 @@ import com.ventimetriquadriconsulting.event.repository.CateringStorageRepository
 import com.ventimetriquadriconsulting.event.workstations.entity.Product;
 import com.ventimetriquadriconsulting.event.workstations.entity.dto.ProductDTO;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,5 +85,16 @@ public class CateringStorageService {
             // Save the updated CateringStorage entity
             cateringStorageRepository.save(cateringStorage);
         });
+    }
+
+    @Transactional
+    @Modifying
+    public void removeProducts(long cateringStorageId, long productId) {
+        log.info("Remove product with id {} from storage mobile with id {}", productId, cateringStorageId);
+        CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
+                -> new NotFoundException("Exception throwed while getting data for catering storage with id : " + cateringStorageId + ". Cannot retrieve catering storage and delete product with id " + productId));
+
+        cateringStorage.getCateringStorageProducts().removeIf(product -> product.getProductId() == productId);
+        cateringStorageRepository.save(cateringStorage);
     }
 }

@@ -40,9 +40,17 @@ public class CateringStorage {
     )
     private String branchCode;
 
+    private String name;
+
+    @Column(
+            name = "car_licence_plate",
+            length = 10
+    )
+    private String carLicensePlate;
+
     @ElementCollection
     @CollectionTable(
-            name = "event_products",
+            name = "catering_products",
             joinColumns = @JoinColumn(name = "event_product_id")
     )
     @OrderColumn(name = "position")
