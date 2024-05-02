@@ -3,13 +3,12 @@ package com.ventimetriquadriconsulting.event.controller;
 import com.ventimetriquadriconsulting.event.entity.CateringStorage;
 import com.ventimetriquadriconsulting.event.entity.dto.CateringStorageDTO;
 import com.ventimetriquadriconsulting.event.entity.dto.EventDTO;
-import com.ventimetriquadriconsulting.event.repository.CateringStorageRepository;
+import com.ventimetriquadriconsulting.event.entity.dto.ExpenseEventDTO;
 import com.ventimetriquadriconsulting.event.service.CateringStorageService;
 import com.ventimetriquadriconsulting.event.service.EventService;
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
 import com.ventimetriquadriconsulting.event.workstations.entity.dto.WorkstationDTO;
 import com.ventimetriquadriconsulting.event.workstations.entity.dto.ProductDTO;
-import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -87,24 +86,6 @@ public class EventController {
         return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
     }
 
-    @PostMapping("/{eventId}/workstations/{workstationId}/products")
-    public ResponseEntity<?> addProductsToWorkstation(@PathVariable long eventId,
-                                                      @PathVariable long workstationId,
-                                                      @RequestBody List<ProductDTO> productDTOList) {
-        try {
-
-            WorkstationDTO workstationDTO = eventService.addProductsToWorkstation(eventId, workstationId, productDTOList);
-            return ResponseEntity.ok().body(workstationDTO);
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request.");
-        }
-    }
-
     @DeleteMapping("/{eventId}/delete")
     public ResponseEntity<?> deleteEvent(@PathVariable long eventId){
         eventService.deleteEvent(eventId);
@@ -158,6 +139,21 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PutMapping("/{eventId}/expence/save")
+    public ResponseEntity<ExpenseEventDTO> saveExpence(@PathVariable long eventId, @RequestBody ExpenseEventDTO expenseEventDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.saveExpence(eventId, expenseEventDTO));
+    }
+
+    @DeleteMapping("/{eventId}/expence/delete")
+    public ResponseEntity<?> deleteExpence(@PathVariable long eventId, @RequestBody ExpenseEventDTO expenseEventDTO){
+        eventService.deleteExpence(eventId, expenseEventDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/{eventId}/expence/update")
+    public ResponseEntity<ExpenseEventDTO> updateExpence(@PathVariable long eventId, @RequestBody ExpenseEventDTO expenseEventDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.updateExpence(eventId, expenseEventDTO));
+    }
 
 
 //
@@ -182,10 +178,40 @@ public class EventController {
 //        return eventService.createWorkstation(workstation);
 //    }
 //
-//    @PostMapping(path = "/workstation/addproduct")
-//    public Workstation addProductToWorkstation(@RequestBody Workstation workstation){
-//        return eventService.createWorkstation(workstation);
-//    }
+    @PostMapping(path = "/{eventiId}/{cateringStorageId}/workstation/{workstationId}/addproducts")
+    public ResponseEntity<List<ProductDTO>> addProductToWorkstation(@PathVariable long eventiId,
+                                                                    @PathVariable long workstationId,
+                                                                    @PathVariable long cateringStorageId,
+                                                                    @RequestParam List<Long> productIds) {
+
+        List<ProductDTO> productDTOS = eventService.addProductsToWorkstation(eventiId, workstationId, productIds, cateringStorageId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(productDTOS);
+    }
+
+    @DeleteMapping(path = "/deletefromworkstation/{workstationId}/product/{productId}")
+    public ResponseEntity<?> deleteProductFromWorkstation(@PathVariable long workstationId, @PathVariable long productId){
+        eventService.deleteProductFromWorkstation(workstationId, productId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    @PutMapping(path = "/loadamountforworkstationproduct/{workstationId}")
+    public ResponseEntity<?> loadAmountForWorkstationProduct(@PathVariable long workstationId,
+                                                               @RequestBody Map<Long, Double> insertValueMapProductIdAmountToInsert) {
+
+        eventService.setLoadQuantity(workstationId, insertValueMapProductIdAmountToInsert);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping(path = "/unloadamountforworkstationproduct/{workstationId}")
+    public ResponseEntity<?> unloadAmountForWorkstationProduct(@PathVariable long workstationId,
+                                                               @RequestBody Map<Long, Double> insertValueMapProductIdAmountToInsert) {
+
+        eventService.setUnLoadQuantity(workstationId, insertValueMapProductIdAmountToInsert);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 //
 //    // EXPENCE RESOURCES
 //    @GetMapping(path = "/expence/retrievebyeventid")

@@ -175,7 +175,7 @@ public class BranchService {
         return getBranchesByUserCode(userCode, fcmToken);
     }
     private BranchResponseEntity convertToBranchResponseEntity(BranchUser branchUser) {
-        log.info("Convert Branch User object to a dto" + branchUser.toString());
+//        log.info("Convert Branch User object to a dto" + branchUser.toString());
         return BranchResponseEntity.builder()
                 .branchId(branchUser.getBranch().getBranchId())
                 .name(branchUser.getBranch().getName())
@@ -194,7 +194,7 @@ public class BranchService {
     }
 
     private BranchResponseEntity convertToBranchResponseEntity(Branch branch) {
-        log.info("Convert Branch object to a dto" + branch.toString());
+//        log.info("Convert Branch object to a dto" + branch.toString());
         return BranchResponseEntity.builder()
                 .branchId(branch.getBranchId())
                 .name(branch.getName())

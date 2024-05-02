@@ -46,10 +46,10 @@ public class ProductDTO {
                 .build();
     }
 
-    public static Set<ProductDTO> listFromEntities(Set<Product> products) {
+    public static List<ProductDTO> listFromEntities(List<Product> products) {
         return products.stream()
                 .map(ProductDTO::fromEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public static Set<Product> listToEntities(List<ProductDTO> productDTOs) {

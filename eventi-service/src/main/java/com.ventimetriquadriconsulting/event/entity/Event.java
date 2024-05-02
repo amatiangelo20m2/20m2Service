@@ -78,6 +78,13 @@ public class Event implements Serializable {
         return this.workstations;
     }
 
+    public Set<ExpenseEvent> getExpenseEvents() {
+        if (this.expenseEvents == null) {
+            this.expenseEvents = new HashSet<>();
+        }
+        return this.expenseEvents;
+    }
+
     @Override
     public String toString() {
         return "Event{" +

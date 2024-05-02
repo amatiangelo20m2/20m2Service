@@ -3,8 +3,10 @@ package com.ventimetriquadriconsulting.event.service;
 
 import com.ventimetriquadriconsulting.event.entity.CateringStorage;
 import com.ventimetriquadriconsulting.event.entity.Event;
+import com.ventimetriquadriconsulting.event.entity.ExpenseEvent;
 import com.ventimetriquadriconsulting.event.entity.dto.CateringStorageDTO;
 import com.ventimetriquadriconsulting.event.entity.dto.EventDTO;
+import com.ventimetriquadriconsulting.event.entity.dto.ExpenseEventDTO;
 import com.ventimetriquadriconsulting.event.repository.CateringStorageRepository;
 import com.ventimetriquadriconsulting.event.repository.EventRepository;
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
@@ -66,7 +68,7 @@ public class EventService {
 
         Event event = eventRepository
                 .findById(eventId).orElseThrow(()
-                -> new NotFoundException("Exception thowed while getting data. No event with id : "
+                        -> new NotFoundException("Exception thowed while getting data. No event with id : "
                         + eventId + "found. Cannot delete workstation with id " + workstationId));
 
         event.getWorkstations().remove(workstation);
@@ -189,27 +191,40 @@ public class EventService {
         }
     }
 
-    public WorkstationDTO addProductsToWorkstation(long eventId, long workstationId, List<ProductDTO> productDTOList) {
+    public List<ProductDTO> addProductsToWorkstation(
+            long eventId,
+            long workstationId,
+            List<Long> productIds,
+            long cateringStorageId) {
+
         // Retrieve the event and workstation
+
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
+
 
         Workstation workstation = event.getWorkstations().stream()
                 .filter(ws -> ws.getWorkstationId() == workstationId)
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Workstation not found"));
 
-        // Convert and add product DTOs to the workstation
-        List<Product> products = productDTOList.stream()
-                .map(ProductDTO::toEntity)
+        CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
+                -> new NotFoundException("Catering storage not found for id [" + cateringStorageId + "]"));
+
+        List<Product> productsToAdd = cateringStorage.getCateringStorageProducts().stream()
+                .filter(product -> productIds.contains(product.getProductId()))
                 .toList();
 
-        workstation.getProducts().addAll(products);
+        if(productsToAdd.isEmpty()) {
+            log.warn("No products found for the given product IDs: {}", productIds);
+        }
+
+        workstation.getProducts().addAll(productsToAdd);
 
         // Save the changes
         eventRepository.save(event);
 
-        return WorkstationDTO.fromEntity(workstation);
+        return ProductDTO.listFromEntities(productsToAdd);
     }
 
     @Transactional
@@ -246,5 +261,106 @@ public class EventService {
     public CateringStorageDTO createCateringStorage(CateringStorageDTO cateringStorageDTO) {
         log.info("Create catering storage {}", cateringStorageDTO);
         return CateringStorageDTO.fromEntity(cateringStorageRepository.save(CateringStorageDTO.toEntity(cateringStorageDTO)));
+    }
+
+    @Transactional
+    public ExpenseEventDTO saveExpence(long eventId, ExpenseEventDTO expenseEventDTO) {
+        log.info("Create expence {} for event with id {}", expenseEventDTO, eventId);
+
+        Event event = eventRepository.findById(eventId).orElseThrow(() ->
+                new NotFoundException("Event not found for id " + eventId));
+
+        ExpenseEvent expenseEvent = expenseEventDTO.toEntity();
+        event.getExpenseEvents().add(expenseEvent);
+
+        eventRepository.save(event);
+
+        return ExpenseEventDTO.fromEntity(expenseEvent);
+    }
+
+    @Transactional
+    @Modifying
+    public void deleteExpence(long eventId, ExpenseEventDTO expenseEventDTO) {
+        log.info("Delete expence {} for event with id {}", expenseEventDTO, eventId);
+        Event event = eventRepository.findById(eventId).orElseThrow(() ->
+                new NotFoundException("Event not found for id " + eventId));
+
+        for (ExpenseEvent expenseEvent : event.getExpenseEvents()) {
+            if (expenseEvent.getExpenseId() == expenseEventDTO.getExpenseId()) {
+                event.getExpenseEvents().remove(expenseEvent);
+                break;
+            }
+        }
+        eventRepository.save(event);
+    }
+
+    @Transactional
+    @Modifying
+    public ExpenseEventDTO updateExpence(long eventId, ExpenseEventDTO updatedExpenseEvent) {
+        log.info("Update expence {} for event with id {}", updatedExpenseEvent, eventId);
+        Event event = eventRepository.findById(eventId).orElseThrow(() ->
+                new NotFoundException("Event not found for id " + eventId));
+
+        ExpenseEvent updatedExpense = null;
+
+        for (ExpenseEvent expenseEvent : event.getExpenseEvents()) {
+            if (expenseEvent.getExpenseId() == updatedExpenseEvent.getExpenseId()) {
+                // Update the attributes of the found ExpenseEvent
+                expenseEvent.setDescription(updatedExpenseEvent.getDescription());
+                expenseEvent.setPrice(updatedExpenseEvent.getPrice());
+                expenseEvent.setAmount(updatedExpenseEvent.getAmount());
+                expenseEvent.setDateInsert(updatedExpenseEvent.getDateInsert());
+                updatedExpense = expenseEvent;
+            }
+        }
+        eventRepository.save(event);
+
+        return ExpenseEventDTO.fromEntity(Objects.requireNonNull(updatedExpense));
+    }
+
+    @Transactional
+    @Modifying
+    public void deleteProductFromWorkstation(long workstationId, long productId) {
+        log.info("Delete product form workstation with id {} - Product to remove has id {}", workstationId, productId);
+
+        Workstation workstation = workstationRepository.findById(workstationId).orElseThrow(() -> new NotFoundException("Workstation not found for id " + workstationId));
+        Optional<Product> productOptional = workstation.getProducts().stream()
+                .filter(product -> product.getProductId() == productId)
+                .findFirst();
+        productOptional.ifPresent(product -> workstation.getProducts().remove(product));
+    }
+
+    @Transactional
+    @Modifying
+    public void setLoadQuantity(long workstationId, Map<Long, Double> insertValueMapProductIdAmountToInsert) {
+        log.info("This map contain the product id and the amount to add in order to perform a load product into workstation event. MAP: {} and it will be apply to a workstation with id {}", insertValueMapProductIdAmountToInsert, workstationId);
+
+        Workstation workstation = workstationRepository.findById(workstationId).orElseThrow(()
+                -> new NotFoundException("Workstation not found for id " + workstationId));
+
+        for (Product product : workstation.getProducts()) {
+            long productId = product.getProductId();
+            if (insertValueMapProductIdAmountToInsert.containsKey(productId)) {
+                double quantityInserted = insertValueMapProductIdAmountToInsert.get(productId);
+                product.setQuantityInserted(quantityInserted);
+            }
+        }
+    }
+
+    @Transactional
+    @Modifying
+    public void setUnLoadQuantity(long workstationId, Map<Long, Double> insertValueMapProductIdAmountToInsert) {
+        log.info("This map contain the product id and the amount to add in order to perform a unload product into workstation event. MAP: {} and it will be apply to a workstation with id {}", insertValueMapProductIdAmountToInsert, workstationId);
+
+        Workstation workstation = workstationRepository.findById(workstationId).orElseThrow(()
+                -> new NotFoundException("Workstation not found for id " + workstationId));
+
+        for (Product product : workstation.getProducts()) {
+            long productId = product.getProductId();
+            if (insertValueMapProductIdAmountToInsert.containsKey(productId)) {
+                double quantityInserted = insertValueMapProductIdAmountToInsert.get(productId);
+                product.setQuantityConsumed(quantityInserted);
+            }
+        }
     }
 }
