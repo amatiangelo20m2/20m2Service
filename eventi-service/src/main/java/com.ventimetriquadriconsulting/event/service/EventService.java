@@ -23,6 +23,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -271,6 +272,9 @@ public class EventService {
                 new NotFoundException("Event not found for id " + eventId));
 
         ExpenseEvent expenseEvent = expenseEventDTO.toEntity();
+
+        expenseEvent.setExpenseId(UUID.randomUUID().toString());
+        expenseEvent.setDateInsert(LocalDate.now());
         event.getExpenseEvents().add(expenseEvent);
 
         eventRepository.save(event);
@@ -286,7 +290,7 @@ public class EventService {
                 new NotFoundException("Event not found for id " + eventId));
 
         for (ExpenseEvent expenseEvent : event.getExpenseEvents()) {
-            if (expenseEvent.getExpenseId() == expenseEventDTO.getExpenseId()) {
+            if (Objects.equals(expenseEvent.getExpenseId(), expenseEventDTO.getExpenseId())) {
                 event.getExpenseEvents().remove(expenseEvent);
                 break;
             }
@@ -304,7 +308,7 @@ public class EventService {
         ExpenseEvent updatedExpense = null;
 
         for (ExpenseEvent expenseEvent : event.getExpenseEvents()) {
-            if (expenseEvent.getExpenseId() == updatedExpenseEvent.getExpenseId()) {
+            if (Objects.equals(expenseEvent.getExpenseId(), updatedExpenseEvent.getExpenseId())) {
                 // Update the attributes of the found ExpenseEvent
                 expenseEvent.setDescription(updatedExpenseEvent.getDescription());
                 expenseEvent.setPrice(updatedExpenseEvent.getPrice());

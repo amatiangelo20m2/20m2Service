@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Builder
 public class ExpenseEventDTO implements Serializable {
 
-    private long expenseId;
+    private String expenseId;
     private String description;
     private double price;
     private double amount;

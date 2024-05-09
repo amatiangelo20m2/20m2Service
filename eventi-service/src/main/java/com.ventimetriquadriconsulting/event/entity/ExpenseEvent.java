@@ -14,11 +14,10 @@ import java.time.LocalDate;
 @Builder
 public class ExpenseEvent {
 
-    private long expenseId;
+    private String expenseId;
     private String description;
     private double price;
     private double amount;
     private LocalDate dateInsert;
-
 
 }
