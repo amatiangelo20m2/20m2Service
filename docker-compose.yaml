@@ -63,72 +63,84 @@ services:
     ports:
       - "5050:80"
 
-  discovery-server:
-    image: amatiangelo1990/20m2:discovery-server
-    container_name: discovery-server
-    ports:
-      - "8761:8761"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-    depends_on:
-      - zipkin
-  api-gw:
-    image: amatiangelo1990/20m2:api-gw
-    container_name: api-gw
-    ports:
-      - "8088:8088"
-    expose:
-      - "8088"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
-    depends_on:
-      - zipkin
-      - discovery-server
-  auth-service:
-    image: amatiangelo1990/20m2:auth-service
-    container_name: auth-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
-    depends_on:
-      - zipkin
-      - discovery-server
-      - api-gw
-  notification-service:
-    image: amatiangelo1990/20m2:notification-service
-    container_name: notification-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
-    depends_on:
-      - zipkin
-      - discovery-server
-      - api-gw
-  ventimetri-service:
-    image: amatiangelo1990/20m2:ventimetri-service
-    container_name: ventimetri-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
-    depends_on:
-      - zipkin
-      - discovery-server
-      - api-gw
-      - notification-service
-      - db20m2
-  eventi-service:
-    image: amatiangelo1990/20m2:eventi-service
-    container_name: eventi-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
-    depends_on:
-      - zipkin
-      - discovery-server
-      - api-gw
-      - notification-service
-      - db20m2event
+#  discovery-server:
+#    image: amatiangelo1990/20m2:discovery-server
+#    container_name: discovery-server
+#    ports:
+#      - "8761:8761"
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#    depends_on:
+#      - zipkin
+#  api-gw:
+#    image: amatiangelo1990/20m2:api-gw
+#    container_name: api-gw
+#    ports:
+#      - "8088:8088"
+#    expose:
+#      - "8088"
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#  auth-service:
+#    image: amatiangelo1990/20m2:auth-service
+#    container_name: auth-service
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#      - api-gw
+#  notification-service:
+#    image: amatiangelo1990/20m2:notification-service
+#    container_name: notification-service
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#      - api-gw
+#  ventimetri-service:
+#    image: amatiangelo1990/20m2:ventimetri-service
+#    container_name: ventimetri-service
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#      - api-gw
+#      - notification-service
+#      - db20m2
+#  eventi-service:
+#    image: amatiangelo1990/20m2:eventi-service
+#    container_name: eventi-service
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#      - api-gw
+#      - notification-service
+#      - db20m2event
+#  customer-service:
+#    image: amatiangelo1990/20m2:customer-service
+#    container_name: customer-service
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#      - api-gw
+#      - notification-service
+#      - db20m2
 
 volumes:
   data: {}

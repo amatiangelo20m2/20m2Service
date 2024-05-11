@@ -19,6 +19,7 @@ import com.ventimetriconsulting.user.UserResponseEntity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -230,7 +231,7 @@ public class BranchService {
 
         log.info("Retrieve all employee for branch with code {}", branchCode);
 
-        List<BranchUser> branchUserByBranchCode = branchUserRepository.findBranchesEmployee(
+        List<BranchUser> branchUserByBranchCode = branchUserRepository.findBranchesByBranchCode(
                 branchCode).orElseThrow(()
                 -> new BranchNotFoundException("Branch user relation not found for branch with code: "
                 + branchCode
@@ -397,7 +398,7 @@ public class BranchService {
 
 
     public BranchResponseEntity getBranchesByUserCodeAndBranchCode(String userCode,
-                                                                         String branchCode) {
+                                                                   String branchCode) {
 
         log.info("Retrieve branch for user with code [{}] and branch code [{}]", userCode, branchCode);
 
@@ -429,5 +430,29 @@ public class BranchService {
         }else{
             return new ArrayList<>();
         }
+    }
+
+    @Transactional
+    @Modifying
+    public void deleteBranch(String branchCode) {
+        log.info("Delete branch with code {}", branchCode);
+
+
+        Branch branch = branchRepository.findByBranchCode(branchCode).orElseThrow(()
+                -> new BranchNotFoundException("No branch found with code [" + branchCode + "]. Cannot proceed deleting it."));;
+
+        log.info("Delete all record from branch user repository where branch has id {}", branch.getBranchId());
+        branchUserRepository.deleteByBranchId(branch.getBranchId());
+
+        log.info("Delete branch with code {}", branchCode);
+        branchRepository.deleteByBranchCode(branchCode);
+    }
+
+    @Transactional
+    @Modifying
+    public void removeUserFromBranch(String userCode, String branchCode) {
+        log.info("Remove user with code {} from branch with code {}", userCode, branchCode);
+        Optional<BranchUser> byUserCodeAndBranchCode = branchUserRepository.findByUserCodeAndBranchCode(userCode, branchCode);
+        byUserCodeAndBranchCode.ifPresent(branchUser -> branchUserRepository.delete(branchUser));
     }
 }

@@ -24,9 +24,9 @@
 //@Slf4j
 //public class DataLoader implements CommandLineRunner {
 //
-//    private BranchController branchController;
-//    private SupplierController supplierController;
-//    private StorageController storageController;
+//    private final BranchController branchController;
+//    private final SupplierController supplierController;
+//    private final StorageController storageController;
 //
 //    @Autowired
 //    public DataLoader(BranchController branchController, SupplierController supplierController, StorageController storageController) {

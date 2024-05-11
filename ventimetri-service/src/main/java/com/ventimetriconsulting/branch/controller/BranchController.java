@@ -82,6 +82,21 @@ public class BranchController {
                 .body(branchResponseEntity);
     }
 
+    @DeleteMapping(path = "/branch/delete")
+    public ResponseEntity<?> delete(@RequestParam String branchCode) {
+        branchService.deleteBranch(branchCode);
+        return ResponseEntity
+                .status(HttpStatus.OK).build();
+    }
+
+    @PutMapping(path = "/branch/removefromuserlist")
+    public ResponseEntity<?> removeUserFromBranch(@RequestParam String userCode, @RequestParam String branchCode) {
+        branchService.removeUserFromBranch(userCode, branchCode);
+        return ResponseEntity
+                .status(HttpStatus.OK).build();
+    }
+
+
     @GetMapping(path = "/branchdatabybranchcodeanduser")
     public ResponseEntity<BranchResponseEntity> getBranchDataByBranchCodeAndUserCode(@RequestParam String userCode,
                                                                                      @RequestParam String branchCode) {

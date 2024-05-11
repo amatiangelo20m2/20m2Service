@@ -32,7 +32,7 @@ public interface BranchUserRepository  extends JpaRepository<BranchUser, Long> {
     List<String> findFMCTokensByBranchCodeAndRole(String branchCode, Role role);
 
     @Query("SELECT bu FROM BranchUser bu WHERE bu.branch.branchCode = ?1")
-    Optional<List<BranchUser>> findBranchesEmployee(String branchCode);
+    Optional<List<BranchUser>> findBranchesByBranchCode(String branchCode);
 
     @Query("SELECT bu FROM BranchUser bu WHERE bu.userCode = ?1 AND bu.branch.branchCode = ?2")
     Optional<BranchUser> findByUserCodeAndBranchCode(String userCode, String branchCode);
@@ -42,4 +42,9 @@ public interface BranchUserRepository  extends JpaRepository<BranchUser, Long> {
             "bu.branch.branchCode = :branchCode " +
             "AND bu.fMCToken IS NOT NULL AND bu.role = :role")
     Optional<BranchUser> findByBranchCodeAndRole(String branchCode, Role role);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM BranchUser b WHERE b.branch.branchId = :branchId")
+    void deleteByBranchId(long branchId);
 }

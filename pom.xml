@@ -40,6 +40,7 @@
     <module>ventimetri-service</module>
     <module>notification-service</module>
     <module>eventi-service</module>
+      <module>customer-service</module>
   </modules>
 
   <dependencyManagement>
