@@ -10,5 +10,4 @@ public class VentiMetriServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(VentiMetriServiceApplication.class, args);
     }
-
 }
