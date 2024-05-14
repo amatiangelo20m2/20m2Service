@@ -18,7 +18,7 @@ delete from order_entity where branch_id = 3;
 delete from branch_user where authorized = false;
 delete from branch_user where id = 14;
 delete from branch_user where role != 0;
-delete from branch_user where id < 7;
+delete from branch_user where fmc_token IS NULL;
 
 truncate table notification_entity;
 

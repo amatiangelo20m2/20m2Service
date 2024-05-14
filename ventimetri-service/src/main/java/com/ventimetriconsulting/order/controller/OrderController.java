@@ -81,12 +81,13 @@ public class OrderController {
             return ResponseEntity.badRequest().body(null);
         }
 
+
         try {
             List<OrderDTO> listOrderDtos = orderService
                     .retrieveOrders(branchCode,
                             startDateLocalDate,
                             endDateLocalDate,
-                            OrderStatus.ARCHIVED);
+                            OrderStatus.ARCHIVIATO);
 
             return ResponseEntity.ok().body(listOrderDtos);
         } catch (Exception e) {

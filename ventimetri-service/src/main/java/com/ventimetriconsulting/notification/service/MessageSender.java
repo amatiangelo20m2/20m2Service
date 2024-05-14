@@ -27,12 +27,7 @@ public class MessageSender {
 
         log.info("Sending notification message {}", notificationEntity);
 
-        if(rabbitTemplate != null) {
-            rabbitTemplate.convertAndSend("queue_20m2", notificationEntity, message -> {
-                message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
-                return message;
-            });
-        }
+
 
         for(String fcmToken : notificationEntity.getFmcToken()){
             notificationService.save(NotificationEntityTable.builder()
@@ -46,5 +41,11 @@ public class MessageSender {
                     .build());
         }
 
+        if(rabbitTemplate != null) {
+            rabbitTemplate.convertAndSend("queue_20m2", notificationEntity, message -> {
+                message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                return message;
+            });
+        }
     }
 }

@@ -33,7 +33,10 @@ public class NotificationEntityTable {
     private long notificationId;
 
     private String title;
+
+    @Lob
     private String message;
+
     private String fmcToken;
 
     @Enumerated(EnumType.STRING)

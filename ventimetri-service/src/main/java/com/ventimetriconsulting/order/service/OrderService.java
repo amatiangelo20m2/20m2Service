@@ -44,11 +44,14 @@ public class OrderService {
     @Transactional
     public OrderDTO createOrder(CreateOrderEntity createOrderEntity) {
 
-        log.info("Creating order by user {} (with code {}) for a branch/supplier with code {}/{}",
+        log.info("Creating order by user {} (with code {}) for a branch/supplier with code {}{}. The order is requested to be delivered in {}",
                 createOrderEntity.getUserName(),
                 createOrderEntity.getUserCode(),
                 createOrderEntity.getBranchCodeTarget(),
-                createOrderEntity.getSupplierCodeTarget());
+                createOrderEntity.getSupplierCodeTarget(),
+                createOrderEntity.getIncomingDate()
+
+                );
 
         Branch byBranchCode = branchRepository.findByBranchCode(createOrderEntity.getBranchCode())
                 .orElseThrow(() -> new BranchNotFoundException("Exception thowed while getting data. No branch with code : " + createOrderEntity.getBranchCode() + "found. Cannot create order for the branch" ));
@@ -68,7 +71,7 @@ public class OrderService {
 
                 .incomingDate(createOrderEntity.getIncomingDate())
                 .orderTarget(createOrderEntity.getOrderTarget())
-                .orderStatus(OrderStatus.DRAFT)
+                .orderStatus(OrderStatus.BOZZA)
                 .build());
 
         log.info("Add to order created in a DRAFT satus the product: ");
@@ -103,11 +106,11 @@ public class OrderService {
 
         log.info("Save order with status SENT");
 
-        savedOrder.setOrderStatus(OrderStatus.CREATED);
+        savedOrder.setOrderStatus(OrderStatus.INVIATO);
 
         // TODO: send app notification
         // i add a user code to exclude the fcm token from the list
-        // so how send the order DONT receive the notification
+        // so who send the order DONT receive the notification. This kind of notification must not be received from administrator
         List<String> fmcTokensByBranchCode
                 = branchUserRepository.findFMCTokensByBranchCode(createOrderEntity.getBranchCodeTarget(),
                 createOrderEntity.getUserCode());
@@ -150,7 +153,7 @@ public class OrderService {
             byBranchBranchCodeAndInsertedDateBetween = orderEntityRepository.findByBranchBranchCodeAndIncomingDateBetweenAndOrderStatusNot(branchCode,
                     initialDate,
                     endDate,
-                    OrderStatus.ARCHIVED);
+                    OrderStatus.ARCHIVIATO);
         }
 
         log.info("Found n {} orders for branch with code {}", byBranchBranchCodeAndInsertedDateBetween.size(), branchCode);
@@ -213,6 +216,8 @@ public class OrderService {
         }
 
         if(allItemsDoneBySupplier(order.getOrderItems().stream().toList())){
+            order.setOrderStatus(OrderStatus.PRONTO_A_PARTIRE);
+            orderEntityRepository.save(order);
             //TODO SEND NOTIFY TO FACTOTUM (IF PRESENT) OF THIS BRANCH THAT THE ORDER IS READY TO GO
             Optional<BranchUser> byBranchCodeAndRole = branchUserRepository.findByBranchCodeAndRole(order.getCodeTarget(), Role.FACTOTUM);
             byBranchCodeAndRole.ifPresent(branchUser -> messageSender.enqueMessage(
@@ -224,7 +229,6 @@ public class OrderService {
                             .fmcToken(List.of(branchUser.getFMCToken()))
                             .build()));
         }
-        orderEntityRepository.save(order);
     }
 
     private String buildProductList(Set<OrderItem> orderItems) {
