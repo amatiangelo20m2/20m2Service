@@ -95,18 +95,38 @@ public class OrderController {
         }
     }
 
-    @PutMapping(path = "/update")
-    public ResponseEntity<OrderDTO> updateOrder(@RequestParam long orderId,
-                                                @RequestBody List<OrderItemDto> orderItemDtoList) {
+    @PutMapping(path = "/updatetoprontoapartire")
+    public ResponseEntity<OrderDTO> updateOrder(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList) {
         try {
-            orderService.updateOrderItem(orderId,
-                    orderItemDtoList);
+            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.PRONTO_A_PARTIRE);
+            return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(path = "/updatetoconsegnato")
+    public ResponseEntity<OrderDTO> updateOrderToDelivered(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList) {
+        try {
+            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.CONSEGNATO);
+            return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+    @PutMapping(path = "/updatetoarchiviato")
+    public ResponseEntity<OrderDTO> updateOrderToArchived(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList) {
+        try {
+            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.ARCHIVIATO);
 
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
     @PutMapping(path = "/updatestatus")
     public ResponseEntity<OrderDTO> updateOrderStatus(@RequestParam long orderId,

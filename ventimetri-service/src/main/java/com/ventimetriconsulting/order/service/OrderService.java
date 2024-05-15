@@ -181,7 +181,7 @@ public class OrderService {
 
     @Transactional
     public void updateOrderItem(long orderId,
-                                List<OrderItemDto> orderItemDtos) {
+                                List<OrderItemDto> orderItemDtos, OrderStatus status) {
 
 
 
@@ -189,12 +189,12 @@ public class OrderService {
 
         for(OrderItemDto orderItemDto : orderItemDtos){
 
-            log.info("Update Order with id {}, " +
+            log.info("Update Order with id {}, to status {} " +
                             "ProdId {}, " +
                             "product name {}, " +
                             "quantity {}, " +
                             "unitMeasure {}, " +
-                            "price {}", orderId, orderItemDto.getProductId(),
+                            "price {}", orderId, status, orderItemDto.getProductId(),
                     orderItemDto.getProductName(),
                     orderItemDto.getQuantity(),
                     orderItemDto.getUnitMeasure().name(),
@@ -216,18 +216,40 @@ public class OrderService {
         }
 
         if(allItemsDoneBySupplier(order.getOrderItems().stream().toList())){
-            order.setOrderStatus(OrderStatus.PRONTO_A_PARTIRE);
+            order.setOrderStatus(status);
             orderEntityRepository.save(order);
             //TODO SEND NOTIFY TO FACTOTUM (IF PRESENT) OF THIS BRANCH THAT THE ORDER IS READY TO GO
             Optional<BranchUser> byBranchCodeAndRole = branchUserRepository.findByBranchCodeAndRole(order.getCodeTarget(), Role.FACTOTUM);
-            byBranchCodeAndRole.ifPresent(branchUser -> messageSender.enqueMessage(
-                    NotificationEntity.builder()
-                            .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() +" pronto!")
-                            .message("Ordine da consegnare il "
-                                    + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
-                            .redirectPage(RedirectPage.ORDERS)
-                            .fmcToken(List.of(branchUser.getFMCToken()))
-                            .build()));
+
+            if (Objects.requireNonNull(status) == OrderStatus.INVIATO) {
+                byBranchCodeAndRole.ifPresent(branchUser -> messageSender.enqueMessage(
+                        NotificationEntity.builder()
+                                .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " pronto!")
+                                .message("Ordine da consegnare il "
+                                        + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
+                                .redirectPage(RedirectPage.ORDERS)
+                                .fmcToken(List.of(branchUser.getFMCToken()))
+                                .build()));
+
+            }else if(Objects.requireNonNull(status) == OrderStatus.PRONTO_A_PARTIRE) {
+                byBranchCodeAndRole.ifPresent(branchUser -> messageSender.enqueMessage(
+                        NotificationEntity.builder()
+                                .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " è pronto a partire!")
+                                .message("Ordine da consegnare il "
+                                        + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
+                                .redirectPage(RedirectPage.ORDERS)
+                                .fmcToken(List.of(branchUser.getFMCToken()))
+                                .build()));
+            } else if(Objects.requireNonNull(status) == OrderStatus.CONSEGNATO) {
+                byBranchCodeAndRole.ifPresent(branchUser -> messageSender.enqueMessage(
+                        NotificationEntity.builder()
+                                .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " consegnato!")
+                                .message("Ordine consegnato. Recap ordine - \nProdotti: " + buildProductList(order.getOrderItems()))
+                                .redirectPage(RedirectPage.ORDERS)
+                                .fmcToken(List.of(branchUser.getFMCToken()))
+                                .build()));
+            }
+
         }
     }
 
