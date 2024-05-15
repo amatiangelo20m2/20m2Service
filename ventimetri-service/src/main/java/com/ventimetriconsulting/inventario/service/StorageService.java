@@ -67,37 +67,69 @@ public class StorageService {
     @Transactional
     public InventarioDTO insertProductToStorage(long productId,
                                                 long storageId,
-                                                String userName) {
+                                                String userName,
+                                                double amount) {
 
 
-        Storage storage = storageRepository.findById(storageId)
-                .orElseThrow(() -> new BranchNotFoundException("Storage not found with id: " + storageId + ". Cannot put the product"));
+        Optional<Inventario> existingInventory =
+                inventarioRepository.findByProduct_ProductIdAndStorage_StorageId(productId, storageId);
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BranchNotFoundException("Product not found with id: " + productId + ". Cannot update the storage"));
+        if (existingInventory.isPresent()) {
+            log.info("Inventario is already present for the product selected. I will update the existing row: {}", existingInventory);
+            // Update existing inventory
+            Inventario inventario = existingInventory.get();
+            double newStock = inventario.getStock() + amount;
+            inventario.setStock(newStock);
 
-        log.info("Adding product id {} to the storage with id {} - User ({})", product, storageId, userName);
+            // Add new inventory action
+            InventoryAction newAction = InventoryAction.builder()
+                    .insertionDate(LocalDate.now())
+                    .modifiedByUser(userName)
+                    .amount(amount)
+                    .operationType(OperationType.INSERTION)
+                    .build();
+            inventario.getInventoryActions().add(newAction);
 
-        Inventario inventario = Inventario
-                .builder()
-                .inventarioId(0)
-                .product(product)
-                .storage(storage)
-                .insertionDate(LocalDate.now())
-                .stock(0L)
-                .deletionDate(null)
-                .inventoryActions(new HashSet<>(Collections.singletonList(InventoryAction.builder()
-                        .insertionDate(LocalDate.now())
-                        .modifiedByUser(userName)
-                        .amount(0)
-                        .operationType(OperationType.CREATION)
-                        .build())))
-                .build();
+            return InventarioDTO.fromEntity(inventarioRepository.save(inventario));
 
-        Inventario inventarioSaved = inventarioRepository.save(inventario);
-        storage.getInventario().add(inventarioSaved);
+        } else {
+            Storage storage = storageRepository.findById(storageId)
+                    .orElseThrow(() -> new BranchNotFoundException("Storage not found with id: " + storageId + ". Cannot put the product"));
 
-        return InventarioDTO.fromEntity(inventarioSaved);
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new BranchNotFoundException("Product not found with id: " + productId + ". Cannot update the storage"));
+
+            log.info("Adding product id {} to the storage with id {} - User ({})", product, storageId, userName);
+
+            for(Inventario inventario : storage.getInventario()){
+
+                if(inventario.getStorage().getStorageId() == storageId
+                        && inventario.getProduct().getProductId() == productId){
+
+                }
+            }
+
+            Inventario inventario = Inventario
+                    .builder()
+                    .inventarioId(0)
+                    .product(product)
+                    .storage(storage)
+                    .insertionDate(LocalDate.now())
+                    .stock(amount)
+                    .deletionDate(null)
+                    .inventoryActions(new HashSet<>(Collections.singletonList(InventoryAction.builder()
+                            .insertionDate(LocalDate.now())
+                            .modifiedByUser(userName)
+                            .amount(amount)
+                            .operationType(OperationType.CREATION)
+                            .build())))
+                    .build();
+
+            Inventario inventarioSaved = inventarioRepository.save(inventario);
+            storage.getInventario().add(inventarioSaved);
+
+            return InventarioDTO.fromEntity(inventarioSaved);
+        }
     }
 
     @Transactional

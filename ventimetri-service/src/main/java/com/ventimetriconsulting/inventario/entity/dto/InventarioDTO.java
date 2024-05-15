@@ -22,7 +22,7 @@ public class InventarioDTO {
     private LocalDate deletionDate;
     private ProductDTO productDTO;
     private Set<InventoryAction> inventoryAction;
-    private long stock;
+    private double stock;
 
     public static InventarioDTO fromEntity(Inventario inventario) {
         return InventarioDTO.builder()

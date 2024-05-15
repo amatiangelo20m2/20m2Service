@@ -177,7 +177,7 @@ public class TestSuiteVentiMetriQuadriService {
                 branchRepository,
                 productRepository,
                 branchUserRepository,
-                messageSender);
+                messageSender, storageService);
         orderController = new OrderController(orderService);
     }
 
@@ -550,12 +550,12 @@ public class TestSuiteVentiMetriQuadriService {
                         .orderTarget(OrderTarget.BRANCH)
                         .incomingDate(LocalDate.now())
                         .insertedDate(LocalDate.now())
-                        .branchCodeTarget(targetBranch.getBody().getBranchCode())
+                        .branchCodeTarget(Objects.requireNonNull(targetBranch.getBody()).getBranchCode())
                         .supplierCodeTarget("")
                         .orderItemAmountMap(integerDoubleMap)
                         .build());
 
-                assertEquals("Angelo Amati", orderDTO.getBody().getCreatedByUser());
+                assertEquals("Angelo Amati", Objects.requireNonNull(orderDTO.getBody()).getCreatedByUser());
 
                 assertEquals(2, orderDTO.getBody().getOrderItemDtoList().size());
 

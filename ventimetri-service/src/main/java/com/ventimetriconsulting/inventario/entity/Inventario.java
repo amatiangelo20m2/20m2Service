@@ -45,7 +45,7 @@ public class Inventario {
 
     private LocalDate insertionDate;
     private LocalDate deletionDate;
-    private long stock;
+    private double stock;
 
     @ElementCollection
     @CollectionTable(

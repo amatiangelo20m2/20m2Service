@@ -22,7 +22,7 @@ public class InventoryAction {
     private LocalDate insertionDate;
 
     @Column(name = "inserted_amount", nullable = false)
-    private long amount;
+    private double amount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")

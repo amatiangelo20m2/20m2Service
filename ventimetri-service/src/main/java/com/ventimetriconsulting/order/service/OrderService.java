@@ -8,6 +8,7 @@ import com.ventimetriconsulting.branch.exception.customexceptions.OrderNotFound;
 import com.ventimetriconsulting.branch.exception.customexceptions.ProductNotFoundException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
+import com.ventimetriconsulting.inventario.service.StorageService;
 import com.ventimetriconsulting.notification.entity.RedirectPage;
 import com.ventimetriconsulting.notification.service.MessageSender;
 import com.ventimetriconsulting.notification.entity.NotificationEntity;
@@ -41,6 +42,7 @@ public class OrderService {
     private BranchUserRepository branchUserRepository;
     private MessageSender messageSender;
 
+    private StorageService storageService;
     @Transactional
     public OrderDTO createOrder(CreateOrderEntity createOrderEntity) {
 
@@ -181,11 +183,15 @@ public class OrderService {
 
     @Transactional
     public void updateOrderItem(long orderId,
-                                List<OrderItemDto> orderItemDtos, OrderStatus status) {
+                                List<OrderItemDto> orderItemDtos,
+                                OrderStatus status,
+                                long storageId,
+                                String userName) {
 
 
 
-        Order order = orderEntityRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        Order order = orderEntityRepository.findById(orderId).orElseThrow(()
+                -> new IllegalArgumentException("Order not found"));
 
         for(OrderItemDto orderItemDto : orderItemDtos){
 
@@ -214,6 +220,15 @@ public class OrderService {
                         orderItem.setReceived(orderItem.isReceived());
                     });
         }
+
+        if(OrderStatus.ARCHIVIATO == status) {
+
+            log.info("Upon archivied order the system will add the product into the storage with id {}", storageId);
+            for(OrderItem orderItem : order.getOrderItems()) {
+                storageService.insertProductToStorage(orderItem.getProductId(), storageId, userName, orderItem.getReceivedQuantity());
+            }
+        }
+
 
         if(allItemsDoneBySupplier(order.getOrderItems().stream().toList())){
             order.setOrderStatus(status);

@@ -96,9 +96,11 @@ public class OrderController {
     }
 
     @PutMapping(path = "/updatetoprontoapartire")
-    public ResponseEntity<OrderDTO> updateOrder(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList) {
+    public ResponseEntity<OrderDTO> updateOrder(@RequestParam long orderId,
+                                                @RequestBody List<OrderItemDto> orderItemDtoList) {
         try {
-            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.PRONTO_A_PARTIRE);
+            orderService.updateOrderItem(orderId, orderItemDtoList,
+                    OrderStatus.PRONTO_A_PARTIRE, 0L, null);
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -108,7 +110,7 @@ public class OrderController {
     @PutMapping(path = "/updatetoconsegnato")
     public ResponseEntity<OrderDTO> updateOrderToDelivered(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList) {
         try {
-            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.CONSEGNATO);
+            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.CONSEGNATO, 0L, null);
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -117,9 +119,9 @@ public class OrderController {
 
 
     @PutMapping(path = "/updatetoarchiviato")
-    public ResponseEntity<OrderDTO> updateOrderToArchived(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList) {
+    public ResponseEntity<OrderDTO> updateOrderToArchived(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList, @RequestParam  long storageId, @RequestParam String userName) {
         try {
-            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.ARCHIVIATO);
+            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.ARCHIVIATO, storageId, userName);
 
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {

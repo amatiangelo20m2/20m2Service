@@ -47,7 +47,8 @@ public class StorageController {
                 .body(storageService.insertProductToStorage(
                         productId,
                         storageId,
-                        userName));
+                        userName,
+                        0));
     }
 
     /**
