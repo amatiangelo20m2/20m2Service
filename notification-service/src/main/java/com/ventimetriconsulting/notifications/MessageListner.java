@@ -24,7 +24,8 @@ public class MessageListner {
             notificationService.sendNotification(
                     fcmToken,
                     notificationEntity.getTitle(),
-                    notificationEntity.getMessage());
+                    notificationEntity.getMessage(),
+                    notificationEntity.getRedirectPage());
         }
     }
 }

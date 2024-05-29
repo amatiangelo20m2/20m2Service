@@ -1,6 +1,7 @@
 package com.ventimetriconsulting.service;
 
 import com.ventimetriconsulting.entity.FCMResponse;
+import com.ventimetriconsulting.entity.RedirectPage;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +24,17 @@ public class FirebaseNotificationService {
         this.firebaseRestTemplate = firebaseRestTemplate;
     }
 
-    public void sendNotification(String token, String title, String body) {
-        log.info("Sending message with title {}, body {}. Token in use [{}]", title, body, token);
+    public void sendNotification(String token,
+                                 String title,
+                                 String body,
+                                 RedirectPage redirectPage) {
+        log.info("Sending message with title {}, body {}. Token in use [{}]. " +
+                "The notification will redirect user to {}", title, body, token, redirectPage);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> request = new HttpEntity<>(createFirebaseMessageJson(token, title, body), headers);
+        HttpEntity<String> request = new HttpEntity<>(createFirebaseMessageJson(token, title, body, redirectPage), headers);
 
         ResponseEntity<FCMResponse> response = firebaseRestTemplate.exchange(
                 firebaseUrl,
@@ -54,7 +59,7 @@ public class FirebaseNotificationService {
         }
     }
 
-    public static String createFirebaseMessageJson(String token, String title, String body) {
+    public static String createFirebaseMessageJson(String token, String title, String body, RedirectPage redirectPage) {
         try {
             JSONObject messageJson = new JSONObject();
             JSONObject message = new JSONObject();
@@ -64,8 +69,7 @@ public class FirebaseNotificationService {
             notification.put("title", title);
             notification.put("body", body);
 
-            data.put("key1", "value1");
-            data.put("key2", "value2");
+            data.put("page", redirectPage);
 
             message.put("token", token);
             message.put("notification", notification);
