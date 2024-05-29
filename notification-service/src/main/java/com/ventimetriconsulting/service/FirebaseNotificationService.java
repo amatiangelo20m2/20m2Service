@@ -28,35 +28,40 @@ public class FirebaseNotificationService {
                                  String title,
                                  String body,
                                  RedirectPage redirectPage) {
-        log.info("Sending message with title {}, body {}. Token in use [{}]. " +
-                "The notification will redirect user to {}", title, body, token, redirectPage);
+        try{
+            log.info("Sending message with title {}, body {}. Token in use [{}]. " +
+                    "The notification will redirect user to {}", title, body, token, redirectPage);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> request = new HttpEntity<>(createFirebaseMessageJson(token, title, body, redirectPage), headers);
+            HttpEntity<String> request = new HttpEntity<>(createFirebaseMessageJson(token, title, body, redirectPage), headers);
 
-        ResponseEntity<FCMResponse> response = firebaseRestTemplate.exchange(
-                firebaseUrl,
-                HttpMethod.POST,
-                request,
-                FCMResponse.class);
+            ResponseEntity<FCMResponse> response = firebaseRestTemplate.exchange(
+                    firebaseUrl,
+                    HttpMethod.POST,
+                    request,
+                    FCMResponse.class);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
-            log.info("Notification sent successfully. Status code: {}, Response body: {} - Class {}",
-                    response.getStatusCode(),
-                    response.getBody(),
-                    response.getClass());
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("Notification sent successfully. Status code: {}, Response body: {} - Class {}",
+                        response.getStatusCode(),
+                        response.getBody(),
+                        response.getClass());
 
-            FCMResponse body1 = response.getBody();
+                FCMResponse body1 = response.getBody();
 
-            log.info("Response body: {}", body1 );
+                log.info("Response body: {}", body1 );
 
-        } else {
-            log.error("Failed to send notification. " +
-                    "Status code: {}, " +
-                    "Response body: {}", response.getStatusCode(), response.getBody());
+            } else {
+                log.error("Failed to send notification. " +
+                        "Status code: {}, " +
+                        "Response body: {}", response.getStatusCode(), response.getBody());
+            }
+        }catch(Exception e){
+            log.error("Error managed without throwing: " + e);
         }
+
     }
 
     public static String createFirebaseMessageJson(String token, String title, String body, RedirectPage redirectPage) {
