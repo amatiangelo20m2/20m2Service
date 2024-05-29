@@ -2,6 +2,7 @@ package com.ventimetriconsulting.service;
 
 import com.ventimetriconsulting.entity.FCMResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -28,7 +29,7 @@ public class FirebaseNotificationService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> request = new HttpEntity<>(buildNotificationRequest(token, title, body), headers);
+        HttpEntity<String> request = new HttpEntity<>(createFirebaseMessageJson(token, title, body), headers);
 
         ResponseEntity<FCMResponse> response = firebaseRestTemplate.exchange(
                 firebaseUrl,
@@ -44,9 +45,7 @@ public class FirebaseNotificationService {
 
             FCMResponse body1 = response.getBody();
 
-            log.info("Response body notification: {}", body1 );
-
-
+            log.info("Response body: {}", body1 );
 
         } else {
             log.error("Failed to send notification. " +
@@ -55,13 +54,29 @@ public class FirebaseNotificationService {
         }
     }
 
-    private String buildNotificationRequest(String token, String title, String body) {
-        return "{"
-                + "\"to\":\"" + token + "\","
-                + "\"notification\":{"
-                +     "\"title\":\"" + title + "\","
-                +     "\"body\":\"" + body + "\""
-                + "}"
-                + "}";
+    public static String createFirebaseMessageJson(String token, String title, String body) {
+        try {
+            JSONObject messageJson = new JSONObject();
+            JSONObject message = new JSONObject();
+            JSONObject notification = new JSONObject();
+            JSONObject data = new JSONObject();
+
+            notification.put("title", title);
+            notification.put("body", body);
+
+            data.put("key1", "value1");
+            data.put("key2", "value2");
+
+            message.put("token", token);
+            message.put("notification", notification);
+            message.put("data", data);
+
+            messageJson.put("message", message);
+
+            return messageJson.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error creating JSON", e);
+        }
     }
 }
