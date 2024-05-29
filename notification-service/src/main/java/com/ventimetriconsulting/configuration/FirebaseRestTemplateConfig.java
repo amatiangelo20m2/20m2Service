@@ -45,7 +45,10 @@ public class FirebaseRestTemplateConfig {
     }
     public static String getAccessToken() {
         try {
-            InputStream serviceAccountStream = FirebaseRestTemplateConfig.class.getClassLoader().getResourceAsStream("service-account.json");
+            InputStream serviceAccountStream = FirebaseRestTemplateConfig
+                    .class.getClassLoader()
+                    .getResourceAsStream("service-account.json");
+
             if (serviceAccountStream == null) {
                 throw new RuntimeException("service-account.json file not found in resources");
             }
