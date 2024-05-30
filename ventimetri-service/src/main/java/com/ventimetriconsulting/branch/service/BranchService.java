@@ -121,9 +121,9 @@ public class BranchService {
             return new ArrayList<>();
         }else{
             for(BranchUser branchByUserCode : branchesByUserCode){
-                if(!Objects.equals(branchByUserCode.getFMCToken(), fcmToken)){
-                    branchByUserCode.setFMCToken(fcmToken);
-                }
+//                if(!Objects.equals(branchByUserCode.getFMCToken(), fcmToken)){
+                branchByUserCode.setFMCToken(fcmToken);
+//                }
             }
 
             return branchesByUserCode.stream()

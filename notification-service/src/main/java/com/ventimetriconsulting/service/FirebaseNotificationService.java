@@ -64,8 +64,14 @@ public class FirebaseNotificationService {
 
     }
 
-    public static String createFirebaseMessageJson(String token, String title, String body, RedirectPage redirectPage) {
+    public static String createFirebaseMessageJson(String token,
+                                                   String title,
+                                                   String body,
+                                                   RedirectPage redirectPage) {
         try {
+
+            log.info("Build message with Token [{}], title [{}], body [{}], redirectpage [{}]", token, title, body, redirectPage);
+
             JSONObject messageJson = new JSONObject();
             JSONObject message = new JSONObject();
             JSONObject notification = new JSONObject();
@@ -82,6 +88,7 @@ public class FirebaseNotificationService {
 
             messageJson.put("message", message);
 
+            log.info("Builded message [{}]", messageJson);
             return messageJson.toString();
         } catch (Exception e) {
             e.printStackTrace();
