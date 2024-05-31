@@ -193,18 +193,21 @@ public class OrderService {
         Order order = orderEntityRepository.findById(orderId).orElseThrow(()
                 -> new IllegalArgumentException("Order not found"));
 
+        log.info("Update Order with id {} to status {}", orderId, status);
+
         for(OrderItemDto orderItemDto : orderItemDtos){
 
-            log.info("Update Order with id {}, to status {} " +
+            log.info("Update Order item - " +
                             "ProdId {}, " +
                             "product name {}, " +
                             "quantity {}, " +
                             "unitMeasure {}, " +
-                            "price {}", orderId, status, orderItemDto.getProductId(),
+                            "price {}, Received? {}", orderItemDto.getProductId(),
                     orderItemDto.getProductName(),
                     orderItemDto.getQuantity(),
                     orderItemDto.getUnitMeasure().name(),
-                    orderItemDto.getPrice());
+                    orderItemDto.getPrice(),
+                    orderItemDto.isReceived());
 
             order.getOrderItems().stream()
                     .filter(orderItem -> orderItem.getProductId() == orderItemDto.getProductId())

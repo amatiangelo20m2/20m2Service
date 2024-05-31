@@ -31,8 +31,7 @@ public class OrderDTO {
     private String codeTarget;
     private String nameTarget;
 
-
-    Set<OrderItemDto> orderItemDtoList;
+    private Set<OrderItemDto> orderItemDtoList;
 
     public static OrderDTO toDTO(Order order) {
         return OrderDTO.builder()

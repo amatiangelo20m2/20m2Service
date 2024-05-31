@@ -6,15 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 public class OrderItemDto {
 
 //    private long orderItemId;
@@ -60,10 +61,11 @@ public class OrderItemDto {
     }
 
     public static Set<OrderItemDto> fromEntities(Set<OrderItem> orderItems) {
-        return orderItems.stream()
-                .map(OrderItemDto::fromEntity)
-                .collect(Collectors.toSet());
+        TreeSet<OrderItemDto> sortedOrderItems = new TreeSet<>(Comparator.comparing(o -> o.getProductName().toLowerCase()));
+        orderItems.forEach(orderItem -> sortedOrderItems.add(OrderItemDto.fromEntity(orderItem)));
+        return sortedOrderItems;
     }
+
 
     public static Set<OrderItem> toEntities(List<OrderItemDto> orderItemDtos) {
         return orderItemDtos.stream()

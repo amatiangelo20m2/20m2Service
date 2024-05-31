@@ -3,23 +3,27 @@ package com.ventimetriconsulting.order.controller;
 import com.ventimetriconsulting.order.entIty.Order;
 import com.ventimetriconsulting.order.entIty.OrderStatus;
 import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
+import com.ventimetriconsulting.order.entIty.dto.ExcelDataArchivedOrder;
 import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
 import com.ventimetriconsulting.order.entIty.dto.OrderItemDto;
 import com.ventimetriconsulting.order.service.OrderService;
+import com.ventimetriconsulting.supplier.entity.UnitMeasure;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "api/order/")
 @AllArgsConstructor
+@Slf4j
 public class OrderController {
 
     private OrderService orderService;
@@ -119,7 +123,10 @@ public class OrderController {
 
 
     @PutMapping(path = "/updatetoarchiviato")
-    public ResponseEntity<OrderDTO> updateOrderToArchived(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList, @RequestParam  long storageId, @RequestParam String userName) {
+    public ResponseEntity<OrderDTO> updateOrderToArchived(@RequestParam long orderId,
+                                                          @RequestBody List<OrderItemDto> orderItemDtoList,
+                                                          @RequestParam  long storageId,
+                                                          @RequestParam String userName) {
         try {
             orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.ARCHIVIATO, storageId, userName);
 
@@ -162,4 +169,105 @@ public class OrderController {
         }
     }
 
+    @GetMapping(path = "/retrievesingleproddetailsforbranchordersandrangedate")
+    public ResponseEntity<Map<LocalDate, OrderItemDto>> retrieveSingleProductDetailsForRangeDateOrders(
+            @RequestParam long productId,
+            @RequestParam String branchCode,
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+
+        log.info("Retrieve all history details for the product " +
+                "with id {} in the orders of branch with code {} in" +
+                " the date range between {} and {}", productId, branchCode, startDate, endDate);
+        List<OrderDTO> orderArchivedByBrancCode = getOrderArchivedByBrancCode(branchCode, startDate, endDate).getBody();
+
+        Map<LocalDate, OrderItemDto> resultMap = new HashMap<>();
+
+        for (OrderDTO order : Objects.requireNonNull(orderArchivedByBrancCode)) {
+            for (OrderItemDto item : order.getOrderItemDtoList()) {
+                if (item.getProductId() == productId) {
+                    LocalDate incomingDate = order.getIncomingDate();
+                    OrderItemDto existingItem = resultMap.get(incomingDate);
+                    if (existingItem != null) {
+                        // If the key is already present, update the existing item
+                        existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
+                        existingItem.setReceivedQuantity(existingItem.getReceivedQuantity() + item.getReceivedQuantity());
+                        existingItem.setSentQuantity(existingItem.getSentQuantity() + item.getSentQuantity());
+                    } else {
+                        // If the key is not present, add a new item to the map
+                        resultMap.put(incomingDate, new OrderItemDto(
+                                item.getProductId(),
+                                item.getProductName(),
+                                item.getQuantity(),
+                                item.getReceivedQuantity(),
+                                item.getSentQuantity(),
+                                item.getUnitMeasure(),
+                                item.getPrice(),
+                                item.isDoneBySupplier(),
+                                item.isReceived()
+                        ));
+                    }
+                }
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(resultMap);
+    }
+    @GetMapping(path = "/retrieveexceldatafromarchiviedorders")
+    public ResponseEntity<List<ExcelDataArchivedOrder>> retrieveExcelDataFromArchiviedOrders(@RequestParam String branchCode,
+                                                                                             @RequestParam String startDate,
+                                                                                             @RequestParam String endDate) {
+
+        log.info("Retrieve archived orders data for excel for branch with " +
+                "code {} between date {} and {}", branchCode, startDate, endDate);
+        Map<Long, ExcelDataArchivedOrder> productMap = new HashMap<>();
+        List<OrderDTO> orderArchivedByBrancCode = getOrderArchivedByBrancCode(branchCode, startDate, endDate).getBody();
+
+        for (OrderDTO order : Objects.requireNonNull(orderArchivedByBrancCode)) {
+            for (OrderItemDto orderItemDto : order.getOrderItemDtoList()) {
+                long productId = orderItemDto.getProductId();
+                String productName = orderItemDto.getProductName();
+                double quantity = orderItemDto.getQuantity();
+                double receivedQuantity = orderItemDto.getReceivedQuantity();
+                double sentQuantity = orderItemDto.getSentQuantity();
+                UnitMeasure unitMeasure = orderItemDto.getUnitMeasure();
+                double price = orderItemDto.getPrice();
+
+                ExcelDataArchivedOrder excelDataArchivedOrder = productMap.get(productId);
+                if (excelDataArchivedOrder == null) {
+                    excelDataArchivedOrder = new ExcelDataArchivedOrder();
+                    excelDataArchivedOrder.setProductId(productId);
+                    excelDataArchivedOrder.setProductName(productName);
+                    excelDataArchivedOrder.setUnitMeasure(unitMeasure);
+                    excelDataArchivedOrder.setPrice(price);
+                    productMap.put(productId, excelDataArchivedOrder);
+                } else if (excelDataArchivedOrder.getPrice() != price) {
+                    ExcelDataArchivedOrder newOrder = new ExcelDataArchivedOrder();
+                    newOrder.setProductId(productId);
+                    newOrder.setProductName(productName);
+                    newOrder.setUnitMeasure(unitMeasure);
+                    newOrder.setPrice(price);
+                    productMap.put(productId + System.currentTimeMillis(), newOrder);
+                }
+
+                excelDataArchivedOrder.setQuantity(excelDataArchivedOrder.getQuantity() + quantity);
+                excelDataArchivedOrder.setReceivedQuantity(excelDataArchivedOrder.getReceivedQuantity() + receivedQuantity);
+                excelDataArchivedOrder.setSentQuantity(excelDataArchivedOrder.getSentQuantity() + sentQuantity);
+            }
+        }
+
+
+        List<ExcelDataArchivedOrder> sortedList = new ArrayList<>(productMap.values()); // Create a copy to avoid modifying original collection
+
+
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(sortByProductNameDesc(sortedList));
+    }
+
+    public static List<ExcelDataArchivedOrder> sortByProductNameDesc(Collection<ExcelDataArchivedOrder> collection) {
+        return collection.stream()
+                .sorted(Comparator.comparing(o -> o.getProductName().toLowerCase()))
+                .collect(Collectors.toList());
+    }
 }

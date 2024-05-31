@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -36,16 +37,10 @@ public class InventarioDTO {
     }
 
     public static Set<InventarioDTO> fromEntities(Set<Inventario> inventarios) {
-        Set<InventarioDTO> inventarioDTOs = new TreeSet<>((dto1, dto2) -> {
-            String name1 = dto1.getProductDTO().getName();
-            String name2 = dto2.getProductDTO().getName();
-            return name1.compareTo(name2);
-        });
-
-        for (Inventario inventario : inventarios) {
-            inventarioDTOs.add(fromEntity(inventario));
-        }
-        return inventarioDTOs;
+        return inventarios.stream()
+                .map(InventarioDTO::fromEntity)
+                .sorted(Comparator.comparing(dto -> dto.getProductDTO().getName().toLowerCase(), Comparator.naturalOrder()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static Inventario toEntity(InventarioDTO inventarioDTO) {
