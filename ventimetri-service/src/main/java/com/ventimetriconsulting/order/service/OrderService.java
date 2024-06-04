@@ -6,6 +6,7 @@ import com.ventimetriconsulting.branch.entity.Role;
 import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
 import com.ventimetriconsulting.branch.exception.customexceptions.OrderNotFound;
 import com.ventimetriconsulting.branch.exception.customexceptions.ProductNotFoundException;
+import com.ventimetriconsulting.branch.exception.customexceptions.SupplierNotFoundException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
 import com.ventimetriconsulting.inventario.service.StorageService;
@@ -15,12 +16,14 @@ import com.ventimetriconsulting.notification.entity.NotificationEntity;
 import com.ventimetriconsulting.order.entIty.Order;
 import com.ventimetriconsulting.order.entIty.OrderItem;
 import com.ventimetriconsulting.order.entIty.OrderStatus;
+import com.ventimetriconsulting.order.entIty.OrderTarget;
 import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
 import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
 import com.ventimetriconsulting.order.entIty.dto.OrderItemDto;
 import com.ventimetriconsulting.order.repository.OrderEntityRepository;
 import com.ventimetriconsulting.supplier.entity.Product;
 import com.ventimetriconsulting.supplier.repository.ProductRepository;
+import com.ventimetriconsulting.supplier.repository.SupplierRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,8 @@ public class OrderService {
 
     private OrderEntityRepository orderEntityRepository;
     private BranchRepository branchRepository;
+    private SupplierRepository supplierRepository;
+
     private ProductRepository productRepository;
     private BranchUserRepository branchUserRepository;
     private MessageSender messageSender;
@@ -46,19 +51,29 @@ public class OrderService {
     @Transactional
     public OrderDTO createOrder(CreateOrderEntity createOrderEntity) {
 
-        log.info("Creating order by user {} (with code {}) for a branch/supplier with code {}{}. The order is requested to be delivered in {}",
+        log.info("Creating order by user {} (with code {}) for a branch/supplier with code {}/{}. The order is requested to be delivered in {}",
                 createOrderEntity.getUserName(),
                 createOrderEntity.getUserCode(),
                 createOrderEntity.getBranchCodeTarget(),
                 createOrderEntity.getSupplierCodeTarget(),
-                createOrderEntity.getIncomingDate()
-
-                );
+                createOrderEntity.getIncomingDate());
 
         Branch byBranchCode = branchRepository.findByBranchCode(createOrderEntity.getBranchCode())
-                .orElseThrow(() -> new BranchNotFoundException("Exception thowed while getting data. No branch with code : " + createOrderEntity.getBranchCode() + "found. Cannot create order for the branch" ));
+                .orElseThrow(() -> new BranchNotFoundException("Exception throwed while getting data. No branch with code : " + createOrderEntity.getBranchCode() + "found. Cannot create order for the branch" ));
 
-        String branchTargetName = branchRepository.findBranchNameByBranchCode(createOrderEntity.getBranchCodeTarget()).orElseThrow(() -> new BranchNotFoundException("Exception thowed while getting data. No branch with code  : " + createOrderEntity.getBranchCodeTarget() + "found. Cannot retrieve branch name" ));;
+        String targetName = "";
+        String targetCode = "";
+        if(OrderTarget.BRANCH == createOrderEntity.getOrderTarget()){
+            targetName = branchRepository
+                    .findBranchNameByBranchCode(createOrderEntity.getBranchCodeTarget()).orElseThrow(() -> new BranchNotFoundException("Exception throwed while getting data. No branch with code  : " + createOrderEntity.getBranchCodeTarget() + "found. Cannot retrieve branch name" ));
+            targetCode = createOrderEntity.getBranchCodeTarget();
+
+        }else if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
+            log.info("Retrieve supplier with code {}", createOrderEntity.getSupplierCodeTarget());
+            targetName = supplierRepository.findSupplierNameByCode(createOrderEntity.getSupplierCodeTarget())
+                    .orElseThrow(() -> new SupplierNotFoundException("Exception throwed while getting data. No supplier found with code  : " + createOrderEntity.getSupplierCodeTarget() + "found. Cannot retrieve supplier name" ));
+            targetCode = createOrderEntity.getSupplierCodeTarget();
+        }
 
         Order savedOrder = orderEntityRepository.save(Order.builder()
                 .orderId(0L)
@@ -67,10 +82,8 @@ public class OrderService {
                 .createdByUser(createOrderEntity.getUserName())
                 .createdByBranchName(byBranchCode.getName())
                 .insertedDate(createOrderEntity.getInsertedDate())
-
-                .nameTarget(branchTargetName)
-                .codeTarget(createOrderEntity.getBranchCodeTarget())
-
+                .nameTarget(targetName)
+                .codeTarget(targetCode)
                 .incomingDate(createOrderEntity.getIncomingDate())
                 .orderTarget(createOrderEntity.getOrderTarget())
                 .orderStatus(OrderStatus.BOZZA)
@@ -83,7 +96,7 @@ public class OrderService {
         createOrderEntity.getOrderItemAmountMap().forEach((prodId, prodAmount) -> {
 
             Product product = productRepository.findById(prodId)
-                    .orElseThrow(() -> new ProductNotFoundException("Exception thowed while getting data. No product found with id  : " + prodId + ". Cannot create order." ));
+                    .orElseThrow(() -> new ProductNotFoundException("Exception throwed while getting data. No product found with id  : " + prodId + ". Cannot create order." ));
 
             log.info(" - {} x {} {}", product.getName(), prodAmount , product.getUnitMeasure());
             productsForNotification
@@ -108,25 +121,24 @@ public class OrderService {
 
         log.info("Save order with status SENT");
 
-        savedOrder.setOrderStatus(OrderStatus.INVIATO);
+        if(OrderTarget.BRANCH == createOrderEntity.getOrderTarget()){
+            savedOrder.setOrderStatus(OrderStatus.INVIATO);
+            List<String> fmcTokensByBranchCode
+                    = branchUserRepository.findFMCTokensByBranchCode(createOrderEntity.getBranchCodeTarget(),
+                    createOrderEntity.getUserCode());
 
-        // TODO: send app notification
-        // i add a user code to exclude the fcm token from the list
-        // so who send the order DONT receive the notification. This kind of notification must not be received from administrator
-        List<String> fmcTokensByBranchCode
-                = branchUserRepository.findFMCTokensByBranchCode(createOrderEntity.getBranchCodeTarget(),
-                createOrderEntity.getUserCode());
+            messageSender.enqueMessage(NotificationEntity
+                    .builder()
+                    .title("\uD83D\uDCE6 Ordine da " + byBranchCode.getName() +" eseguito da "
+                            + createOrderEntity.getUserName())
+                    .message(productsForNotification.toString())
+                    .fmcToken(fmcTokensByBranchCode)
+                    .redirectPage(RedirectPage.ORDERS)
+                    .build());
 
-
-
-        messageSender.enqueMessage(NotificationEntity
-                .builder()
-                .title("\uD83D\uDCE6 Ordine da " + byBranchCode.getName() +" eseguito da "
-                        + createOrderEntity.getUserName())
-                .message(productsForNotification.toString())
-                .fmcToken(fmcTokensByBranchCode)
-                .redirectPage(RedirectPage.ORDERS)
-                .build());
+        }else if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
+            savedOrder.setOrderStatus(OrderStatus.CONSEGNATO);
+        }
 
         return OrderDTO.toDTO(savedOrder);
     }

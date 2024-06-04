@@ -107,7 +107,7 @@ public class BookingService {
                         .setExplanation(meResponse.getMe().getExplanation());
                 return BranchConfigurationDTO.fromEntity(configurationRepositoryById.get());
             }else{
-                throw new GlobalException("Cannot proceed - Exception thowed during creationg of branch configuration");
+                throw new GlobalException("Cannot proceed - Exception throwed during creationg of branch configuration");
             }
         }else {
             // retrieve status and if is in qr code try to get the qr code

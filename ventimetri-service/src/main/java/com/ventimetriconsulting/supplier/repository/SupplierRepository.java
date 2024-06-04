@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, Long> {
@@ -18,4 +19,6 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
     @Query("DELETE FROM Supplier s WHERE s.supplierId = :supplierId")
     void deleteBySupplierId(Long supplierId);
 
+    @Query("SELECT supplier.name FROM Supplier supplier WHERE supplier.supplierCode = :supplierCodeTarget")
+    Optional<String> findSupplierNameByCode(String supplierCodeTarget);
 }

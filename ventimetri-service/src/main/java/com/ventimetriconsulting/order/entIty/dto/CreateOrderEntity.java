@@ -28,7 +28,6 @@ public class CreateOrderEntity {
     private String branchCodeTarget;
     private String supplierCodeTarget;
 
-
     private Map<Long, Double> orderItemAmountMap;
 
 }

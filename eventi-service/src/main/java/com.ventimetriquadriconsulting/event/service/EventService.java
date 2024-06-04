@@ -69,7 +69,7 @@ public class EventService {
 
         Event event = eventRepository
                 .findById(eventId).orElseThrow(()
-                        -> new NotFoundException("Exception thowed while getting data. No event with id : "
+                        -> new NotFoundException("Exception throwed while getting data. No event with id : "
                         + eventId + "found. Cannot delete workstation with id " + workstationId));
 
         event.getWorkstations().remove(workstation);
