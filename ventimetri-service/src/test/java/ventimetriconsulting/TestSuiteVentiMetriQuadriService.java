@@ -173,11 +173,15 @@ public class TestSuiteVentiMetriQuadriService {
         storageController = new StorageController(storageService, branchService);
 
 
-        OrderService orderService = new OrderService(orderEntityRepository,
+        OrderService orderService = new OrderService(
+                orderEntityRepository,
                 branchRepository,
+                supplierRepository,
                 productRepository,
                 branchUserRepository,
-                messageSender, storageService);
+                messageSender,
+                storageService);
+
         orderController = new OrderController(orderService);
     }
 
@@ -539,17 +543,16 @@ public class TestSuiteVentiMetriQuadriService {
 
                 ResponseEntity<BranchResponseEntity> targetBranch = branchController.save(createFakeBranchCreationEntity(userCode1));
 
-
-
-
+                // Define the date format pattern
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
                 ResponseEntity<OrderDTO> orderDTO = orderController.createOrder(CreateOrderEntity
                         .builder()
                         .branchCode(branchCode)
                         .userName("Angelo Amati")
                         .orderTarget(OrderTarget.BRANCH)
-                        .incomingDate(LocalDate.now())
-                        .insertedDate(LocalDate.now())
+                        .incomingDate(formatter.format(LocalDate.now()))
+                        .insertedDate(formatter.format(LocalDate.now()))
                         .branchCodeTarget(Objects.requireNonNull(targetBranch.getBody()).getBranchCode())
                         .supplierCodeTarget("")
                         .orderItemAmountMap(integerDoubleMap)
@@ -561,8 +564,6 @@ public class TestSuiteVentiMetriQuadriService {
 
                 LocalDate today = LocalDate.now();
 
-                // Define the date format pattern
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
                 // Calculate 3 days before today
                 LocalDate threeDaysBefore = today.minusDays(3);

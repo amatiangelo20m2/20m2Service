@@ -31,6 +31,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,8 @@ public class OrderService {
     private MessageSender messageSender;
 
     private StorageService storageService;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     @Transactional
     public OrderDTO createOrder(CreateOrderEntity createOrderEntity) {
 
@@ -81,10 +84,10 @@ public class OrderService {
                 .userCode(createOrderEntity.getUserCode())
                 .createdByUser(createOrderEntity.getUserName())
                 .createdByBranchName(byBranchCode.getName())
-                .insertedDate(createOrderEntity.getInsertedDate())
+                .insertedDate(LocalDate.parse(createOrderEntity.getInsertedDate(), formatter))
                 .nameTarget(targetName)
                 .codeTarget(targetCode)
-                .incomingDate(createOrderEntity.getIncomingDate())
+                .incomingDate(LocalDate.parse(createOrderEntity.getIncomingDate(), formatter))
                 .orderTarget(createOrderEntity.getOrderTarget())
                 .orderStatus(OrderStatus.BOZZA)
                 .build());
@@ -106,19 +109,33 @@ public class OrderService {
                     .append(product.getUnitMeasure())
                     .append(" ").append(product.getName());
 
-            savedOrder.getOrderItems().add(OrderItem.builder()
-                    .productId(product.getProductId())
-                    .sentQuantity(0)
-                    .receivedQuantity(0)
-                    .productName(product.getName())
-                    .quantity(prodAmount)
-                    .price(product.getPrice())
-                    .isReceived(false)
-                    .isDoneBySupplier(false)
-                    .unitMeasure(product.getUnitMeasure())
-                    .build());
+            // if the target is supplier set received qantity and sent quanty the same as the quantity requested. The user just need to confirm it
+            if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
+                savedOrder.getOrderItems().add(OrderItem.builder()
+                        .productId(product.getProductId())
+                        .sentQuantity(prodAmount)
+                        .receivedQuantity(prodAmount)
+                        .productName(product.getName())
+                        .quantity(prodAmount)
+                        .price(product.getPrice())
+                        .isReceived(false)
+                        .isDoneBySupplier(true)
+                        .unitMeasure(product.getUnitMeasure())
+                        .build());
+            }else{
+                savedOrder.getOrderItems().add(OrderItem.builder()
+                        .productId(product.getProductId())
+                        .sentQuantity(0)
+                        .receivedQuantity(0)
+                        .productName(product.getName())
+                        .quantity(prodAmount)
+                        .price(product.getPrice())
+                        .isReceived(false)
+                        .isDoneBySupplier(false)
+                        .unitMeasure(product.getUnitMeasure())
+                        .build());
+            }
         });
-
         log.info("Save order with status SENT");
 
         if(OrderTarget.BRANCH == createOrderEntity.getOrderTarget()){
@@ -137,11 +154,31 @@ public class OrderService {
                     .build());
 
         }else if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
-            savedOrder.setOrderStatus(OrderStatus.CONSEGNATO);
+            savedOrder.setOrderStatus(OrderStatus.INVIATO);
         }
 
         return OrderDTO.toDTO(savedOrder);
     }
+
+    @Transactional
+    @Modifying
+    public void retrieveSupplierOrderByDateStillToUpdateToConsegnato(){
+        log.info("Retrieve all orders in INVIATO status for All Suppliers. Change the status to CONSEGNATO in order to make possible to move into storage");
+        List<Order> byOrderTargetAndIncomingDateAndOrderStatus = orderEntityRepository
+                .findByOrderTargetAndIncomingDateAndOrderStatus(OrderTarget.SUPPLIER,
+                        LocalDate.now(),
+                        OrderStatus.INVIATO);
+        List<OrderDTO> dtoList = OrderDTO.toDTOList(byOrderTargetAndIncomingDateAndOrderStatus);
+
+        log.info(dtoList.toString());
+
+
+        for(Order order : byOrderTargetAndIncomingDateAndOrderStatus){
+            log.info("Updating order to CONSEGNATO with id " + order.getOrderId());
+            order.setOrderStatus(OrderStatus.CONSEGNATO);
+        }
+    }
+
 
     public List<OrderDTO> retrieveOrders(String branchCode,
                                          LocalDate initialDate,

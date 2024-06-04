@@ -21,8 +21,9 @@ public class CreateOrderEntity {
     private String userCode;
     private String branchCode;
 
-    private LocalDate insertedDate;
-    private LocalDate incomingDate;
+    //date format yyyy-MM-dd
+    private String insertedDate;
+    private String incomingDate;
 
     private OrderTarget orderTarget;
     private String branchCodeTarget;
