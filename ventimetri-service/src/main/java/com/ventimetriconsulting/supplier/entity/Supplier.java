@@ -57,6 +57,8 @@ public class Supplier {
     private String cf;
     private String country;
 
+    private String createdByUserCode;
+
     @OneToMany(fetch = FetchType.EAGER,
             mappedBy = "supplier", cascade = CascadeType.ALL)
     private List<Product> products;
@@ -73,6 +75,11 @@ public class Supplier {
 
     public Supplier(){
         this.products = new ArrayList<>();
+    }
+
+    public void removeProduct(Product product) {
+        products.remove(product);
+        product.setSupplier(null);
     }
 
     public List<Product> getProducts() {

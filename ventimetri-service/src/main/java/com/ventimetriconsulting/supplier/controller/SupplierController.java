@@ -41,26 +41,17 @@ public class SupplierController {
 
     @PostMapping(path = "/product/insertlist")
     public ResponseEntity<List<ProductDTO>> insertProductList(
-            @RequestBody List<ProductDTO> productDTOList, @RequestParam("supplierId") Long supplierId) {
+            @RequestBody List<ProductDTO> productDTOList,
+            @RequestParam("supplierId") Long supplierId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(supplierService.insertListProduct(productDTOList, supplierId));
     }
 
+    @DeleteMapping(path = "/delete")
+    public ResponseEntity<Boolean> removeSupplier(@RequestParam("supplierId") Long supplierId) {
 
-    @PutMapping(path = "/unlinkfrombranch")
-    public ResponseEntity<Boolean> unlinkSupplierFromBranch(@RequestParam("supplierId") Long supplierId,
-                                                            @RequestParam("branchId") Long branchId) {
-
-        supplierService.unlinkSupplierFromBranch(supplierId, branchId);
+        supplierService.deleteSupplier(supplierId);
         return ResponseEntity.status(HttpStatus.OK).body(true);
-    }
-
-    @PutMapping(path = "/associatetobranch")
-    public ResponseEntity<SupplierDTO> associateSupplierToBranch(@RequestParam("supplierId") Long supplierId,
-                                                                 @RequestParam("branchId") Long branchId) {
-
-        SupplierDTO supplierDTO = supplierService.associateSupplierToBranch(supplierId, branchId);
-        return ResponseEntity.status(HttpStatus.OK).body(supplierDTO);
     }
 
     @DeleteMapping(path = "/product/delete")

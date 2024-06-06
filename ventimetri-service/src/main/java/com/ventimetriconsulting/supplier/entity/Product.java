@@ -19,6 +19,7 @@ import java.util.UUID;
 @Builder
 @ToString
 public class Product {
+
     @Id
     @SequenceGenerator(
             name = "product_id",
@@ -36,6 +37,7 @@ public class Product {
     private long productId;
 
     private String name;
+
     @Column(
             name = "product_code",
             nullable = false,
@@ -53,9 +55,9 @@ public class Product {
     private String description;
     private int vatApplied;
     private double price;
+    private double vatPrice = 0.0;
     private String category;
     private String sku;
-
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "supplier_id")

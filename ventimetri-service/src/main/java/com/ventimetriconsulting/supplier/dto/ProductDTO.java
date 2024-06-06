@@ -24,6 +24,7 @@ public class ProductDTO {
     private String description;
     private int vatApplied;
     private double price;
+    private double vatPrice;
     private String category;
     private String sku;
 
@@ -34,6 +35,7 @@ public class ProductDTO {
                 .unitMeasure(productDTO.getUnitMeasure())
                 .vatApplied(productDTO.getVatApplied())
                 .price(productDTO.getPrice())
+                .vatPrice(productDTO.getVatPrice())
                 .productCode(productDTO.getProductCode())
                 .description(productDTO.getDescription())
                 .category(productDTO.getCategory())
@@ -49,6 +51,7 @@ public class ProductDTO {
                 .unitMeasure(product.getUnitMeasure())
                 .vatApplied(product.getVatApplied())
                 .price(product.getPrice())
+                .vatPrice(product.getVatPrice())
                 .productCode(product.getProductCode())
                 .description(product.getDescription())
                 .category(product.getCategory())

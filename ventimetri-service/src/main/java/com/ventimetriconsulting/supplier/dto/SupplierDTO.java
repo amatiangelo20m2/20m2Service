@@ -32,6 +32,7 @@ public class SupplierDTO {
     private String supplierCode;
     private String country;
     private List<ProductDTO> productDTOList;
+    private String createdByUserCode;
 
 
     public static Supplier fromDTO(SupplierDTO supplierDTO) {
@@ -48,6 +49,7 @@ public class SupplierDTO {
                 .pec(supplierDTO.getPec())
                 .supplierCode(supplierDTO.getSupplierCode())
                 .country(supplierDTO.getCountry())
+                .createdByUserCode(supplierDTO.getCreatedByUserCode())
                 .build();
     }
 
@@ -65,6 +67,7 @@ public class SupplierDTO {
         dto.setCf(supplier.getCf());
         dto.setSupplierCode(supplier.getSupplierCode());
         dto.setCountry(supplier.getCountry());
+        dto.setCreatedByUserCode(supplier.getCreatedByUserCode());
         dto.setProductDTOList(ProductDTO.toDTOList(supplier.getProducts()));
         return dto;
     }

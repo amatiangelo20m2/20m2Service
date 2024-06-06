@@ -7,6 +7,10 @@ public enum UnitMeasure {
     PACCHI,
     BARATTOLIPICCOLI,
     CARTONI,
+    CARTONE6,
+    CARTONE12,
+    CARTONE24,
+    CARTONE50,
     BOTTIGLIA,
     BARATTOLI,
     FARDELLO,
@@ -14,5 +18,6 @@ public enum UnitMeasure {
     BOTTIGLIETTA,
     UNITA,
     SECCHIO,
-    ALTRO;
+    ALTRO,
+    COLLO;
 }
