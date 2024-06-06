@@ -152,9 +152,10 @@ public class SupplierService {
 
             if(productNames.contains(productDTO.getName())){
                 for(Product product : supplier.getProducts()){
-                    if(Objects.equals(productDTO.getName(), product.getName())){
+                    if(Objects.equals(productDTO.getName().toLowerCase(), product.getName().toLowerCase())){
 
                         log.info("Updating product {}", product);
+                        product.setName(productDTO.getName());
                         product.setPrice(productDTO.getPrice());
                         product.setVatPrice(productDTO.getVatPrice());
                         product.setCategory(productDTO.getCategory());
