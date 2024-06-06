@@ -22,6 +22,8 @@ public class OrderItem implements Serializable {
 
     private UnitMeasure unitMeasure;
     private double price;
+    private double vatPrice;
+    private int vat;
     private boolean isDoneBySupplier;
     private boolean isReceived;
 

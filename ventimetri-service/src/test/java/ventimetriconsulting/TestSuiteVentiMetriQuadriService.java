@@ -420,7 +420,7 @@ public class TestSuiteVentiMetriQuadriService {
 
 
         ResponseEntity<BranchResponseEntity> branchResponseEntityResponseEntity1 = branchController.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
-        assertEquals(0, Objects.requireNonNull(branchResponseEntityResponseEntity1.getBody()).getSupplierDTOList().size());
+        assertEquals(1, Objects.requireNonNull(branchResponseEntityResponseEntity1.getBody()).getSupplierDTOList().size());
 
 
         branchResponseEntityResponseEntity1 = branchController.getBranchDataByBranchCodeAndUserCode(userCode, branchCode);
