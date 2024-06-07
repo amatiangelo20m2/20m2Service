@@ -49,6 +49,7 @@ public class ProductDTO {
 
     public static ProductDTO toDTO(Product product) {
 
+
         return ProductDTO.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
@@ -64,13 +65,11 @@ public class ProductDTO {
                 .deleted(product.isDeleted())
                 .build();
     }
-
     public static List<Product> fromDTOList(List<ProductDTO> productDTOList) {
         return productDTOList.stream()
                     .map(ProductDTO::fromDTO)
                     .collect(Collectors.toList());
     }
-
     public static List<ProductDTO> toDTOList(List<Product> productList, boolean available, boolean deleted) {
         return productList.stream()
                 .filter(product -> product.isAvailable() == available
