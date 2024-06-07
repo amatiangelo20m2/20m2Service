@@ -3,15 +3,12 @@ package com.ventimetriconsulting.supplier.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.UUID;
 
 @Entity(name = "Product")
 @Table(name = "product",
-        uniqueConstraints=
-        @UniqueConstraint(columnNames={"product_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "unitMeasure", "supplier_id"}))
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -58,6 +55,8 @@ public class Product {
     private double vatPrice = 0.0;
     private String category;
     private String sku;
+    private boolean available = true;
+    private boolean deleted = false;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "supplier_id")

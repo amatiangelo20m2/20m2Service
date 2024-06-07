@@ -54,18 +54,8 @@ public class SupplierController {
         return ResponseEntity.status(HttpStatus.OK).body(true);
     }
 
-    @DeleteMapping(path = "/product/delete")
-    public ResponseEntity<Boolean> deleteProductById(
-            @RequestParam("productId") Long productId,
-            @RequestParam("supplierId") Long supplierId) {
-
-        supplierService.deleteProductById(productId, supplierId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(true);
-    }
-
     @PutMapping(path = "/product/update")
-    public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO){
+    public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(supplierService.updateProduct(productDTO));
@@ -75,8 +65,4 @@ public class SupplierController {
     public ResponseEntity<List<SupplierDTO>> retrieveAllSupplier(){
         return ResponseEntity.status(HttpStatus.OK).body(supplierService.retrieveAllSuppliers());
     }
-//    @GetMapping(path = "/retrieve/bybranchcode")
-//    public ResponseEntity<List<SupplierDTO>> retrieveByBranchCode(@RequestParam String branchCode) {
-//        return ResponseEntity.status(HttpStatus.OK).body(supplierService.retrieveByBranchCode(branchCode));
-//    }
 }

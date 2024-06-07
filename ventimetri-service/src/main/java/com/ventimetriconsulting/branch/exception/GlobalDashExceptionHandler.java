@@ -30,7 +30,6 @@ public class GlobalDashExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(exception.getMessage());
     }
-
     @ExceptionHandler(MessageNotSentException.class)
     public ResponseEntity<String> handleMessageNotSentException(MessageNotSentException exception) {
         return ResponseEntity
@@ -62,6 +61,13 @@ public class GlobalDashExceptionHandler {
     public ResponseEntity<String> handleInventarioNotFoundException(StorageNotFoundException exception) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(exception.getMessage());
+    }
+
+    @ExceptionHandler(CreateProductException.class)
+    public ResponseEntity<String> handleProductCreationException(CreateProductException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(exception.getMessage());
     }
 

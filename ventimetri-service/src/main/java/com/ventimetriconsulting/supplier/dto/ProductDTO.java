@@ -27,6 +27,8 @@ public class ProductDTO {
     private double vatPrice;
     private String category;
     private String sku;
+    private boolean available;
+    private boolean deleted;
 
     public static Product fromDTO(ProductDTO productDTO) {
         return Product.builder()
@@ -40,6 +42,8 @@ public class ProductDTO {
                 .description(productDTO.getDescription())
                 .category(productDTO.getCategory())
                 .sku(productDTO.getSku())
+                .available(productDTO.isAvailable())
+                .deleted(productDTO.isDeleted())
                 .build();
     }
 
@@ -56,6 +60,8 @@ public class ProductDTO {
                 .description(product.getDescription())
                 .category(product.getCategory())
                 .sku(product.getSku())
+                .available(product.isAvailable())
+                .deleted(product.isDeleted())
                 .build();
     }
 
@@ -65,8 +71,10 @@ public class ProductDTO {
                     .collect(Collectors.toList());
     }
 
-    public static List<ProductDTO> toDTOList(List<Product> productList) {
+    public static List<ProductDTO> toDTOList(List<Product> productList, boolean available, boolean deleted) {
         return productList.stream()
+                .filter(product -> product.isAvailable() == available
+                        && product.isDeleted() == deleted)
                 .map(ProductDTO::toDTO)
                 .collect(Collectors.toList());
     }

@@ -68,7 +68,9 @@ public class SupplierDTO {
         dto.setSupplierCode(supplier.getSupplierCode());
         dto.setCountry(supplier.getCountry());
         dto.setCreatedByUserCode(supplier.getCreatedByUserCode());
-        dto.setProductDTOList(ProductDTO.toDTOList(supplier.getProducts()));
+        dto.setProductDTOList(ProductDTO.toDTOList(supplier.getProducts(),
+                true,
+                false));
         return dto;
     }
 

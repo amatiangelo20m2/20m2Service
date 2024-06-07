@@ -2,6 +2,7 @@ package com.ventimetriconsulting.supplier.service;
 
 import com.ventimetriconsulting.branch.entity.Branch;
 import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
+import com.ventimetriconsulting.branch.exception.customexceptions.CreateProductException;
 import com.ventimetriconsulting.branch.exception.customexceptions.ProductNotFoundException;
 import com.ventimetriconsulting.branch.exception.customexceptions.SupplierNotFoundException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
@@ -50,21 +51,27 @@ public class SupplierService {
     @Modifying
     public ProductDTO createProduct(ProductDTO productDTO,
                                     Long supplierId) {
-        log.info("Saving product {} for supplier with id {}", productDTO, supplierId);
+        try{
+            log.info("Saving product {} for supplier with id {}", productDTO, supplierId);
 
-        Supplier supplier = supplierRepository
-                .findById(supplierId).orElseThrow(() -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));
+            Supplier supplier = supplierRepository
+                    .findById(supplierId).orElseThrow(() -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));
 
 
-        Product product = ProductDTO.fromDTO(productDTO);
-        product.setSupplier(supplier);
-        supplier.getProducts().add(product);
+            Product product = ProductDTO.fromDTO(productDTO);
+            product.setSupplier(supplier);
+            supplier.getProducts().add(product);
 
-        Product savedProduct = productRepository.save(product);
+            Product savedProduct = productRepository.save(product);
 
-        ProductDTO dto = ProductDTO.toDTO(savedProduct);
-        log.info("Saved prod (dto): " + dto);
-        return dto;
+            ProductDTO dto = ProductDTO.toDTO(savedProduct);
+            log.info("Saved prod (dto): " + dto);
+            return dto;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new CreateProductException(e.getMessage());
+        }
+
     }
 
     @Transactional
@@ -87,29 +94,6 @@ public class SupplierService {
     }
 
     @Transactional
-    @Modifying
-    public void deleteProductById(Long productId,
-                                  Long supplierId) {
-        log.info("Remove product by id {} for supplier with id {}", productId, supplierId);
-
-        Optional<Supplier> supplierOptional = supplierRepository.findById(supplierId);
-        if (supplierOptional.isPresent()) {
-            Supplier supplier = supplierOptional.get();
-            Optional<Product> productOptional = productRepository.findById(productId);
-            if (productOptional.isPresent()) {
-                Product product = productOptional.get();
-                supplier.removeProduct(product);
-                productRepository.delete(product); // Delete product from the database
-                supplierRepository.save(supplier); // Save the updated supplier
-            } else {
-                throw new RuntimeException("Product not found");
-            }
-        } else {
-            throw new RuntimeException("Supplier not found");
-        }
-    }
-
-    @Transactional
     public ProductDTO updateProduct(ProductDTO productDTO) {
 
         log.info("Updating product {}", productDTO);
@@ -128,6 +112,8 @@ public class SupplierService {
         product.setUnitMeasure(productDTO.getUnitMeasure());
         product.setSku(productDTO.getSku());
         product.setVatApplied(productDTO.getVatApplied());
+        product.setAvailable(productDTO.isAvailable());
+        product.setDeleted(productDTO.isDeleted());
 
         return ProductDTO.toDTO(product);
     }
@@ -135,49 +121,46 @@ public class SupplierService {
     @Transactional
     @Modifying
     public List<ProductDTO> insertListProduct(List<ProductDTO> productDTOList,
-                                        Long supplierId) {
+                                              Long supplierId) {
 
         log.info("Saving product list {} for supplier with id {}", productDTOList, supplierId);
 
         Supplier supplier = supplierRepository
                 .findById(supplierId).orElseThrow(() -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));
 
-        List<ProductDTO> productDTOS = new ArrayList<>();
+        Map<String, Product> existingProductsMap = supplier.getProducts().stream()
+                .collect(Collectors.toMap(
+                        product -> (product.getName().toLowerCase() + "-" + product.getUnitMeasure().toString()),
+                        product -> product
+                ));
 
-        List<String> productNames = supplier.getProducts().stream()
-                .map(Product::getName)
-                .toList();
+        for (ProductDTO productDTO : productDTOList) {
+            String productKey = productDTO.getName().toLowerCase() + "-" + productDTO.getUnitMeasure().toString();
 
-        for(ProductDTO productDTO : productDTOList) {
+            if (existingProductsMap.containsKey(productKey)) {
+                Product product = existingProductsMap.get(productKey);
+                log.info("Updating product {}", product);
+                product.setName(productDTO.getName());
+                product.setPrice(productDTO.getPrice());
+                product.setVatPrice(productDTO.getVatPrice());
+                product.setCategory(productDTO.getCategory());
+                product.setDescription(productDTO.getDescription());
+                product.setUnitMeasure(productDTO.getUnitMeasure());
+                product.setSku(productDTO.getSku());
+                product.setVatApplied(productDTO.getVatApplied());
+                product.setAvailable(productDTO.isAvailable());
+                product.setDeleted(productDTO.isDeleted());
 
-            if(productNames.contains(productDTO.getName())){
-                for(Product product : supplier.getProducts()){
-                    if(Objects.equals(productDTO.getName().toLowerCase(), product.getName().toLowerCase())){
-
-                        log.info("Updating product {}", product);
-                        product.setName(productDTO.getName());
-                        product.setPrice(productDTO.getPrice());
-                        product.setVatPrice(productDTO.getVatPrice());
-                        product.setCategory(productDTO.getCategory());
-                        product.setDescription(productDTO.getDescription());
-
-                        product.setUnitMeasure(productDTO.getUnitMeasure());
-                        product.setSku(productDTO.getSku());
-                        product.setVatApplied(productDTO.getVatApplied());
-
-                        productDTOS.add(ProductDTO.toDTO(product));
-                    }
-                }
-
-            }else{
-                ProductDTO product = createProduct(productDTO, supplierId);
-                log.info("Stored product: " + product);
-                productDTOS.add(product);
+            } else {
+                log.info("Save brand new prod: {}", productDTO);
+                createProduct(productDTO, supplierId);
             }
         }
 
-        log.info("List output : " + productDTOS);
-        return productDTOS;
+        supplier = supplierRepository
+                .findById(supplierId).orElseThrow(() -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));
+
+        return ProductDTO.toDTOList(supplier.getProducts(), true, false);
     }
 
     @Transactional
