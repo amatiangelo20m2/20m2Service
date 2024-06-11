@@ -31,7 +31,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,26 +53,29 @@ public class OrderService {
     private StorageService storageService;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     @Transactional
     public OrderDTO createOrder(CreateOrderEntity createOrderEntity) {
 
-        log.info("Creating order by user {} (with code {}) for a branch/supplier with code {}/{}. The order is requested to be delivered in {}",
+        log.info("Creating order by user {} (with code {}) for a branch/supplier with code {}/{}. " +
+                        "The order is requested to be delivered in {} to receive in preferred hour ({}). Set in CONSEGNATO STATUS? [{}]",
                 createOrderEntity.getUserName(),
                 createOrderEntity.getUserCode(),
                 createOrderEntity.getBranchCodeTarget(),
                 createOrderEntity.getSupplierCodeTarget(),
-                createOrderEntity.getIncomingDate());
+                createOrderEntity.getIncomingDate(),
+                createOrderEntity.getPreferredReceivingHour(),
+                createOrderEntity.isThisOrderAlreadyInConsegnatoStatus());
 
         Branch byBranchCode = branchRepository.findByBranchCode(createOrderEntity.getBranchCode())
                 .orElseThrow(() -> new BranchNotFoundException("Exception throwed while getting data. No branch with code : " + createOrderEntity.getBranchCode() + "found. Cannot create order for the branch" ));
 
         String targetName = "";
         String targetCode = "";
-        if(OrderTarget.BRANCH == createOrderEntity.getOrderTarget()){
+        if(OrderTarget.BRANCH == createOrderEntity.getOrderTarget()) {
             targetName = branchRepository
                     .findBranchNameByBranchCode(createOrderEntity.getBranchCodeTarget()).orElseThrow(() -> new BranchNotFoundException("Exception throwed while getting data. No branch with code  : " + createOrderEntity.getBranchCodeTarget() + "found. Cannot retrieve branch name" ));
             targetCode = createOrderEntity.getBranchCodeTarget();
-
         }else if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
             log.info("Retrieve supplier with code {}", createOrderEntity.getSupplierCodeTarget());
             targetName = supplierRepository.findSupplierNameByCode(createOrderEntity.getSupplierCodeTarget())
@@ -88,6 +93,7 @@ public class OrderService {
                 .nameTarget(targetName)
                 .codeTarget(targetCode)
                 .incomingDate(LocalDate.parse(createOrderEntity.getIncomingDate(), formatter))
+                .preferredReceivingHour(getHourInLocalTimeFormat(createOrderEntity.getPreferredReceivingHour()))
                 .orderTarget(createOrderEntity.getOrderTarget())
                 .orderStatus(OrderStatus.BOZZA)
                 .build());
@@ -158,10 +164,31 @@ public class OrderService {
                     .build());
 
         }else if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
-            savedOrder.setOrderStatus(OrderStatus.INVIATO);
-        }
 
+            if(createOrderEntity.isThisOrderAlreadyInConsegnatoStatus()){
+                log.info("Save the order already in CONSEGNATO status while is been executed in the same day than the day required to be delivered.");
+                savedOrder.setOrderStatus(OrderStatus.CONSEGNATO);
+            }else{
+                log.info("Save the order for supplier with code {} in INVIATO status", createOrderEntity.getSupplierCodeTarget());
+
+                savedOrder.setOrderStatus(OrderStatus.INVIATO);
+            }
+        }
         return OrderDTO.toDTO(savedOrder);
+    }
+
+    public static LocalTime getHourInLocalTimeFormat(String preferredReceivingHour) {
+        try {
+            // Define the expected time format
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+            // Parse the string to LocalTime
+            return LocalTime.parse(preferredReceivingHour, formatter);
+        } catch (DateTimeParseException e) {
+            // Handle the case where the input string is not in the expected format
+            log.error("Invalid time format: " + preferredReceivingHour + ". The format must be hh:mm");
+            return null;
+        }
     }
 
     @Transactional

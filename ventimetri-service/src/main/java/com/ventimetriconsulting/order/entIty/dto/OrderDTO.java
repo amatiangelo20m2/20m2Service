@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,11 +21,14 @@ public class OrderDTO {
 
     private long orderId;
     private String createdByUser;
+    private String userCode;
     private String createdBranchCode;
     private String createdBranchName;
 
     private LocalDate insertedDate;
     private LocalDate incomingDate;
+    private LocalTime preferredReceivingTime;
+
     private OrderStatus orderStatus;
 
     private OrderTarget orderTarget;
@@ -39,10 +43,12 @@ public class OrderDTO {
                 .createdBranchCode(order.getBranch().getBranchCode())
                 .createdBranchName(order.getBranch().getName())
                 .createdByUser(order.getCreatedByUser())
+                .userCode(order.getUserCode())
                 .codeTarget(order.getCodeTarget())
                 .nameTarget(order.getNameTarget())
                 .orderTarget(order.getOrderTarget())
                 .insertedDate(order.getInsertedDate())
+                .preferredReceivingTime(order.getPreferredReceivingHour())
                 .incomingDate(order.getIncomingDate())
                 .orderStatus(order.getOrderStatus())
                 .orderItemDtoList(OrderItemDto.fromEntities(order.getOrderItems()))

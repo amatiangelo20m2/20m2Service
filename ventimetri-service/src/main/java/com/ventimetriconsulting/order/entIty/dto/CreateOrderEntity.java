@@ -23,12 +23,18 @@ public class CreateOrderEntity {
 
     //date format yyyy-MM-dd
     private String insertedDate;
+
     private String incomingDate;
+
+    // format hh:mm:ss
+    private String preferredReceivingHour;
 
     private OrderTarget orderTarget;
     private String branchCodeTarget;
     private String supplierCodeTarget;
 
     private Map<Long, Double> orderItemAmountMap;
+
+    private boolean isThisOrderAlreadyInConsegnatoStatus;
 
 }

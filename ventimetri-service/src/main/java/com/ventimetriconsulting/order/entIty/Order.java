@@ -5,6 +5,7 @@ import com.ventimetriconsulting.branch.entity.Branch;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +41,8 @@ public class Order {
 
     private LocalDate insertedDate;
     private LocalDate incomingDate;
+
+    private LocalTime preferredReceivingHour;
 
     @Column(name = "order_status", nullable = false)
     @Enumerated(EnumType.STRING)

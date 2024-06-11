@@ -59,6 +59,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import static com.ventimetriconsulting.branch.configuration.bookingconf.entity.BookingForm.FormType.BOOKING_FORM;
@@ -538,14 +539,20 @@ public class TestSuiteVentiMetriQuadriService {
                 ResponseEntity<OrderDTO> orderDTO = orderController.createOrder(CreateOrderEntity
                         .builder()
                         .branchCode(branchCode)
+                        .userCode(userCode)
                         .userName("Angelo Amati")
                         .orderTarget(OrderTarget.BRANCH)
                         .incomingDate(formatter.format(LocalDate.now()))
                         .insertedDate(formatter.format(LocalDate.now()))
                         .branchCodeTarget(Objects.requireNonNull(targetBranch.getBody()).getBranchCode())
                         .supplierCodeTarget("")
+                        .preferredReceivingHour("12:00")
                         .orderItemAmountMap(integerDoubleMap)
+                        .isThisOrderAlreadyInConsegnatoStatus(false)
                         .build());
+
+                assertEquals("USERCODE10", Objects.requireNonNull(orderDTO.getBody()).getUserCode());
+                assertEquals(getHourInLocalTimeFormat("12:00"),orderDTO.getBody().getPreferredReceivingTime());
 
                 assertEquals("Angelo Amati", Objects.requireNonNull(orderDTO.getBody()).getCreatedByUser());
 
@@ -589,6 +596,20 @@ public class TestSuiteVentiMetriQuadriService {
 
                 System.out.println("");
             }
+        }
+    }
+
+    public static LocalTime getHourInLocalTimeFormat(String preferredReceivingHour) {
+        try {
+            // Define the expected time format
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+            // Parse the string to LocalTime
+            return LocalTime.parse(preferredReceivingHour, formatter);
+        } catch (DateTimeParseException e) {
+            // Handle the case where the input string is not in the expected format
+            log.error("Invalid time format: " + preferredReceivingHour + ". The format must be hh:mm");
+            return null;
         }
     }
 
