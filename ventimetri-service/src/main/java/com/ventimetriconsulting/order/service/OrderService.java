@@ -57,10 +57,11 @@ public class OrderService {
     @Transactional
     public OrderDTO createOrder(CreateOrderEntity createOrderEntity) {
 
-        log.info("Creating order by user {} (with code {}) for a branch/supplier with code {}/{}. " +
+        log.info("Creating order by user {} (with code {}). This order is by branch with code {} for a branch/supplier with code {}/{}. " +
                         "The order is requested to be delivered in {} to receive in preferred hour ({}). Set in CONSEGNATO STATUS? [{}]",
                 createOrderEntity.getUserName(),
                 createOrderEntity.getUserCode(),
+                createOrderEntity.getBranchCode(),
                 createOrderEntity.getBranchCodeTarget(),
                 createOrderEntity.getSupplierCodeTarget(),
                 createOrderEntity.getIncomingDate(),
