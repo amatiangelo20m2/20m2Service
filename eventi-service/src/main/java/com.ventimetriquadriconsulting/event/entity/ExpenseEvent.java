@@ -19,5 +19,6 @@ public class ExpenseEvent {
     private double price;
     private double amount;
     private LocalDate dateInsert;
+    private boolean isEmployeeExpense;
 
 }

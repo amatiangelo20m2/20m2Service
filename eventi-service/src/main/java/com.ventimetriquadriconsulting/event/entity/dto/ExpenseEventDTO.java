@@ -23,6 +23,7 @@ public class ExpenseEventDTO implements Serializable {
     private double price;
     private double amount;
     private LocalDate dateInsert;
+    private boolean isEmployeeExpense;
 
     public static ExpenseEventDTO fromEntity(ExpenseEvent expenseEvent) {
         return ExpenseEventDTO.builder()
@@ -31,6 +32,7 @@ public class ExpenseEventDTO implements Serializable {
                 .price(expenseEvent.getPrice())
                 .amount(expenseEvent.getAmount())
                 .dateInsert(expenseEvent.getDateInsert())
+                .isEmployeeExpense(expenseEvent.isEmployeeExpense())
                 .build();
     }
 
@@ -42,6 +44,7 @@ public class ExpenseEventDTO implements Serializable {
                 .price(this.getPrice())
                 .amount(this.getAmount())
                 .dateInsert(this.getDateInsert())
+                .isEmployeeExpense(this.isEmployeeExpense)
                 .build();
     }
 

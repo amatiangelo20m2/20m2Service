@@ -255,9 +255,11 @@ public class OrderService {
     }
 
     @Transactional
+    @Modifying
     public void updateOrderStatus(long orderId, OrderStatus orderStatus){
 
-        Order order = orderEntityRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        Order order = orderEntityRepository.findById(orderId).orElseThrow(()
+                -> new IllegalArgumentException("Order not found with id " + orderId));
         log.info("Update current order {} to [{}]", order, orderStatus);
         order.setOrderStatus(orderStatus);
     }

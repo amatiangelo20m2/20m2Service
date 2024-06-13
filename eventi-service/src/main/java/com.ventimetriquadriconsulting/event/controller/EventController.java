@@ -151,7 +151,8 @@ public class EventController {
     }
 
     @PutMapping("/{eventId}/expence/update")
-    public ResponseEntity<ExpenseEventDTO> updateExpence(@PathVariable long eventId, @RequestBody ExpenseEventDTO expenseEventDTO){
+    public ResponseEntity<ExpenseEventDTO> updateExpence(@PathVariable long eventId,
+                                                         @RequestBody ExpenseEventDTO expenseEventDTO){
         return ResponseEntity.status(HttpStatus.OK).body(eventService.updateExpence(eventId, expenseEventDTO));
     }
 

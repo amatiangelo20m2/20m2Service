@@ -314,6 +314,7 @@ public class EventService {
                 expenseEvent.setPrice(updatedExpenseEvent.getPrice());
                 expenseEvent.setAmount(updatedExpenseEvent.getAmount());
                 expenseEvent.setDateInsert(updatedExpenseEvent.getDateInsert());
+                expenseEvent.setEmployeeExpense(updatedExpenseEvent.isEmployeeExpense());
                 updatedExpense = expenseEvent;
             }
         }

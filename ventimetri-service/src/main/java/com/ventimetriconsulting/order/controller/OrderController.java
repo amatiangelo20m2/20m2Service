@@ -112,7 +112,8 @@ public class OrderController {
     }
 
     @PutMapping(path = "/updatetoconsegnato")
-    public ResponseEntity<OrderDTO> updateOrderToDelivered(@RequestParam long orderId, @RequestBody List<OrderItemDto> orderItemDtoList) {
+    public ResponseEntity<OrderDTO> updateOrderToDelivered(@RequestParam long orderId,
+                                                           @RequestBody List<OrderItemDto> orderItemDtoList) {
         try {
             orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.CONSEGNATO, 0L, null);
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));

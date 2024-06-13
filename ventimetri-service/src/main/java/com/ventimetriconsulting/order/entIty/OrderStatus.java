@@ -9,4 +9,5 @@ public enum OrderStatus implements Serializable {
     PRONTO_A_PARTIRE,
     CONSEGNATO,
     ARCHIVIATO,
+    CANCELLATO
 }
