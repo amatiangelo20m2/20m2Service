@@ -6,5 +6,6 @@ public enum Role {
     FACTOTUM,
     RESPONSABILE_MAGAZZINO,
     BARMAN,
-    CUOCO
+    CUOCO,
+    CAMERIERE,
 }

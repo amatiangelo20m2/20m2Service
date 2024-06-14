@@ -455,4 +455,12 @@ public class BranchService {
         Optional<BranchUser> byUserCodeAndBranchCode = branchUserRepository.findByUserCodeAndBranchCode(userCode, branchCode);
         byUserCodeAndBranchCode.ifPresent(branchUser -> branchUserRepository.delete(branchUser));
     }
+
+    @Transactional
+    @Modifying
+    public void updateEmployeeRole(String branchCode, String userCode, String role) {
+        log.info("Update user with code {} from branch with code {} to role {}", userCode, branchCode, role);
+        Optional<BranchUser> byUserCodeAndBranchCode = branchUserRepository.findByUserCodeAndBranchCode(userCode, branchCode);
+        byUserCodeAndBranchCode.ifPresent(branchUser -> branchUser.setRole(Role.valueOf(role)));
+    }
 }

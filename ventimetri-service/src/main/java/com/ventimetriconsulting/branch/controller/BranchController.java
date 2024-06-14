@@ -157,4 +157,14 @@ public class BranchController {
                 .status(HttpStatus.OK)
                 .body(null);
     }
+
+    @PutMapping(path = "/update/employeerole")
+    public ResponseEntity<Void> updateEmployeeRole(@RequestParam String branchCode,
+                                                   @RequestParam String userCode,
+                                                   @RequestParam String role){
+        branchService.updateEmployeeRole(branchCode, userCode, role);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(null);
+    }
 }
