@@ -36,6 +36,7 @@ public class SupplierService {
 
         log.info("Crete supplier {}. Associate it with branch with code {}", supplierDTO, branchCode);
 
+        supplierDTO.setHideFromOrderList(false);
         Supplier supplier = SupplierDTO.fromDTO(supplierDTO);
 
         Branch branch = branchRepository.findByBranchCode(branchCode)
@@ -201,4 +202,11 @@ public class SupplierService {
         }
     }
 
+    @Transactional
+    @Modifying
+    public Boolean turnSupplierVisibility(Long supplierId) {
+        log.info("Turn supplier visibility for supplier with id {}. If true the supplier will be visible only for user that has created it and will not be visible to make orders.", supplierId);
+        supplierRepository.toggleIsHideFromOrderList(supplierId);
+        return true;
+    }
 }

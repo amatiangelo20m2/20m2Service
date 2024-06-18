@@ -33,7 +33,7 @@ public class SupplierDTO {
     private String country;
     private List<ProductDTO> productDTOList;
     private String createdByUserCode;
-
+    private boolean isHideFromOrderList;
 
     public static Supplier fromDTO(SupplierDTO supplierDTO) {
         return Supplier.builder()
@@ -50,6 +50,7 @@ public class SupplierDTO {
                 .supplierCode(supplierDTO.getSupplierCode())
                 .country(supplierDTO.getCountry())
                 .createdByUserCode(supplierDTO.getCreatedByUserCode())
+                .isHideFromOrderList(supplierDTO.isHideFromOrderList())
                 .build();
     }
 
@@ -71,6 +72,7 @@ public class SupplierDTO {
         dto.setProductDTOList(ProductDTO.toDTOList(supplier.getProducts(),
                 true,
                 false));
+        dto.setHideFromOrderList(supplier.isHideFromOrderList());
         return dto;
     }
 

@@ -61,8 +61,13 @@ public class SupplierController {
                 .body(supplierService.updateProduct(productDTO));
     }
 
-    @GetMapping(path = "retrieveSuppliers")
-    public ResponseEntity<List<SupplierDTO>> retrieveAllSupplier(){
+    @GetMapping(path = "/retrieveSuppliers")
+    public ResponseEntity<List<SupplierDTO>> retrieveAllSupplier() {
         return ResponseEntity.status(HttpStatus.OK).body(supplierService.retrieveAllSuppliers());
+    }
+
+    @PutMapping(path = "/turnsuppliervisibility")
+    public ResponseEntity<Boolean> turnSupplierVisibility(@RequestParam("supplierId") Long supplierId) {
+        return ResponseEntity.status(HttpStatus.OK).body(supplierService.turnSupplierVisibility(supplierId));
     }
 }

@@ -150,7 +150,7 @@ public class OrderService {
         log.info("Save order with status SENT");
 
         if(OrderTarget.BRANCH == createOrderEntity.getOrderTarget()){
-            savedOrder.setOrderStatus(OrderStatus.INVIATO);
+            savedOrder.setOrderStatus(OrderStatus.IN_LAVORAZIONE);
             List<String> fmcTokensByBranchCode
                     = branchUserRepository.findFMCTokensByBranchCode(createOrderEntity.getBranchCodeTarget(),
                     createOrderEntity.getUserCode());
@@ -167,11 +167,10 @@ public class OrderService {
         }else if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
 
             if(createOrderEntity.isThisOrderAlreadyInConsegnatoStatus()){
-                log.info("Save the order already in CONSEGNATO status while is been executed in the same day than the day required to be delivered.");
-                savedOrder.setOrderStatus(OrderStatus.CONSEGNATO);
+                log.info("Save the order already in DA_CONFERMARE status while is been executed in the same day than the day required to be delivered.");
+                savedOrder.setOrderStatus(OrderStatus.DA_CONFERMARE);
             }else{
                 log.info("Save the order for supplier with code {} in INVIATO status", createOrderEntity.getSupplierCodeTarget());
-
                 savedOrder.setOrderStatus(OrderStatus.INVIATO);
             }
         }
@@ -207,7 +206,7 @@ public class OrderService {
 
         for(Order order : byOrderTargetAndIncomingDateAndOrderStatus){
             log.info("Updating order to CONSEGNATO with id " + order.getOrderId());
-            order.setOrderStatus(OrderStatus.CONSEGNATO);
+            order.setOrderStatus(OrderStatus.DA_CONFERMARE);
         }
     }
 

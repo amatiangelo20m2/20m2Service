@@ -58,11 +58,7 @@ public class Supplier {
     private String country;
 
     private String createdByUserCode;
-
-    // if this code is present, this supplier belong to a branch (FORNITORE type)
-    // and it will not be visible to the others branches when thay choose supplier to perform order.
-    //
-    private String branchSupplierCode;
+    private boolean isHideFromOrderList;
 
     @OneToMany(fetch = FetchType.EAGER,
             mappedBy = "supplier", cascade = CascadeType.ALL)
