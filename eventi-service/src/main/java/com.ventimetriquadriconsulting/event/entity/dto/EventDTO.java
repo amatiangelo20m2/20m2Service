@@ -33,6 +33,7 @@ public class EventDTO implements Serializable {
     private String location;
     private Set<WorkstationDTO> workstations;
     private Set<ExpenseEventDTO> expenseEvents;
+    private long cateringStorageId;
 
     public static EventDTO fromEntity(Event event) {
         return EventDTO.builder()
@@ -48,6 +49,7 @@ public class EventDTO implements Serializable {
                         .map(WorkstationDTO::fromEntity)
                         .collect(Collectors.toSet()))
                 .expenseEvents(new HashSet<>(ExpenseEventDTO.toDTOList(event.getExpenseEvents().stream().toList())))
+                .cateringStorageId(event.getCateringStorageId())
                 .build();
     }
 
@@ -69,6 +71,7 @@ public class EventDTO implements Serializable {
                 .expenseEvents(eventDTO.getExpenseEvents() != null ?
                         ExpenseEventDTO.fromDTOList(eventDTO.getExpenseEvents().stream().toList()) :
                         Collections.emptySet())
+                .cateringStorageId(eventDTO.getCateringStorageId())
                 .build();
     }
 

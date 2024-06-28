@@ -209,4 +209,25 @@ public class SupplierService {
         supplierRepository.toggleIsHideFromOrderList(supplierId);
         return true;
     }
+
+    @Transactional
+    @Modifying
+    public SupplierDTO editSupplier(SupplierDTO supplierDTO) {
+
+        log.info("Update supplier {}", supplierDTO);
+        Supplier supplier = supplierRepository.findById(supplierDTO.getSupplierId())
+                .orElseThrow(() -> new SupplierNotFoundException("Supplier not found with code: "
+                        + supplierDTO.getSupplierId() +
+                        ". Cannot create any product"));
+
+        supplier.setAddress(supplierDTO.getAddress());
+        supplier.setName(supplierDTO.getName());
+        supplier.setCity(supplierDTO.getCity());
+        supplier.setCountry(supplierDTO.getCountry());
+        supplier.setPec(supplierDTO.getPec());
+        supplier.setPhoneNumber(supplierDTO.getPhoneNumber());
+        supplier.setCap(supplierDTO.getCap());
+
+        return SupplierDTO.fromEntity(supplier);
+    }
 }

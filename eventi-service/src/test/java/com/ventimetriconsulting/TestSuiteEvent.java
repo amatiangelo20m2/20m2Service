@@ -170,6 +170,7 @@ public class TestSuiteEvent {
                 .location("Fake Location")
                 .workstations(workstationDTOList)
                 .expenseEvents(expenseEventDTOList)
+                .cateringStorageId(0L)
                 .build();
     }
 

@@ -51,7 +51,7 @@ public class CateringStorage {
     @ElementCollection
     @CollectionTable(
             name = "catering_products",
-            joinColumns = @JoinColumn(name = "event_product_id")
+            joinColumns = @JoinColumn(name = "catering_storage_id")
     )
     @OrderColumn(name = "position")
     private Set<Product> cateringStorageProducts;

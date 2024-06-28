@@ -368,4 +368,35 @@ public class EventService {
             }
         }
     }
+
+    @Transactional
+    @Modifying
+    public WorkstationDTO retrieveWorkstationById(long eventId, long workstationId) {
+
+        log.info("Retrieve workstation with id {}. The event where this workstation belong has id {}",workstationId,  eventId);
+
+        Workstation workstation = workstationRepository.findById(workstationId).orElseThrow(()
+                -> new NotFoundException("Workstation not found for id " + workstationId));
+
+        return WorkstationDTO.fromEntity(workstation);
+    }
+
+    @Transactional
+    @Modifying
+    public CateringStorage loadProductIntoStorageVan(long cateringStorageId, Map<Long, Double> insertValueMapProductIdAmountToInsert) {
+        log.info("This map contain the product id and the amount to add in order to perform a load product into workstation event. " +
+                "MAP: {} and it will be apply to a storage van with id {}", insertValueMapProductIdAmountToInsert, cateringStorageId);
+
+        CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
+                -> new NotFoundException("Storage not found for id " + cateringStorageId));
+
+        for (Product product : cateringStorage.getCateringStorageProducts()) {
+            long productId = product.getProductId();
+            if (insertValueMapProductIdAmountToInsert.containsKey(productId)) {
+                double quantityInserted = insertValueMapProductIdAmountToInsert.get(productId);
+                product.setQuantityInserted(quantityInserted);
+            }
+        }
+        return cateringStorage;
+    }
 }

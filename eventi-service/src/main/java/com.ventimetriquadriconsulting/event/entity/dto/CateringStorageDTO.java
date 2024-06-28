@@ -24,6 +24,7 @@ public class CateringStorageDTO {
     private Set<ProductDTO> cateringStorageProducts;
 
     public static CateringStorageDTO fromEntity(CateringStorage cateringStorage) {
+
         return CateringStorageDTO.builder()
                 .cateringStorageId(cateringStorage.getCateringStorageId())
                 .branchCode(cateringStorage.getBranchCode())

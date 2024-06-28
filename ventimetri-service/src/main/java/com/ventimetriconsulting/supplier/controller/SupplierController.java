@@ -24,6 +24,13 @@ public class SupplierController {
                 .body(supplierService.createSupplier(supplierDTO, branchCode));
     }
 
+    @PutMapping(path = "/editsupplier")
+    public ResponseEntity<SupplierDTO> editSupplier(
+            @RequestBody SupplierDTO supplierDTO) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(supplierService.editSupplier(supplierDTO));
+    }
+
     @PostMapping(path = "/addlist")
     public ResponseEntity<List<SupplierDTO>> insertSupplierList(
             @RequestBody List<SupplierDTO> supplierDTOList,

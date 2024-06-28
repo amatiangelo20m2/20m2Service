@@ -51,9 +51,7 @@ public class EventController {
                 .body(eventService.addWorkstationToEvent(
                         eventId,
                         workstationDTO));
-
     }
-
 
     @DeleteMapping(path = "/delete/workstation")
     public ResponseEntity<Void> deleteWorkstation(long workstationId, long eventId){
@@ -66,6 +64,12 @@ public class EventController {
     @DeleteMapping("/{workstationId}/products/{productId}")
     public ResponseEntity<?> deleteWorkstationProduct(@PathVariable long workstationId, @PathVariable long productId) {
         return eventService.deleteProduct(workstationId, productId);
+    }
+
+    @PutMapping("/{cateringStorageId}/loadprod/storagecatering")
+    public ResponseEntity<CateringStorage> loadProductsIntoStorageCatering(@PathVariable long cateringStorageId,
+                                                             @RequestBody Map<Long, Double> quantityMap) {
+        return ResponseEntity.ok().body(eventService.loadProductIntoStorageVan(cateringStorageId, quantityMap));
     }
 
     @PutMapping("/{workstationId}/products/{productId}")
@@ -156,29 +160,15 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).body(eventService.updateExpence(eventId, expenseEventDTO));
     }
 
+    @GetMapping("/{eventId}/retrieveworkstation/{workstationId}")
+    public ResponseEntity<WorkstationDTO> retrieveWorkstation(@PathVariable long eventId,
+                                                         @PathVariable long workstationId){
 
-//
-//    @DeleteMapping(path = "/delete")
-//    public void delete(@RequestParam("eventId") long eventId){
-//        eventService.deleteEvent(eventId);
-//    }
-//
-//    @PutMapping(path = "/close")
-//    public void close(@RequestParam("eventId") long eventId){
-//        eventService.closeEvent(eventId);
-//    }
-//
-//    @PutMapping(path = "/update")
-//    public void update(@RequestBody Event event){
-//        eventService.update(event);
-//    }
-//
-//    // WORKSTATION REOURCES
-//    @PostMapping(path = "/workstation/create")
-//    public Workstation createWorkstation(@RequestBody Workstation workstation){
-//        return eventService.createWorkstation(workstation);
-//    }
-//
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.retrieveWorkstationById(eventId, workstationId));
+    }
+
     @PostMapping(path = "/{eventiId}/{cateringStorageId}/workstation/{workstationId}/addproducts")
     public ResponseEntity<List<ProductDTO>> addProductToWorkstation(@PathVariable long eventiId,
                                                                     @PathVariable long workstationId,

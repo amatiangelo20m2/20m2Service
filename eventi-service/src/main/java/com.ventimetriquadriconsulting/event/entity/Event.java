@@ -45,6 +45,8 @@ public class Event implements Serializable {
     private LocalDate dateEvent;
     private LocalDate dateCreation;
 
+    private long cateringStorageId;
+
     @Enumerated
     private EventStatus eventStatus;
 
