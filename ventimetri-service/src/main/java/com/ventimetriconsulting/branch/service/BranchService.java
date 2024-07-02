@@ -486,7 +486,5 @@ public class BranchService {
         if (!Objects.equals(branchCreationEntity.getCity(), "") && branchCreationEntity.getCity() != null) {
             branch.setCity(branchCreationEntity.getCity());
         }
-
-
     }
 }
