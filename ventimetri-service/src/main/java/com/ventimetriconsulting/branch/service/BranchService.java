@@ -463,4 +463,30 @@ public class BranchService {
         Optional<BranchUser> byUserCodeAndBranchCode = branchUserRepository.findByUserCodeAndBranchCode(userCode, branchCode);
         byUserCodeAndBranchCode.ifPresent(branchUser -> branchUser.setRole(Role.valueOf(role)));
     }
+
+    @Transactional
+    @Modifying
+    public void updateBranchData(BranchCreationEntity branchCreationEntity) {
+        log.info("Updating branch data {} ", branchCreationEntity);
+        Branch branch = branchRepository.findByBranchCode(branchCreationEntity.getBranchCode()).orElseThrow(()
+                -> new BranchNotFoundException("No branch found with code [" + branchCreationEntity.getBranchCode() + "]. Cannot proceed deleting it."));
+
+        if (!Objects.equals(branchCreationEntity.getName(), "") && branchCreationEntity.getName() != null) {
+            branch.setName(branchCreationEntity.getName());
+        }
+
+        if (!Objects.equals(branchCreationEntity.getAddress(), "") && branchCreationEntity.getAddress() != null) {
+            branch.setAddress(branchCreationEntity.getAddress());
+        }
+
+        if (!Objects.equals(branchCreationEntity.getCap(), "") && branchCreationEntity.getCap() != null) {
+            branch.setCap(branchCreationEntity.getCap());
+        }
+
+        if (!Objects.equals(branchCreationEntity.getCity(), "") && branchCreationEntity.getCity() != null) {
+            branch.setCity(branchCreationEntity.getCity());
+        }
+
+
+    }
 }

@@ -21,6 +21,14 @@ public class BranchController {
 
     private BranchService branchService;
 
+    @PutMapping(path = "/updatebranchdata")
+    public ResponseEntity<?> updateBranchData(@RequestBody BranchCreationEntity branchCreationEntity) {
+
+        branchService.updateBranchData(branchCreationEntity);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping(path = "/retrievedata")
     public ResponseEntity<VentiMetriQuadriData> retrieveData(@RequestParam String userCode, @RequestParam String fcmToken){
         List<BranchResponseEntity> branchesByUserCode = branchService.getBranchesByUserCode(userCode, fcmToken);
