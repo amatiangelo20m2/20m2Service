@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -198,6 +199,7 @@ public class EventService {
             List<Long> productIds,
             long cateringStorageId) {
 
+        log.info("Add products with ids {} to the workstation with id {}", productIds, workstationId);
         // Retrieve the event and workstation
 
         Event event = eventRepository.findById(eventId)
@@ -218,14 +220,17 @@ public class EventService {
 
         if(productsToAdd.isEmpty()) {
             log.warn("No products found for the given product IDs: {}", productIds);
+            return new ArrayList<>();
+        }else{
+            List<Product> list = productsToAdd.stream()
+                    .map(Product::new).toList();
+            workstation.getProducts().addAll(list);
+            eventRepository.save(event);
+
+            return ProductDTO.listFromEntities(list);
         }
 
-        workstation.getProducts().addAll(productsToAdd);
 
-        // Save the changes
-        eventRepository.save(event);
-
-        return ProductDTO.listFromEntities(productsToAdd);
     }
 
     @Transactional

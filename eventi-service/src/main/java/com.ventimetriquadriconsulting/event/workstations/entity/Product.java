@@ -21,4 +21,13 @@ public class Product implements Serializable {
     private double quantityConsumed;
     private double price;
     private UnitMeasure unitMeasure;
+
+    public Product(Product original) {
+        this.productId = original.productId;
+        this.productName = original.productName;
+        this.quantityInserted = 0;
+        this.quantityConsumed = 0;
+        this.price = original.price;
+        this.unitMeasure = original.unitMeasure;
+    }
 }
