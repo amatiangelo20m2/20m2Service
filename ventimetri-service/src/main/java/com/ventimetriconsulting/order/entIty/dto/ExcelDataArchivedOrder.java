@@ -9,7 +9,6 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 public class ExcelDataArchivedOrder {
-
     private long productId;
     private String productName;
     private double quantity;
@@ -17,5 +16,4 @@ public class ExcelDataArchivedOrder {
     private double sentQuantity;
     private UnitMeasure unitMeasure;
     private double price;
-
 }
