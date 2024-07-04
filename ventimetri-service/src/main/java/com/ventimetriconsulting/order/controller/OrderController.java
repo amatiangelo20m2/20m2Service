@@ -223,23 +223,24 @@ public class OrderController {
         List<OrderDTO> orderArchivedByBrancCode = getOrderArchivedByBrancCode(branchCode, startDate, endDate).getBody();
 
         List<OrderDTO> incomingOrders = new ArrayList<>();
-        Map<String, List<OrderDTO>> outgoingOrdersByCodeTarget = new HashMap<>();
+        Map<String, List<OrderDTO>> outgoingOrdersByBranch = new HashMap<>();
 
         for (OrderDTO orderDTO : Objects.requireNonNull(orderArchivedByBrancCode)) {
             if (Objects.equals(orderDTO.getCodeTarget(), branchCode)) {
-                outgoingOrdersByCodeTarget
-                        .computeIfAbsent(orderDTO.getCodeTarget(), k -> new ArrayList<>())
-                        .add(orderDTO);
-            } else {
                 incomingOrders.add(orderDTO);
+            } else {
+                String createdBranchCode = orderDTO.getCreatedBranchCode();
+                outgoingOrdersByBranch
+                        .computeIfAbsent(createdBranchCode, k -> new ArrayList<>())
+                        .add(orderDTO);
             }
         }
 
         List<OrderResultRecap.DetailedProductRecap> incomingRecap = categorizeOrders(incomingOrders);
         List<OrderResultRecap.DetailedProductRecap> outgoingRecap = new ArrayList<>();
 
-        for (Map.Entry<String, List<OrderDTO>> entry : outgoingOrdersByCodeTarget.entrySet()) {
-            List<OrderResultRecap.DetailedProductRecap> categorizedOrders = categorizeOrders(entry.getValue());
+        for (Map.Entry<String, List<OrderDTO>> entry : outgoingOrdersByBranch.entrySet()) {
+            List<OrderResultRecap.DetailedProductRecap> categorizedOrders = categorizeOrders(entry.getValue(), entry.getKey(), entry.getValue().get(0).getCreatedBranchName());
             outgoingRecap.addAll(categorizedOrders);
         }
 
@@ -254,11 +255,15 @@ public class OrderController {
     }
 
     private List<OrderResultRecap.DetailedProductRecap> categorizeOrders(List<OrderDTO> orders) {
+        return categorizeOrders(orders, null, null);
+    }
+
+    private List<OrderResultRecap.DetailedProductRecap> categorizeOrders(List<OrderDTO> orders, String branchCode, String branchName) {
         Map<String, OrderResultRecap.DetailedProductRecap> recapMap = new HashMap<>();
 
         for (OrderDTO order : orders) {
-            String code = order.getCodeTarget();
-            String name = order.getNameTarget();
+            String code = branchCode != null ? branchCode : order.getCodeTarget();
+            String name = branchName != null ? branchName : order.getNameTarget();
 
             OrderResultRecap.DetailedProductRecap recap =
                     recapMap.computeIfAbsent(code, k -> new OrderResultRecap.DetailedProductRecap(code, name, new ArrayList<>()));
@@ -305,5 +310,6 @@ public class OrderController {
                 .sorted(Comparator.comparing(o -> o.getProductName().toLowerCase()))
                 .collect(Collectors.toList());
     }
+
 
 }
