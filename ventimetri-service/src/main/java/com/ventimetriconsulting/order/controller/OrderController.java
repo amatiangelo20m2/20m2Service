@@ -222,21 +222,26 @@ public class OrderController {
 
         List<OrderDTO> orderArchivedByBrancCode = getOrderArchivedByBrancCode(branchCode, startDate, endDate).getBody();
 
-        List<OrderDTO> incomingOrders
-                = new ArrayList<>();
-        List<OrderDTO> outgoingOrders
-                = new ArrayList<>();
+        List<OrderDTO> incomingOrders = new ArrayList<>();
+        Map<String, List<OrderDTO>> outgoingOrdersByCodeTarget = new HashMap<>();
 
         for (OrderDTO orderDTO : Objects.requireNonNull(orderArchivedByBrancCode)) {
             if (Objects.equals(orderDTO.getCodeTarget(), branchCode)) {
-                outgoingOrders.add(orderDTO);
+                outgoingOrdersByCodeTarget
+                        .computeIfAbsent(orderDTO.getCodeTarget(), k -> new ArrayList<>())
+                        .add(orderDTO);
             } else {
                 incomingOrders.add(orderDTO);
             }
         }
 
         List<OrderResultRecap.DetailedProductRecap> incomingRecap = categorizeOrders(incomingOrders);
-        List<OrderResultRecap.DetailedProductRecap> outgoingRecap = categorizeOrders(outgoingOrders);
+        List<OrderResultRecap.DetailedProductRecap> outgoingRecap = new ArrayList<>();
+
+        for (Map.Entry<String, List<OrderDTO>> entry : outgoingOrdersByCodeTarget.entrySet()) {
+            List<OrderResultRecap.DetailedProductRecap> categorizedOrders = categorizeOrders(entry.getValue());
+            outgoingRecap.addAll(categorizedOrders);
+        }
 
         OrderResultRecap orderResultRecap = OrderResultRecap.builder()
                 .incomingsOrders(incomingRecap)
@@ -300,4 +305,5 @@ public class OrderController {
                 .sorted(Comparator.comparing(o -> o.getProductName().toLowerCase()))
                 .collect(Collectors.toList());
     }
+
 }

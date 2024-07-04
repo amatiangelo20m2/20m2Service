@@ -30,8 +30,8 @@ public class OrderDTO {
     private LocalTime preferredReceivingTime;
 
     private OrderStatus orderStatus;
-
     private OrderTarget orderTarget;
+
     private String codeTarget;
     private String nameTarget;
 
