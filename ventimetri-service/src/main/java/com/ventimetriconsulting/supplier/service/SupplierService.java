@@ -175,11 +175,15 @@ public class SupplierService {
 
     public List<SupplierDTO> retrieveAllSuppliers() {
 
-        log.info("Retrieve all suppliers..");
-        List<Supplier> allSuppliers = supplierRepository.findAll();
+        try{
+            log.info("Retrieve all suppliers..");
+            List<Supplier> allSuppliers = supplierRepository.findAll();
+            return SupplierDTO.toDTOList(new HashSet<>(allSuppliers));
+        }catch (Exception e){
+            log.error("Exception: " + e);
+            return new ArrayList<>();
+        }
 
-
-        return SupplierDTO.toDTOList(new HashSet<>(allSuppliers));
     }
 
     @Transactional
