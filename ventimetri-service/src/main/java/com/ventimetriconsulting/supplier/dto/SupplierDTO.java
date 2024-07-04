@@ -1,13 +1,11 @@
 package com.ventimetriconsulting.supplier.dto;
 
-import com.ventimetriconsulting.supplier.entity.Product;
 import com.ventimetriconsulting.supplier.entity.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +31,7 @@ public class SupplierDTO {
     private String country;
     private List<ProductDTO> productDTOList;
     private String createdByUserCode;
-    private boolean isHideFromOrderList;
+    private List<String> branchNotAllowed;
 
     public static Supplier fromDTO(SupplierDTO supplierDTO) {
         return Supplier.builder()
@@ -50,7 +48,7 @@ public class SupplierDTO {
                 .supplierCode(supplierDTO.getSupplierCode())
                 .country(supplierDTO.getCountry())
                 .createdByUserCode(supplierDTO.getCreatedByUserCode())
-                .isHideFromOrderList(supplierDTO.isHideFromOrderList())
+                .branchNotAllowed(supplierDTO.getBranchNotAllowed())
                 .build();
     }
 
@@ -69,10 +67,8 @@ public class SupplierDTO {
         dto.setSupplierCode(supplier.getSupplierCode());
         dto.setCountry(supplier.getCountry());
         dto.setCreatedByUserCode(supplier.getCreatedByUserCode());
-        dto.setProductDTOList(ProductDTO.toDTOList(supplier.getProducts(),
-                true,
-                false));
-        dto.setHideFromOrderList(supplier.isHideFromOrderList());
+        dto.setProductDTOList(ProductDTO.toDTOList(supplier.getProducts(), true, false));
+        dto.setBranchNotAllowed(supplier.getBranchNotAllowed());
         return dto;
     }
 

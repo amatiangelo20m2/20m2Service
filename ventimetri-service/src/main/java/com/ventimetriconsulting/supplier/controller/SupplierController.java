@@ -73,8 +73,11 @@ public class SupplierController {
         return ResponseEntity.status(HttpStatus.OK).body(supplierService.retrieveAllSuppliers());
     }
 
-    @PutMapping(path = "/turnsuppliervisibility")
-    public ResponseEntity<Boolean> turnSupplierVisibility(@RequestParam("supplierId") Long supplierId) {
-        return ResponseEntity.status(HttpStatus.OK).body(supplierService.turnSupplierVisibility(supplierId));
+    @PutMapping(path = "storenewbranchexclusionlisttotupplier")
+    public ResponseEntity<?> storeNewBranchExclusionListToSupplier(@RequestParam("supplierId") Long supplierId,
+                                                                   @RequestBody List<String> exclusionList) {
+        supplierService
+                .storeNewBranchExclusionListToSupplier(supplierId, exclusionList);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

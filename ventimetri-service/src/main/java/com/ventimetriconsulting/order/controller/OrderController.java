@@ -295,12 +295,9 @@ public class OrderController {
         return new ArrayList<>(recapMap.values());
     }
 
-
     public static List<ExcelDataArchivedOrder> sortByProductNameDesc(Collection<ExcelDataArchivedOrder> collection) {
         return collection.stream()
                 .sorted(Comparator.comparing(o -> o.getProductName().toLowerCase()))
                 .collect(Collectors.toList());
     }
-
-
 }

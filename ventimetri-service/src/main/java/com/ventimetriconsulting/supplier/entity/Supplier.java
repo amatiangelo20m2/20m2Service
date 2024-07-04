@@ -56,9 +56,12 @@ public class Supplier {
     private String pec;
     private String cf;
     private String country;
-
     private String createdByUserCode;
-    private boolean isHideFromOrderList;
+
+    @ElementCollection
+    @CollectionTable(name = "branches_not_allowed", joinColumns = @JoinColumn(name = "supplier_id"))
+    @Column(name = "branches_not_allowed")
+    private List<String> branchNotAllowed;
 
     @OneToMany(fetch = FetchType.EAGER,
             mappedBy = "supplier", cascade = CascadeType.ALL)

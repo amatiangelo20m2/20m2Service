@@ -16,7 +16,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,7 +35,6 @@ public class SupplierService {
 
         log.info("Crete supplier {}. Associate it with branch with code {}", supplierDTO, branchCode);
 
-        supplierDTO.setHideFromOrderList(false);
         Supplier supplier = SupplierDTO.fromDTO(supplierDTO);
 
         Branch branch = branchRepository.findByBranchCode(branchCode)
@@ -189,24 +187,13 @@ public class SupplierService {
     public boolean deleteSupplier(Long supplierId) {
         log.info("Delete supplier with id {}", supplierId);
 
-        Optional<Supplier> supplierOptional = supplierRepository.findById(supplierId);
-        if (supplierOptional.isPresent()) {
-            Supplier supplier = supplierOptional.get();
-            // Deleting all products related to this supplier
-            supplier.getProducts().forEach(product -> productRepository.deleteById(product.getProductId()));
-            // Deleting the supplier
-            supplierRepository.delete(supplier);
-            return true;
-        } else {
-            throw new RuntimeException("Supplier not found");
-        }
-    }
+        Supplier supplier = supplierRepository.findById(supplierId).orElseThrow(()
+                -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));;
+        // Deleting all products related to this supplier
+        supplier.getProducts().forEach(product -> productRepository.deleteById(product.getProductId()));
 
-    @Transactional
-    @Modifying
-    public Boolean turnSupplierVisibility(Long supplierId) {
-        log.info("Turn supplier visibility for supplier with id {}. If true the supplier will be visible only for user that has created it and will not be visible to make orders.", supplierId);
-        supplierRepository.toggleIsHideFromOrderList(supplierId);
+        supplierRepository.delete(supplier);
+
         return true;
     }
 
@@ -229,5 +216,16 @@ public class SupplierService {
         supplier.setCap(supplierDTO.getCap());
 
         return SupplierDTO.fromEntity(supplier);
+    }
+
+    @Transactional
+    @Modifying
+    public void storeNewBranchExclusionListToSupplier(Long supplierId, List<String> exclusionList) {
+        log.info("Add the following exclusion branch list {} to the follow supplier with id {}", exclusionList, supplierId);
+
+        Supplier supplier = supplierRepository.findById(supplierId).orElseThrow(()
+                -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));
+
+        supplier.setBranchNotAllowed(exclusionList);
     }
 }

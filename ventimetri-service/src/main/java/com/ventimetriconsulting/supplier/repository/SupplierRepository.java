@@ -22,11 +22,4 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
     @Query("SELECT supplier.name FROM Supplier supplier WHERE supplier.supplierCode = :supplierCodeTarget")
     Optional<String> findSupplierNameByCode(String supplierCodeTarget);
 
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Supplier s SET s.isHideFromOrderList = CASE WHEN s.isHideFromOrderList = true THEN false ELSE true END WHERE s.supplierId = :supplierId")
-    void toggleIsHideFromOrderList(@Param("supplierId") long supplierId);
-
-
 }
