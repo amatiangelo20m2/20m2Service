@@ -73,7 +73,7 @@ public class SupplierController {
         return ResponseEntity.status(HttpStatus.OK).body(supplierService.retrieveAllSuppliers());
     }
 
-    @PutMapping(path = "storenewbranchexclusionlisttotupplier")
+    @PutMapping(path = "/storenewbranchexclusionlisttotupplier")
     public ResponseEntity<?> storeNewBranchExclusionListToSupplier(@RequestParam("supplierId") Long supplierId,
                                                                    @RequestBody List<String> exclusionList) {
         supplierService

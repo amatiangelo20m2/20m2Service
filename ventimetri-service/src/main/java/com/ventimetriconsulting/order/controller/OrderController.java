@@ -224,12 +224,12 @@ public class OrderController {
                 = getOrderArchivedByBrancCode(branchCode, startDate, endDate).getBody();
 
         List<OrderDTO> incomingOrders = new ArrayList<>();
-        Map<String, List<OrderDTO>> outgoingOrdersByCodeTarget = new HashMap<>();
+        Map<String, List<OrderDTO>> outgoingOrdersByCreatedBranchCode = new HashMap<>();
 
         for (OrderDTO orderDTO : Objects.requireNonNull(orderArchivedByBrancCode)) {
             if (Objects.equals(orderDTO.getCodeTarget(), branchCode)) {
-                outgoingOrdersByCodeTarget
-                        .computeIfAbsent(orderDTO.getCodeTarget(), k -> new ArrayList<>())
+                outgoingOrdersByCreatedBranchCode
+                        .computeIfAbsent(orderDTO.getCreatedBranchCode(), k -> new ArrayList<>())
                         .add(orderDTO);
             } else {
                 incomingOrders.add(orderDTO);
@@ -239,8 +239,8 @@ public class OrderController {
         List<OrderResultRecap.DetailedProductRecap> incomingRecap = categorizeOrders(incomingOrders);
         List<OrderResultRecap.DetailedProductRecap> outgoingRecap = new ArrayList<>();
 
-        for (Map.Entry<String, List<OrderDTO>> entry : outgoingOrdersByCodeTarget.entrySet()) {
-            List<OrderResultRecap.DetailedProductRecap> categorizedOrders = categorizeOrders(entry.getValue());
+        for (Map.Entry<String, List<OrderDTO>> entry : outgoingOrdersByCreatedBranchCode.entrySet()) {
+            List<OrderResultRecap.DetailedProductRecap> categorizedOrders = categorizeOrders(entry.getValue(), entry.getKey());
             outgoingRecap.addAll(categorizedOrders);
         }
 
@@ -260,6 +260,53 @@ public class OrderController {
         for (OrderDTO order : orders) {
             String code = order.getCodeTarget();
             String name = order.getNameTarget();
+
+            OrderResultRecap.DetailedProductRecap recap =
+                    recapMap.computeIfAbsent(code, k -> new OrderResultRecap.DetailedProductRecap(code, name, new ArrayList<>()));
+
+            Map<Long, ExcelDataArchivedOrder> productMap = recap.getExcelDataArchivedOrderList().stream()
+                    .collect(Collectors.toMap(ExcelDataArchivedOrder::getProductId, product -> product));
+
+            for (OrderItemDto orderItemDto : order.getOrderItemDtoList()) {
+                long productId = orderItemDto.getProductId();
+                String productName = orderItemDto.getProductName();
+                double quantity = orderItemDto.getQuantity();
+                double receivedQuantity = orderItemDto.getReceivedQuantity();
+                double sentQuantity = orderItemDto.getSentQuantity();
+                UnitMeasure unitMeasure = orderItemDto.getUnitMeasure();
+                double price = orderItemDto.getPrice();
+
+                ExcelDataArchivedOrder excelDataArchivedOrder = productMap.get(productId);
+                if (excelDataArchivedOrder == null) {
+                    excelDataArchivedOrder = new ExcelDataArchivedOrder();
+                    excelDataArchivedOrder.setProductId(productId);
+                    excelDataArchivedOrder.setProductName(productName);
+                    excelDataArchivedOrder.setUnitMeasure(unitMeasure);
+                    excelDataArchivedOrder.setPrice(price);
+                    excelDataArchivedOrder.setQuantity(quantity);
+                    excelDataArchivedOrder.setReceivedQuantity(receivedQuantity);
+                    excelDataArchivedOrder.setSentQuantity(sentQuantity);
+                    productMap.put(productId, excelDataArchivedOrder);
+                    recap.getExcelDataArchivedOrderList().add(excelDataArchivedOrder);
+                } else {
+                    excelDataArchivedOrder.setQuantity(excelDataArchivedOrder.getQuantity() + quantity);
+                    excelDataArchivedOrder.setReceivedQuantity(excelDataArchivedOrder.getReceivedQuantity() + receivedQuantity);
+                    excelDataArchivedOrder.setSentQuantity(excelDataArchivedOrder.getSentQuantity() + sentQuantity);
+                }
+            }
+
+            List<ExcelDataArchivedOrder> sortedList = sortByProductNameDesc(new ArrayList<>(productMap.values()));
+            recap.setExcelDataArchivedOrderList(sortedList);
+        }
+        return new ArrayList<>(recapMap.values());
+    }
+
+    private List<OrderResultRecap.DetailedProductRecap> categorizeOrders(List<OrderDTO> orders, String createdBranchCode) {
+        Map<String, OrderResultRecap.DetailedProductRecap> recapMap = new HashMap<>();
+
+        for (OrderDTO order : orders) {
+            String code = createdBranchCode;
+            String name = order.getCreatedBranchName();
 
             OrderResultRecap.DetailedProductRecap recap =
                     recapMap.computeIfAbsent(code, k -> new OrderResultRecap.DetailedProductRecap(code, name, new ArrayList<>()));
