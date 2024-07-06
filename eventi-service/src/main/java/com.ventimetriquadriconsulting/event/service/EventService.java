@@ -404,4 +404,16 @@ public class EventService {
         }
         return cateringStorage;
     }
+
+    @Transactional
+    @Modifying
+    public void deleteCateringStorage(String branchCode,
+                                                    long cateringStorageId) {
+
+        log.info("Delete catering storage with id {}", cateringStorageId);
+//
+//        CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
+//                -> new NotFoundException("Storage not found for id " + cateringStorageId));
+        cateringStorageRepository.deleteById(cateringStorageId);
+    }
 }

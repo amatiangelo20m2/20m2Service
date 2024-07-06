@@ -110,6 +110,13 @@ public class EventController {
                         .createCateringStorage(cateringStorageDTO));
     }
 
+    @DeleteMapping("/{branchCode}/deletecateringstorage/{cateringStorageId}")
+    public ResponseEntity<CateringStorageDTO> deleteCateringStorage(@PathVariable String branchCode,
+                                                                    @PathVariable long cateringStorageId) {
+        eventService.deleteCateringStorage(branchCode, cateringStorageId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping("/{branchCode}/retrievecateringstorage")
     public ResponseEntity<List<CateringStorageDTO>> retrieveCateringStorageEvent(@PathVariable String branchCode) {
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "Product")
@@ -57,6 +58,11 @@ public class Product {
     private String sku;
     private boolean available = true;
     private boolean deleted = false;
+
+    @ElementCollection
+    @CollectionTable(name = "branch_list_not_allowed_to_see_product", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "branch_list_not_allowed_to_see_product")
+    private List<String> branchListNotAllowedToSeeThisProduct;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "supplier_id")

@@ -80,4 +80,13 @@ public class SupplierController {
                 .storeNewBranchExclusionListToSupplier(supplierId, exclusionList);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @PutMapping(path = "/storenewbranchListNotAllowedToSeeProduct")
+    public ResponseEntity<?> storeNewBranchListNotAllowedToSeeProduct(@RequestParam("supplierId") Long supplierId,
+                                                                      @RequestParam("productId") Long productId,
+                                                                   @RequestBody List<String> exclusionList) {
+
+        supplierService.storeNewBranchListNotAllowedToSeeProduct(supplierId, productId, exclusionList);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

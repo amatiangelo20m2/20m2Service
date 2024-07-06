@@ -228,8 +228,22 @@ public class SupplierService {
         log.info("Add the following exclusion branch list {} to the follow supplier with id {}", exclusionList, supplierId);
 
         Supplier supplier = supplierRepository.findById(supplierId).orElseThrow(()
-                -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));
+                -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot update the branch exclusion list"));
 
         supplier.setBranchNotAllowed(exclusionList);
+    }
+
+    @Transactional
+    @Modifying
+    public void storeNewBranchListNotAllowedToSeeProduct(Long supplierId, Long productId, List<String> exclusionList) {
+        log.info("Add the following exclusion branch list {} to the follow product with id {} (this product belong to supplier with id {})",
+                exclusionList,
+                productId,
+                supplierId);
+
+        Product product = productRepository.findById(productId).orElseThrow(()
+                -> new SupplierNotFoundException("Product not found with code: " + productId + ". Cannot update the branch exclusion list"));
+
+        product.setBranchListNotAllowedToSeeThisProduct(exclusionList);
     }
 }

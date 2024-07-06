@@ -29,6 +29,7 @@ public class ProductDTO {
     private String sku;
     private boolean available;
     private boolean deleted;
+    private List<String> branchListNotAllowedToSeeThisProduct;
 
     public static Product fromDTO(ProductDTO productDTO) {
         return Product.builder()
@@ -44,6 +45,7 @@ public class ProductDTO {
                 .sku(productDTO.getSku())
                 .available(productDTO.isAvailable())
                 .deleted(productDTO.isDeleted())
+                .branchListNotAllowedToSeeThisProduct(productDTO.getBranchListNotAllowedToSeeThisProduct())
                 .build();
     }
 
@@ -63,6 +65,7 @@ public class ProductDTO {
                 .sku(product.getSku())
                 .available(product.isAvailable())
                 .deleted(product.isDeleted())
+                .branchListNotAllowedToSeeThisProduct(product.getBranchListNotAllowedToSeeThisProduct())
                 .build();
     }
     public static List<Product> fromDTOList(List<ProductDTO> productDTOList) {

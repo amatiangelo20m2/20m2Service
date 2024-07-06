@@ -59,8 +59,8 @@ public class Supplier {
     private String createdByUserCode;
 
     @ElementCollection
-    @CollectionTable(name = "branches_not_allowed", joinColumns = @JoinColumn(name = "supplier_id"))
-    @Column(name = "branches_not_allowed")
+    @CollectionTable(name = "branch_list_not_allowed_to_see_supplier", joinColumns = @JoinColumn(name = "supplier_id"))
+    @Column(name = "branch_list_not_allowed_to_see_supplier")
     private List<String> branchNotAllowed;
 
     @OneToMany(fetch = FetchType.EAGER,
