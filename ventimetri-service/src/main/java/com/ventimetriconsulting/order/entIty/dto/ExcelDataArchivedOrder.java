@@ -16,4 +16,6 @@ public class ExcelDataArchivedOrder {
     private double sentQuantity;
     private UnitMeasure unitMeasure;
     private double price;
+    private double vatPrice;
+    private int vat;
 }

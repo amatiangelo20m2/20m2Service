@@ -16,7 +16,6 @@ public class OrderItem implements Serializable {
     private long productId;
     private String productName;
     private double quantity;
-
     private double receivedQuantity;
     private double sentQuantity;
 

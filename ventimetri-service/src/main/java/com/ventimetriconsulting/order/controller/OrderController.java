@@ -201,6 +201,8 @@ public class OrderController {
                                 item.getSentQuantity(),
                                 item.getUnitMeasure(),
                                 item.getPrice(),
+                                item.getVatPrice(),
+                                item.getVat(),
                                 item.isDoneBySupplier(),
                                 item.isReceived()
                         ));
@@ -275,19 +277,29 @@ public class OrderController {
                 double sentQuantity = orderItemDto.getSentQuantity();
                 UnitMeasure unitMeasure = orderItemDto.getUnitMeasure();
                 double price = orderItemDto.getPrice();
+                double vatPrice = orderItemDto.getVatPrice();
+                int vat = orderItemDto.getVat();
 
                 ExcelDataArchivedOrder excelDataArchivedOrder = productMap.get(productId);
                 if (excelDataArchivedOrder == null) {
+
                     excelDataArchivedOrder = new ExcelDataArchivedOrder();
                     excelDataArchivedOrder.setProductId(productId);
                     excelDataArchivedOrder.setProductName(productName);
+
                     excelDataArchivedOrder.setUnitMeasure(unitMeasure);
                     excelDataArchivedOrder.setPrice(price);
+                    excelDataArchivedOrder.setVatPrice(vatPrice);
+                    excelDataArchivedOrder.setVat(vat);
+
                     excelDataArchivedOrder.setQuantity(quantity);
                     excelDataArchivedOrder.setReceivedQuantity(receivedQuantity);
                     excelDataArchivedOrder.setSentQuantity(sentQuantity);
+
                     productMap.put(productId, excelDataArchivedOrder);
                     recap.getExcelDataArchivedOrderList().add(excelDataArchivedOrder);
+
+
                 } else {
                     excelDataArchivedOrder.setQuantity(excelDataArchivedOrder.getQuantity() + quantity);
                     excelDataArchivedOrder.setReceivedQuantity(excelDataArchivedOrder.getReceivedQuantity() + receivedQuantity);

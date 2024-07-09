@@ -26,6 +26,8 @@ public class OrderItemDto {
     private double sentQuantity;
     private UnitMeasure unitMeasure;
     private double price;
+    private double vatPrice;
+    private int vat;
     private boolean isDoneBySupplier;
     private boolean isReceived;
 
@@ -40,6 +42,8 @@ public class OrderItemDto {
                 .productName(orderItem.getProductName())
                 .unitMeasure(orderItem.getUnitMeasure())
                 .price(orderItem.getPrice())
+                .vat(orderItem.getVat())
+                .vatPrice(orderItem.getVatPrice())
                 .isDoneBySupplier(orderItem.isDoneBySupplier())
                 .isReceived(orderItem.isReceived())
                 .build();
@@ -55,6 +59,8 @@ public class OrderItemDto {
                 .sentQuantity(orderItemDto.sentQuantity)
                 .unitMeasure(orderItemDto.getUnitMeasure())
                 .price(orderItemDto.getPrice())
+                .vat(orderItemDto.getVat())
+                .vatPrice(orderItemDto.getVatPrice())
                 .isDoneBySupplier(orderItemDto.isDoneBySupplier)
                 .isReceived(orderItemDto.isReceived())
                 .build();
