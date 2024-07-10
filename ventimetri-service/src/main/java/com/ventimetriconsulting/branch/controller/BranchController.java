@@ -157,9 +157,10 @@ public class BranchController {
 
     @PutMapping(path = "/confirmemployee")
     public ResponseEntity<Void> confirmEmployee(@RequestParam String branchCode,
-                                                @RequestParam String userCode){
+                                                @RequestParam String userCode,
+                                                @RequestParam String adminUserCode){
 
-        branchService.confirmEmployee(branchCode, userCode);
+        branchService.confirmEmployee(branchCode, userCode, adminUserCode);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

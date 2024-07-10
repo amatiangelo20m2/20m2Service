@@ -43,6 +43,12 @@ public interface BranchUserRepository  extends JpaRepository<BranchUser, Long> {
             "AND bu.fMCToken IS NOT NULL AND bu.role = :role")
     Optional<BranchUser> findByBranchCodeAndRole(String branchCode, Role role);
 
+    @Query("SELECT bu FROM BranchUser bu WHERE " +
+            "bu.branch.branchCode = :branchCode " +
+            "AND bu.fMCToken IS NOT NULL AND bu.userCode = :userCode AND bu.role = :role")
+    Optional<BranchUser> findByBranchCodeAndUserCode(String branchCode, String userCode, Role role);
+
+
     @Transactional
     @Modifying
     @Query("DELETE FROM BranchUser b WHERE b.branch.branchId = :branchId")

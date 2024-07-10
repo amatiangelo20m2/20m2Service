@@ -358,12 +358,13 @@ public class BranchService {
     }
 
     @Transactional
-    public void confirmEmployee(String branchCode, String userCode) {
+    public void confirmEmployee(String branchCode, String userCode, String adminUserCode) {
+        log.info("Confirm employee with code {} for branch {}. Retrieve data from auth-service..", userCode, branchCode);
 
         BranchUser amministratore = branchUserRepository
-                .findByBranchCodeAndRole(branchCode, Role.AMMINISTRATORE).orElseThrow(()
+                .findByBranchCodeAndUserCode(branchCode, adminUserCode, Role.AMMINISTRATORE).orElseThrow(()
                         -> new BranchNotFoundException("Branch user relation not found for branch with code: "
-                        + branchCode + " and user role " + Role.AMMINISTRATORE));
+                        + branchCode + " and user code " + adminUserCode));
 
         UserResponseEntity userResponseEntity = loadBalancedWebClientBuilder.build()
                 .get()
