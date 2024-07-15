@@ -576,8 +576,11 @@ public class TestSuiteVentiMetriQuadriService {
                 assertEquals(1, orderByBrancCode.getBody().size());
                 assertEquals(2, orderByBrancCode.getBody().get(0).getOrderItemDtoList().size());
 
+                List<Long> productsListIds = new ArrayList<>();
+                productsListIds.add(orderByBrancCode.getBody().get(0).getOrderItemDtoList().stream().toList().get(0).getProductId());
+
                 orderController.deleteOrderItemFromOrder(orderByBrancCode.getBody().get(0).getOrderId(),
-                        orderByBrancCode.getBody().get(0).getOrderItemDtoList().stream().toList().get(0).getProductId());
+                        productsListIds);
 
                 orderByBrancCode = orderController
                         .getOrderByBrancCode(branchCode, threeDaysBeforeString, threeDaysAfterString);

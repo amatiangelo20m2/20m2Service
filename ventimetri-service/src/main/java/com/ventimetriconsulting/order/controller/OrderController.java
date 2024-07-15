@@ -148,9 +148,10 @@ public class OrderController {
     }
 
     @DeleteMapping(path = "/deleteorderitem")
-    public ResponseEntity<Void> deleteOrderItemFromOrder(@RequestParam long orderId, @RequestParam long productId) {
+    public ResponseEntity<Void> deleteOrderItemFromOrder(@RequestParam long orderId,
+                                                         @RequestParam List<Long> productIdList) {
         try {
-            orderService.deleteOrderItem(orderId, productId);
+            orderService.deleteOrderItem(orderId, productIdList);
             return ResponseEntity.status(HttpStatus.OK).body(null);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

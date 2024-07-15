@@ -378,13 +378,15 @@ public class OrderService {
 
     @Transactional
     @Modifying
-    public void deleteOrderItem(long orderId, long productId) {
-        log.info("Delete order item with product id {} from order with id {}",productId, orderId);
+    public void deleteOrderItem(long orderId, List<Long> productIdList) {
+        log.info("Delete order items with product ids {} from order with id {}", productIdList, orderId);
 
         Order order = orderEntityRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        order.getOrderItems().removeIf(orderItem -> orderItem.getProductId() == productId);
+        order.getOrderItems().removeIf(orderItem -> productIdList.contains(orderItem.getProductId()));
         orderEntityRepository.save(order);
+
     }
+
     @Transactional
     @Modifying
     public void deleteOrder(long orderId) {
