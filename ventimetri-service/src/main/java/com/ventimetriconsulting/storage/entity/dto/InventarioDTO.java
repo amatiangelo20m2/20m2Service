@@ -1,7 +1,7 @@
-package com.ventimetriconsulting.inventario.entity.dto;
+package com.ventimetriconsulting.storage.entity.dto;
 
-import com.ventimetriconsulting.inventario.entity.Inventario;
-import com.ventimetriconsulting.inventario.entity.extra.InventoryAction;
+import com.ventimetriconsulting.storage.entity.Inventario;
+import com.ventimetriconsulting.storage.entity.extra.InventoryAction;
 import com.ventimetriconsulting.supplier.dto.ProductDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,6 @@
-package com.ventimetriconsulting.inventario.entity;
+package com.ventimetriconsulting.storage.entity;
 
-import com.ventimetriconsulting.inventario.entity.extra.InventoryAction;
+import com.ventimetriconsulting.storage.entity.extra.InventoryAction;
 import com.ventimetriconsulting.supplier.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;

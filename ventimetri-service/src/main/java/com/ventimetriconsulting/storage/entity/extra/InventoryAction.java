@@ -1,4 +1,4 @@
-package com.ventimetriconsulting.inventario.entity.extra;
+package com.ventimetriconsulting.storage.entity.extra;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

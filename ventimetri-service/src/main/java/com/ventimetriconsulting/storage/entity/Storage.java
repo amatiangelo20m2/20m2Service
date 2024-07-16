@@ -1,4 +1,4 @@
-package com.ventimetriconsulting.inventario.entity;
+package com.ventimetriconsulting.storage.entity;
 
 
 import jakarta.persistence.*;

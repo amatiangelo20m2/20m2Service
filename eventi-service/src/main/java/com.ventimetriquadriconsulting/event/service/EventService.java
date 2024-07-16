@@ -342,8 +342,10 @@ public class EventService {
 
     @Transactional
     @Modifying
-    public void setLoadQuantity(long workstationId, Map<Long, Double> insertValueMapProductIdAmountToInsert) {
-        log.info("This map contain the product id and the amount to add in order to perform a load product into workstation event. MAP: {} and it will be apply to a workstation with id {}", insertValueMapProductIdAmountToInsert, workstationId);
+    public void setLoadQuantity(long workstationId, long cateringStorageId,
+                                Map<Long, Double> insertValueMapProductIdAmountToInsert) {
+        log.info("This map contain the product id and the amount" +
+                " to add in order to perform a load product into workstation event. MAP: {} and it will be apply to a workstation with id {}. Unload than products from catering storage with id {}", insertValueMapProductIdAmountToInsert, workstationId, cateringStorageId);
 
         Workstation workstation = workstationRepository.findById(workstationId).orElseThrow(()
                 -> new NotFoundException("Workstation not found for id " + workstationId));
@@ -355,6 +357,28 @@ public class EventService {
                 product.setQuantityInserted(quantityInserted);
             }
         }
+
+        //unload products amount from catering storage
+
+//        CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
+//                -> new NotFoundException("Storage not found for id " + cateringStorageId));
+//
+//        Set<Product> cateringStorageProducts = cateringStorage.getCateringStorageProducts();
+//        for(Product product : cateringStorageProducts){
+//
+//            if(insertValueMapProductIdAmountToInsert.containsKey(product.getProductId())){
+//                double newAmount = product.getQuantityInserted() - insertValueMapProductIdAmountToInsert.get(product.getProductId());
+//                log.info("Set new value {} {} for product {} (with id {}) into storage catering {} with id {}",
+//                        newAmount,
+//                        product.getUnitMeasure(),
+//                        product.getProductName(),
+//                        product.getProductId(),
+//                        cateringStorage.getName(),
+//                        cateringStorageId);
+//
+//                product.setQuantityInserted(newAmount);
+//            }
+//        }
     }
 
     @Transactional

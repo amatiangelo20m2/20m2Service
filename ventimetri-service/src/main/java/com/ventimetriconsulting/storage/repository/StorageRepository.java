@@ -1,6 +1,6 @@
-package com.ventimetriconsulting.inventario.repository;
+package com.ventimetriconsulting.storage.repository;
 
-import com.ventimetriconsulting.inventario.entity.Storage;
+import com.ventimetriconsulting.storage.entity.Storage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

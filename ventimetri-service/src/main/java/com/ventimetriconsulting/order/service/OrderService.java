@@ -9,7 +9,7 @@ import com.ventimetriconsulting.branch.exception.customexceptions.ProductNotFoun
 import com.ventimetriconsulting.branch.exception.customexceptions.SupplierNotFoundException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
-import com.ventimetriconsulting.inventario.service.StorageService;
+import com.ventimetriconsulting.storage.service.StorageService;
 import com.ventimetriconsulting.notification.entity.RedirectPage;
 import com.ventimetriconsulting.notification.service.MessageSender;
 import com.ventimetriconsulting.notification.entity.NotificationEntity;

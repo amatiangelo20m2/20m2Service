@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,7 +34,8 @@ public class CateringStorageDTO {
                 .carLicensePlate(cateringStorage.getCarLicensePlate())
                 .cateringStorageProducts(cateringStorage.getCateringStorageProducts().stream()
                         .map(ProductDTO::fromEntity)
-                        .collect(Collectors.toSet()))
+                        .sorted(Comparator.comparing(ProductDTO::getProductName)) // Assuming ProductDTO has a getName method
+                        .collect(Collectors.toCollection(LinkedHashSet::new)))
                 .build();
     }
 

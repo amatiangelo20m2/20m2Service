@@ -8,8 +8,8 @@ import com.ventimetriconsulting.branch.exception.customexceptions.GlobalExceptio
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
 import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
-import com.ventimetriconsulting.inventario.entity.Storage;
-import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
+import com.ventimetriconsulting.storage.entity.Storage;
+import com.ventimetriconsulting.storage.entity.dto.StorageDTO;
 import com.ventimetriconsulting.notification.entity.RedirectPage;
 import com.ventimetriconsulting.notification.service.MessageSender;
 import com.ventimetriconsulting.notification.entity.NotificationEntity;

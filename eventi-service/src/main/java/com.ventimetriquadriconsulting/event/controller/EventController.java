@@ -194,11 +194,11 @@ public class EventController {
     }
 
 
-    @PutMapping(path = "/loadamountforworkstationproduct/{workstationId}")
-    public ResponseEntity<?> loadAmountForWorkstationProduct(@PathVariable long workstationId,
+    @PutMapping(path = "/loadamountforworkstationproduct/{workstationId}/{cateringStorageId}")
+    public ResponseEntity<?> loadAmountForWorkstationProduct(@PathVariable long workstationId, @PathVariable long cateringStorageId,
                                                                @RequestBody Map<Long, Double> insertValueMapProductIdAmountToInsert) {
 
-        eventService.setLoadQuantity(workstationId, insertValueMapProductIdAmountToInsert);
+        eventService.setLoadQuantity(workstationId, cateringStorageId, insertValueMapProductIdAmountToInsert);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

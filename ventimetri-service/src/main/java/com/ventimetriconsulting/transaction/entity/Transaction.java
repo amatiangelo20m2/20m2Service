@@ -1,6 +1,5 @@
 package com.ventimetriconsulting.transaction.entity;
 
-import com.ventimetriconsulting.inventario.entity.extra.OperationType;
 import jakarta.persistence.*;
 import lombok.*;
 

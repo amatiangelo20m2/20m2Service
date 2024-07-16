@@ -1,17 +1,17 @@
-package com.ventimetriconsulting.inventario.controller;
+package com.ventimetriconsulting.storage.controller;
 
 import com.ventimetriconsulting.branch.service.BranchService;
-import com.ventimetriconsulting.inventario.entity.dto.InventarioDTO;
-import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
-import com.ventimetriconsulting.inventario.entity.dto.TransactionInventoryRequest;
-import com.ventimetriconsulting.inventario.service.StorageService;
-import com.ventimetriconsulting.supplier.dto.ProductDTO;
+import com.ventimetriconsulting.storage.entity.dto.InventarioDTO;
+import com.ventimetriconsulting.storage.entity.dto.StorageDTO;
+import com.ventimetriconsulting.storage.entity.dto.TransactionInventoryRequest;
+import com.ventimetriconsulting.storage.service.StorageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "api/storage/")
@@ -104,5 +104,11 @@ public class StorageController {
             @RequestBody TransactionInventoryRequest transactionInventoryRequest){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(storageService.insertDataIntoInventario(transactionInventoryRequest));
+    }
+
+    @PutMapping(path = "/update/stock/{storageId}")
+    public ResponseEntity<StorageDTO> updateStock(@PathVariable long storageId, @RequestBody Map<Long, Double> stockValues){
+        StorageDTO storageDTO = storageService.updateStockValueInventario(storageId, stockValues);
+        return ResponseEntity.status(HttpStatus.OK).body(storageDTO);
     }
 }

@@ -1,13 +1,11 @@
-package com.ventimetriconsulting.inventario.entity.dto;
+package com.ventimetriconsulting.storage.entity.dto;
 
-import com.ventimetriconsulting.inventario.entity.Storage;
-import com.ventimetriconsulting.supplier.dto.SupplierDTO;
+import com.ventimetriconsulting.storage.entity.Storage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;

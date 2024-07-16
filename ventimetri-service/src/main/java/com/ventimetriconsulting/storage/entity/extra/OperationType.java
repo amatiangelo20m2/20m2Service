@@ -1,4 +1,4 @@
-package com.ventimetriconsulting.inventario.entity.extra;
+package com.ventimetriconsulting.storage.entity.extra;
 
 public enum OperationType {
     CREATION,

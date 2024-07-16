@@ -1,20 +1,19 @@
-package com.ventimetriconsulting.inventario.service;
+package com.ventimetriconsulting.storage.service;
 
 import com.ventimetriconsulting.branch.entity.Branch;
 import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
 import com.ventimetriconsulting.branch.exception.customexceptions.InventarioNotFoundException;
 import com.ventimetriconsulting.branch.exception.customexceptions.StorageNotFoundException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
-import com.ventimetriconsulting.inventario.entity.Inventario;
-import com.ventimetriconsulting.inventario.entity.Storage;
-import com.ventimetriconsulting.inventario.entity.dto.InventarioDTO;
-import com.ventimetriconsulting.inventario.entity.dto.StorageDTO;
-import com.ventimetriconsulting.inventario.entity.dto.TransactionInventoryRequest;
-import com.ventimetriconsulting.inventario.entity.extra.InventoryAction;
-import com.ventimetriconsulting.inventario.entity.extra.OperationType;
-import com.ventimetriconsulting.inventario.repository.InventarioRepository;
-import com.ventimetriconsulting.inventario.repository.StorageRepository;
-import com.ventimetriconsulting.supplier.dto.ProductDTO;
+import com.ventimetriconsulting.storage.entity.Inventario;
+import com.ventimetriconsulting.storage.entity.Storage;
+import com.ventimetriconsulting.storage.entity.dto.InventarioDTO;
+import com.ventimetriconsulting.storage.entity.dto.StorageDTO;
+import com.ventimetriconsulting.storage.entity.dto.TransactionInventoryRequest;
+import com.ventimetriconsulting.storage.entity.extra.InventoryAction;
+import com.ventimetriconsulting.storage.entity.extra.OperationType;
+import com.ventimetriconsulting.storage.repository.InventarioRepository;
+import com.ventimetriconsulting.storage.repository.StorageRepository;
 import com.ventimetriconsulting.supplier.entity.Product;
 import com.ventimetriconsulting.supplier.entity.Supplier;
 import com.ventimetriconsulting.supplier.repository.ProductRepository;
@@ -22,7 +21,6 @@ import com.ventimetriconsulting.supplier.repository.SupplierRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
@@ -258,5 +256,26 @@ public class StorageService {
         }
         return StorageDTO.fromEntity(storage);
     }
+
+    @Transactional
+    @Modifying
+    public StorageDTO updateStockValueInventario(long storageId, Map<Long, Double> stockValues) {
+
+        Storage storage = storageRepository.findById(storageId)
+                .orElseThrow(() -> new StorageNotFoundException("Storage not found with id: " + storageId + ". Cannot update inventario"));
+
+        log.info("Updating inventario. News values are (inventario id - stock value) {} ", stockValues);
+
+        for(Inventario inventario : storage.getInventario()){
+            if(stockValues.containsKey(inventario.getInventarioId())){
+                inventario.setStock(stockValues.get(inventario.getInventarioId()));
+            }
+        }
+
+        return StorageDTO.fromEntity(storage);
+    }
+
+
+
 
 }
