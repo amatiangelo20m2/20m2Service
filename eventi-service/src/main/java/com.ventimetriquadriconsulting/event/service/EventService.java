@@ -234,14 +234,35 @@ public class EventService {
     }
 
     @Transactional
+    @Modifying
     public void closeEvent(long eventId) {
+
         log.info("Close event with id {}", eventId);
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found with id " + eventId));
+        CateringStorage cateringStorage = cateringStorageRepository.findById(event.getCateringStorageId()).orElseThrow(() -> new NotFoundException("Storage not found for id " + event.getCateringStorageId()));
+
+        Map<Long, Double> productDifferenceMap = new HashMap<>();
+
+        for (Workstation workstation : event.getWorkstations()) {
+            for (Product product : workstation.getProducts()) {
+                long productId = product.getProductId();
+                double difference = product.getQuantityInserted() - product.getQuantityConsumed();
+
+                productDifferenceMap.put(productId, productDifferenceMap.getOrDefault(productId, 0.0) + difference);
+            }
+        }
+
+        for (Product product : cateringStorage.getCateringStorageProducts()) {
+            long productId = product.getProductId();
+            if (productDifferenceMap.containsKey(productId)) {
+                double consumedQuantity = productDifferenceMap.get(productId);
+                product.setQuantityInserted(product.getQuantityInserted() - consumedQuantity);
+            }
+        }
 
         event.setEventStatus(EventStatus.CHIUSO);
     }
-
 
     @Transactional
     public WorkstationDTO addWorkstationToEvent(long eventId, WorkstationDTO workstationDTO) {
