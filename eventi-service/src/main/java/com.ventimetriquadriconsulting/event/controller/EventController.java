@@ -68,8 +68,12 @@ public class EventController {
 
     @PutMapping("/{cateringStorageId}/loadprod/storagecatering")
     public ResponseEntity<CateringStorage> loadProductsIntoStorageCatering(@PathVariable long cateringStorageId,
-                                                             @RequestBody Map<Long, Double> quantityMap) {
-        return ResponseEntity.ok().body(eventService.loadProductIntoStorageVan(cateringStorageId, quantityMap));
+                                                                           @RequestBody Map<Long, Double> quantityMap) {
+
+        //TODO: use that storageId to update storage
+        return ResponseEntity.ok().body(eventService.loadProductIntoStorageVan(
+                cateringStorageId,
+                quantityMap));
     }
 
     @PutMapping("/{workstationId}/products/{productId}")
@@ -117,6 +121,12 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PutMapping("/emptycateringstorage/{cateringStorageId}")
+    public ResponseEntity<CateringStorageDTO> emptyCateringStorage(@PathVariable long cateringStorageId) {
+        eventService.emptyCateringStorage(cateringStorageId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping("/{branchCode}/retrievecateringstorage")
     public ResponseEntity<List<CateringStorageDTO>> retrieveCateringStorageEvent(@PathVariable String branchCode) {
 
@@ -138,7 +148,7 @@ public class EventController {
 
     @DeleteMapping("/{cateringStorageId}/removeproduct/{productId}")
     public ResponseEntity<?> removeProductFromStorageMobile(@PathVariable long cateringStorageId,
-                                                                        @PathVariable long productId){
+                                                            @PathVariable long productId){
 
         cateringStorageService.removeProducts(cateringStorageId, productId);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -169,7 +179,7 @@ public class EventController {
 
     @GetMapping("/{eventId}/retrieveworkstation/{workstationId}")
     public ResponseEntity<WorkstationDTO> retrieveWorkstation(@PathVariable long eventId,
-                                                         @PathVariable long workstationId){
+                                                              @PathVariable long workstationId){
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -196,7 +206,7 @@ public class EventController {
 
     @PutMapping(path = "/loadamountforworkstationproduct/{workstationId}/{cateringStorageId}")
     public ResponseEntity<?> loadAmountForWorkstationProduct(@PathVariable long workstationId, @PathVariable long cateringStorageId,
-                                                               @RequestBody Map<Long, Double> insertValueMapProductIdAmountToInsert) {
+                                                             @RequestBody Map<Long, Double> insertValueMapProductIdAmountToInsert) {
 
         eventService.setLoadQuantity(workstationId, cateringStorageId, insertValueMapProductIdAmountToInsert);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -209,26 +219,5 @@ public class EventController {
         eventService.setUnLoadQuantity(workstationId, insertValueMapProductIdAmountToInsert);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-//
-//    // EXPENCE RESOURCES
-//    @GetMapping(path = "/expence/retrievebyeventid")
-//    public List<ExpenceEvent> retrieveAllExpenpencesByEventId(@RequestParam("eventid") long eventId){
-//        return eventService.findExpencesByEventId(eventId);
-//    }
-//
-//    @PostMapping(path = "/expence/create")
-//    public ExpenceEvent saveExpence(@RequestBody ExpenceEvent expenceEvent){
-//        return eventService.saveExpence(expenceEvent);
-//    }
-//    @DeleteMapping(path = "expence/delete")
-//    public void deleteExpence(@RequestBody ExpenceEvent expenceEvent){
-//        eventService.deleteEvent(expenceEvent);
-//    }
-//
-//    @PutMapping(path = "expence/update")
-//    public void updateExpence(@RequestBody ExpenceEvent expenceEvent){
-//        eventService.updateExpence(expenceEvent);
-//    }
 }
 

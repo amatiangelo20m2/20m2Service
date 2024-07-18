@@ -1,6 +1,5 @@
 package com.ventimetriconsulting.order.controller;
 
-import com.ventimetriconsulting.order.entIty.Order;
 import com.ventimetriconsulting.order.entIty.OrderStatus;
 import com.ventimetriconsulting.order.entIty.dto.*;
 import com.ventimetriconsulting.order.service.OrderService;
@@ -64,6 +63,15 @@ public class OrderController {
         }
     }
 
+    @PutMapping(path = "/editorder/{orderId}")
+    public ResponseEntity<OrderDTO> editOrder(@PathVariable long orderId,
+                                                @RequestBody Map<Long, Double> requestEditingMap) {
+
+        OrderDTO orderDTO = orderService.editOrder(orderId, requestEditingMap);
+        return ResponseEntity.ok().body(orderDTO);
+    }
+
+
     @GetMapping(path = "/retrievearchivedorders")
     public ResponseEntity<List<OrderDTO>> getOrderArchivedByBrancCode(
             @RequestParam String branchCode,
@@ -100,7 +108,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> updateOrder(@RequestParam long orderId,
                                                 @RequestBody List<OrderItemDto> orderItemDtoList) {
         try {
-            orderService.updateOrderItem(orderId, orderItemDtoList,
+            orderService.updateOrder(orderId, orderItemDtoList,
                     OrderStatus.PRONTO_A_PARTIRE, 0L, null);
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {
@@ -110,9 +118,15 @@ public class OrderController {
 
     @PutMapping(path = "/updatetoconsegnato")
     public ResponseEntity<OrderDTO> updateOrderToDelivered(@RequestParam long orderId,
-                                                           @RequestBody List<OrderItemDto> orderItemDtoList) {
+                                                           @RequestBody List<OrderItemDto> orderItemDtoList, @RequestParam long storageId) {
         try {
-            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.CONSEGNATO, 0L, null);
+            orderService.updateOrder(
+                    orderId,
+                    orderItemDtoList,
+                    OrderStatus.CONSEGNATO,
+                    storageId,
+                    null);
+
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -123,10 +137,10 @@ public class OrderController {
     @PutMapping(path = "/updatetoarchiviato")
     public ResponseEntity<OrderDTO> updateOrderToArchived(@RequestParam long orderId,
                                                           @RequestBody List<OrderItemDto> orderItemDtoList,
-                                                          @RequestParam  long storageId,
+                                                          @RequestParam long storageId,
                                                           @RequestParam String userName) {
         try {
-            orderService.updateOrderItem(orderId, orderItemDtoList, OrderStatus.ARCHIVIATO, storageId, userName);
+            orderService.updateOrder(orderId, orderItemDtoList, OrderStatus.ARCHIVIATO, storageId, userName);
 
             return ResponseEntity.status(HttpStatus.OK).body(orderService.retrieveOrderByOrderId(orderId));
         } catch (Exception e) {

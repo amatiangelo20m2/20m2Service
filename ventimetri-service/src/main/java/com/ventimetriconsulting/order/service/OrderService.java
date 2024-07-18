@@ -264,13 +264,12 @@ public class OrderService {
     }
 
     @Transactional
-    public void updateOrderItem(long orderId,
-                                List<OrderItemDto> orderItemDtos,
-                                OrderStatus status,
-                                long storageId,
-                                String userName) {
-
-
+    @Modifying
+    public void updateOrder(long orderId,
+                            List<OrderItemDto> orderItemDtos,
+                            OrderStatus status,
+                            long storageId,
+                            String userName) {
 
         Order order = orderEntityRepository.findById(orderId).orElseThrow(()
                 -> new IllegalArgumentException("Order not found"));
@@ -306,9 +305,28 @@ public class OrderService {
                     });
         }
 
-        if(OrderStatus.ARCHIVIATO == status) {
+        //if the status is in consegnato the products will be removed from the origin storage
+        if(OrderStatus.CONSEGNATO == status) {
+            log.info("Upon consegnato order the system will remove the products from the storage with id {}", storageId);
 
-            log.info("Upon archivied order the system will add the product into the storage with id {}", storageId);
+            Map<Long, Double> removeProdMap = new HashMap<>();
+
+            order.getOrderItems().forEach(orderItem -> {
+                removeProdMap.put(orderItem.getProductId(), orderItem.getSentQuantity());
+            });
+
+            storageService.removeProductAmountFromStorage(
+                    removeProdMap,
+                    storageId,
+                    userName);
+
+
+        }
+
+
+        //if the status is in archiviato the products will be added into destination storage
+        if(OrderStatus.ARCHIVIATO == status) {
+            log.info("Upon archivied order the system will add the products into the storage with id {}", storageId);
             for(OrderItem orderItem : order.getOrderItems()) {
                 storageService.insertProductToStorage(orderItem.getProductId(), storageId, userName, orderItem.getReceivedQuantity());
             }
@@ -398,5 +416,37 @@ public class OrderService {
         Order order = orderEntityRepository.findById(orderId).orElseThrow(()
                 -> new OrderNotFound("Exception trowed while getting data. No order for id : " + orderId + " found."));
         return OrderDTO.toDTO(order);
+    }
+
+    @Transactional
+    @Modifying
+    public OrderDTO editOrder(long orderId, Map<Long, Double> requestEditingMap) {
+
+        log.info("Edit order with id {} and assign this new values {}", orderId, requestEditingMap);
+        Order order = orderEntityRepository.findById(orderId).orElseThrow(() ->
+                new OrderNotFound("Exception thrown while getting data. No order for id: " + orderId + " found."));
+
+        Set<OrderItem> orderItems = order.getOrderItems();
+
+        Iterator<OrderItem> iterator = orderItems.iterator();
+        while (iterator.hasNext()) {
+            OrderItem orderItem = iterator.next();
+            if (requestEditingMap.containsKey(orderItem.getProductId())) {
+                double newQuantity = requestEditingMap.get(orderItem.getProductId());
+                if (newQuantity == 0) {
+                    iterator.remove();
+                } else {
+                    orderItem.setQuantity(newQuantity);
+                }
+            }
+        }
+
+        // Save the order back to the repository
+        Order savedOrder = orderEntityRepository.save(order);
+
+        // Return the updated order as a DTO
+        return OrderDTO.toDTO(savedOrder);
+
+
     }
 }

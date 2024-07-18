@@ -174,6 +174,7 @@ public class StorageService {
     }
 
     @Transactional
+    @Modifying
     public InventarioDTO putDataIntoInventario(long inventarioId,
                                                long insertedAmount,
                                                long removedAmount,
@@ -202,20 +203,7 @@ public class StorageService {
     }
 
     @Transactional
-    public void removeProductFromStorage(long inventarioId) {
-
-//        Inventario inventario = inventarioRepository
-//                .findById(inventarioId).orElseThrow(()
-//                        -> new StorageNotFoundException("Inventario not found with id: " + inventarioId + ". Cannot update inventario"));
-//
-//        log.info("Delete product from inventario. " +
-//                        "Inventario id {}, product {}, updating delete date to today",
-//                inventarioId,
-//                inventario.getProduct());
-//
-//        inventario.setDeletionDate(LocalDate.now());
-//
-//        return InventarioDTO.fromEntity(inventario);
+    public void deleteProductFromStorage(long inventarioId) {
 
         log.info("Delete inventario by id {}", inventarioId);
         inventarioRepository.deleteById(inventarioId);
@@ -276,6 +264,24 @@ public class StorageService {
     }
 
 
+    @Transactional
+    @Modifying
+    public void removeProductAmountFromStorage(Map<Long, Double> removeProdMap,
+                                               long storageId,
+                                               String userName) {
 
+        Storage storage = storageRepository.findById(storageId)
+                .orElseThrow(() -> new StorageNotFoundException("Storage not found with id: " + storageId + ". Cannot update inventario"));
 
+        log.info("Updating inventario. Remove products from inventario with id {}. Map of prodIt-amountToRemove {} - by user {}",
+                storageId,
+                removeProdMap,
+                userName);
+
+        storage.getInventario().forEach(inventario -> {
+            if(removeProdMap.containsKey(inventario.getProduct().getProductId())){
+                inventario.setStock(inventario.getStock() - removeProdMap.get(inventario.getProduct().getProductId()));
+            }
+        });
+    }
 }

@@ -452,13 +452,24 @@ public class EventService {
 
     @Transactional
     @Modifying
-    public void deleteCateringStorage(String branchCode,
-                                                    long cateringStorageId) {
+    public void deleteCateringStorage(String branchCode, long cateringStorageId) {
 
+        //TODO: with the branch code u have to put back the quantity into the storage of that branch
         log.info("Delete catering storage with id {}", cateringStorageId);
-//
-//        CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
-//                -> new NotFoundException("Storage not found for id " + cateringStorageId));
         cateringStorageRepository.deleteById(cateringStorageId);
+    }
+
+    @Transactional
+    @Modifying
+    public void emptyCateringStorage(long cateringStorageId) {
+
+        //TODO: with the branch code u have to put back the quantity into the storage of that branch
+        log.info("Empty catering storage with id {}", cateringStorageId);
+        CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
+                -> new NotFoundException("Storage not found for id " + cateringStorageId));
+
+        cateringStorage.getCateringStorageProducts().clear();
+
+        cateringStorageRepository.save(cateringStorage);
     }
 }

@@ -93,7 +93,7 @@ public class StorageController {
     public ResponseEntity<?> removeProductFromStorage(
             @RequestParam("inventarioId") long inventarioId){
 
-        storageService.removeProductFromStorage(inventarioId);
+        storageService.deleteProductFromStorage(inventarioId);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(null);

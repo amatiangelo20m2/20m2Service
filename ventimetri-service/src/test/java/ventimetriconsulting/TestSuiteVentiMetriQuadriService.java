@@ -494,8 +494,12 @@ public class TestSuiteVentiMetriQuadriService {
                 ResponseEntity<List<InventarioDTO>> inventarioList = storageController.insertProductsFromSupplierList(supplierDTO.getSupplierId(), 1, "Angelo Amati");
                 assertEquals(29, Objects.requireNonNull(inventarioList.getBody()).size());
 
-                ResponseEntity<InventarioDTO> inventarioDTOResponseEntity = storageController.putData(inventarioList.getBody().get(0).getInventarioId(), 2, 4, "asdasd");
+                ResponseEntity<InventarioDTO> inventarioDTOResponseEntity = storageController.putData(inventarioList.getBody().get(0).getInventarioId(),
+                        2,
+                        4,
+                        "asdasd");
                 assertEquals(2, Objects.requireNonNull(inventarioDTOResponseEntity.getBody()).getInventoryAction().size());
+
                 assertNull(inventarioDTOResponseEntity.getBody().getDeletionDate());
 
                 storageController.removeProductFromStorage(inventarioDTOResponseEntity.getBody().getInventarioId());
