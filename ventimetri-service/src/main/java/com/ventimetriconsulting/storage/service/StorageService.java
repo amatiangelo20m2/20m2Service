@@ -47,8 +47,7 @@ public class StorageService {
     private final InventarioRepository inventarioRepository;
     private final ProductRepository productRepository;
     private final MessageSender messageSender;
-
-    private BranchUserRepository branchUserRepository;
+    private final BranchUserRepository branchUserRepository;
 
     @Transactional
     public StorageDTO createStorage(StorageDTO storageDTO,

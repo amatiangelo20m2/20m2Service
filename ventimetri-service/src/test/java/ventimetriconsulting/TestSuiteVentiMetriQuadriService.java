@@ -171,7 +171,8 @@ public class TestSuiteVentiMetriQuadriService {
                 branchRepository,
                 inventarioRepository,
                 productRepository,
-                messageSender);
+                messageSender,
+                branchUserRepository);
 
         storageController = new StorageController(storageService, branchService);
 
