@@ -106,7 +106,7 @@ public class StorageController {
                 .body(storageService.insertDataIntoInventario(transactionInventoryRequest));
     }
 
-    @PutMapping(path = "/update/stock/{storageId}/{userName}/{branchId}")
+    @PutMapping(path = "/update/stock/{storageId}/{userName}/{branchCode}")
     public ResponseEntity<StorageDTO> updateStock(@PathVariable long storageId,
                                                   @RequestBody Map<Long, Double> stockValues,
                                                   @PathVariable String userName,
