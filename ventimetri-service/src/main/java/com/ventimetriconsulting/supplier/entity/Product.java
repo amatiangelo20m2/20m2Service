@@ -54,7 +54,7 @@ public class Product {
     private int vatApplied;
     private double price;
     private double vatPrice = 0.0;
-    private String category;
+    private ProductCategory category;
     private String sku;
     private boolean available = true;
     private boolean deleted = false;

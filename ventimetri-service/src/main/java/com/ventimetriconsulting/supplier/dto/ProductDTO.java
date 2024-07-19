@@ -1,6 +1,7 @@
 package com.ventimetriconsulting.supplier.dto;
 
 import com.ventimetriconsulting.supplier.entity.Product;
+import com.ventimetriconsulting.supplier.entity.ProductCategory;
 import com.ventimetriconsulting.supplier.entity.UnitMeasure;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +26,7 @@ public class ProductDTO {
     private int vatApplied;
     private double price;
     private double vatPrice;
-    private String category;
+    private ProductCategory category;
     private String sku;
     private boolean available;
     private boolean deleted;
@@ -45,7 +46,8 @@ public class ProductDTO {
                 .sku(productDTO.getSku())
                 .available(productDTO.isAvailable())
                 .deleted(productDTO.isDeleted())
-                .branchListNotAllowedToSeeThisProduct(productDTO.getBranchListNotAllowedToSeeThisProduct())
+                .branchListNotAllowedToSeeThisProduct(productDTO
+                        .getBranchListNotAllowedToSeeThisProduct())
                 .build();
     }
 
@@ -68,6 +70,7 @@ public class ProductDTO {
                 .branchListNotAllowedToSeeThisProduct(product.getBranchListNotAllowedToSeeThisProduct())
                 .build();
     }
+
     public static List<Product> fromDTOList(List<ProductDTO> productDTOList) {
         return productDTOList.stream()
                     .map(ProductDTO::fromDTO)

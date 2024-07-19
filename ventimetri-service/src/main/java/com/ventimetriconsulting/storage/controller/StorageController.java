@@ -106,9 +106,12 @@ public class StorageController {
                 .body(storageService.insertDataIntoInventario(transactionInventoryRequest));
     }
 
-    @PutMapping(path = "/update/stock/{storageId}")
-    public ResponseEntity<StorageDTO> updateStock(@PathVariable long storageId, @RequestBody Map<Long, Double> stockValues){
-        StorageDTO storageDTO = storageService.updateStockValueInventario(storageId, stockValues);
+    @PutMapping(path = "/update/stock/{storageId}/{userName}/{branchId}")
+    public ResponseEntity<StorageDTO> updateStock(@PathVariable long storageId,
+                                                  @RequestBody Map<Long, Double> stockValues,
+                                                  @PathVariable String userName,
+                                                  @PathVariable String branchCode){
+        StorageDTO storageDTO = storageService.updateStockValueInventario(storageId, stockValues, userName, branchCode);
         return ResponseEntity.status(HttpStatus.OK).body(storageDTO);
     }
 }

@@ -1,10 +1,16 @@
 package com.ventimetriconsulting.storage.service;
 
 import com.ventimetriconsulting.branch.entity.Branch;
+import com.ventimetriconsulting.branch.entity.BranchUser;
+import com.ventimetriconsulting.branch.entity.Role;
 import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
 import com.ventimetriconsulting.branch.exception.customexceptions.InventarioNotFoundException;
 import com.ventimetriconsulting.branch.exception.customexceptions.StorageNotFoundException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
+import com.ventimetriconsulting.branch.repository.BranchUserRepository;
+import com.ventimetriconsulting.notification.entity.NotificationEntity;
+import com.ventimetriconsulting.notification.entity.RedirectPage;
+import com.ventimetriconsulting.notification.service.MessageSender;
 import com.ventimetriconsulting.storage.entity.Inventario;
 import com.ventimetriconsulting.storage.entity.Storage;
 import com.ventimetriconsulting.storage.entity.dto.InventarioDTO;
@@ -37,8 +43,12 @@ public class StorageService {
     private final StorageRepository storageRepository;
     private final SupplierRepository supplierRepository;
     private final BranchRepository branchRepository;
+
     private final InventarioRepository inventarioRepository;
     private final ProductRepository productRepository;
+    private final MessageSender messageSender;
+
+    private BranchUserRepository branchUserRepository;
 
     @Transactional
     public StorageDTO createStorage(StorageDTO storageDTO,
@@ -247,18 +257,50 @@ public class StorageService {
 
     @Transactional
     @Modifying
-    public StorageDTO updateStockValueInventario(long storageId, Map<Long, Double> stockValues) {
+    public StorageDTO updateStockValueInventario(long storageId,
+                                                 Map<Long, Double> stockValues,
+                                                 String userName,
+                                                 String branchCode) {
 
         Storage storage = storageRepository.findById(storageId)
                 .orElseThrow(() -> new StorageNotFoundException("Storage not found with id: " + storageId + ". Cannot update inventario"));
 
         log.info("Updating inventario. News values are (inventario id - stock value) {} ", stockValues);
 
+        StringBuilder messageBuilder = new StringBuilder();
+
         for(Inventario inventario : storage.getInventario()){
             if(stockValues.containsKey(inventario.getInventarioId())){
+
+                messageBuilder.append("\n - ")
+                        .append(inventario.getProduct().getName())
+                        .append(" da ")
+                        .append(inventario.getStock())
+                        .append(" a ")
+                        .append(stockValues
+                                .get(inventario.getInventarioId())).append(" ").append(inventario.getProduct().getUnitMeasure().name());
                 inventario.setStock(stockValues.get(inventario.getInventarioId()));
+
+
+
+
             }
         }
+
+        List<String> fmcTokensByBranchCodeAndRole
+                = branchUserRepository.findFMCTokensByBranchCodeAndRole(branchCode, Role.AMMINISTRATORE);
+
+        String branchName = branchRepository.findBranchNameByBranchCode(branchCode)
+                .orElseThrow(() -> new BranchNotFoundException("Branch name not found with code: " + branchCode + "."));;
+
+
+        messageSender.enqueMessage(
+                NotificationEntity.builder()
+                        .title("\uD83D\uDDD2" + userName + " ha modificato magazzino " + storage.getName() + " per branch " + branchName)
+                        .message(messageBuilder.toString())
+                        .redirectPage(RedirectPage.DASHBOARD)
+                        .fmcToken(fmcTokensByBranchCodeAndRole)
+                        .build());
 
         return StorageDTO.fromEntity(storage);
     }
