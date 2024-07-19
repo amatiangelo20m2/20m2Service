@@ -434,7 +434,7 @@ public class TestSuiteVentiMetriQuadriService {
 
         assertEquals(20, productDTO.getProductCode().length());
         assertEquals("Random description", productDTO.getDescription());
-        assertEquals("Random category", productDTO.getCategory());
+        assertEquals(ProductCategory.ALTRO, productDTO.getCategory());
         assertEquals("Random SKU", productDTO.getSku());
         assertEquals(UnitMeasure.KG, productDTO.getUnitMeasure());
 
@@ -452,7 +452,7 @@ public class TestSuiteVentiMetriQuadriService {
 
         assertEquals("NEW PROD CODE", productDTO.getProductCode());
         assertEquals("NEW DESCRIPTION", productDTO.getDescription());
-        assertEquals("NEW CATEGORY", productDTO.getCategory());
+        assertEquals(ProductCategory.ALTRO, productDTO.getCategory());
         assertEquals("NEW SKU", productDTO.getSku());
         assertEquals(UnitMeasure.CT, productDTO.getUnitMeasure());
 
