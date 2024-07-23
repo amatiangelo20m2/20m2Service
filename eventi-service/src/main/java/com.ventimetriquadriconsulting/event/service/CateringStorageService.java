@@ -1,7 +1,6 @@
 package com.ventimetriquadriconsulting.event.service;
 
 import com.ventimetriquadriconsulting.event.entity.CateringStorage;
-import com.ventimetriquadriconsulting.event.entity.dto.CateringStorageDTO;
 import com.ventimetriquadriconsulting.event.repository.CateringStorageRepository;
 import com.ventimetriquadriconsulting.event.workstations.entity.Product;
 import com.ventimetriquadriconsulting.event.workstations.entity.dto.ProductDTO;
@@ -89,12 +88,13 @@ public class CateringStorageService {
 
     @Transactional
     @Modifying
-    public void removeProducts(long cateringStorageId, long productId) {
+    public void removeProductsFromStorage(long cateringStorageId, long productId) {
         log.info("Remove product with id {} from storage mobile with id {}", productId, cateringStorageId);
         CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
-                -> new NotFoundException("Exception throwed while getting data for catering storage with id : " + cateringStorageId + ". Cannot retrieve catering storage and delete product with id " + productId));
+                -> new NotFoundException("Exception thrown while getting data for catering storage with id : " + cateringStorageId + ". Cannot retrieve catering storage and delete product with id " + productId));
 
         cateringStorage.getCateringStorageProducts().removeIf(product -> product.getProductId() == productId);
+
         cateringStorageRepository.save(cateringStorage);
     }
 }

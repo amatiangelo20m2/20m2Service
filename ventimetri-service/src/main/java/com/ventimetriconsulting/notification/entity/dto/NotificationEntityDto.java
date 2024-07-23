@@ -22,7 +22,6 @@ public class NotificationEntityDto {
     private String title;
     private String message;
     private String fmcToken;
-    private boolean read;
     private RedirectPage redirectPage;
     private LocalDate insertionDate;
 
@@ -31,7 +30,6 @@ public class NotificationEntityDto {
                 .notificationId(entity.getNotificationId())
                 .title(entity.getTitle())
                 .message(entity.getMessage())
-                .read(entity.isRead())
                 .fmcToken(entity.getFmcToken())
                 .redirectPage(entity.getRedirectPage())
                 .insertionDate(entity.getInsertionDate())

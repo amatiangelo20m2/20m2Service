@@ -12,13 +12,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<NotificationEntityTable, Long> {
-    List<NotificationEntityTable> findAllByFmcTokenAfterAndInsertionDate(String fcmToken, LocalDate date);
 
     @Query("SELECT n FROM Notification_Entity n WHERE n.fmcToken = ?1 AND n.insertionDate >= ?2 ORDER BY n.notificationId DESC")
     List<NotificationEntityTable> findByFmcTokenAndInsertionDateBeforeOrderByNotificationIdDesc(String fmcToken, LocalDate date);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Notification_Entity n SET n.read = true WHERE n.fmcToken = ?1 AND n.read = false")
-    void updateAllByFmcTokenToRead(String fcmToken);
 }

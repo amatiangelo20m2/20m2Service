@@ -150,7 +150,7 @@ public class EventController {
     public ResponseEntity<?> removeProductFromStorageMobile(@PathVariable long cateringStorageId,
                                                             @PathVariable long productId){
 
-        cateringStorageService.removeProducts(cateringStorageId, productId);
+        cateringStorageService.removeProductsFromStorage(cateringStorageId, productId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

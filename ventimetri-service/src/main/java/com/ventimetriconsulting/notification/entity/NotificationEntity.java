@@ -17,5 +17,4 @@ public class NotificationEntity {
     private List<String> fmcToken;
     private RedirectPage redirectPage;
 
-
 }

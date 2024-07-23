@@ -44,6 +44,4 @@ public class NotificationEntityTable {
 
     private LocalDate insertionDate;
 
-    private boolean read;
-
 }

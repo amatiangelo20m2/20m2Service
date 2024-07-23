@@ -26,9 +26,4 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
-    @PutMapping(path = "/setnotificationread")
-    public void setNotificationReadByFcmToken(@RequestParam String fcmToken){
-        notificationService.updateAllNotificationToRead(fcmToken);
-    }
 }

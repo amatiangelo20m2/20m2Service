@@ -22,8 +22,6 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
-
-
     @Transactional
     public List<NotificationEntityDto> retrieveAll(String fcmToken) {
 
@@ -32,23 +30,15 @@ public class NotificationService {
 
         List<NotificationEntityTable> allByFmcToken =
                 notificationRepository
-                        .findByFmcTokenAndInsertionDateBeforeOrderByNotificationIdDesc(fcmToken,
-                                LocalDate.now().minusDays(7));
+                        .findByFmcTokenAndInsertionDateBeforeOrderByNotificationIdDesc
+                                (fcmToken, LocalDate.now().minusDays(7));
 
-        List<NotificationEntityDto> dtoList = NotificationEntityDto.toDTOList(allByFmcToken);
-        updateAllNotificationToRead(fcmToken);
-
-        return dtoList;
+        return NotificationEntityDto.toDTOList(allByFmcToken);
     }
 
-    @Transactional
-    public void updateAllNotificationToRead(String fcmToken) {
-        log.info("Update to read all notifications for token {}", fcmToken);
-        notificationRepository.updateAllByFmcTokenToRead(fcmToken);
-    }
 
     @Transactional
-    public void save(NotificationEntityTable notificationEntityTable) {
+    public void storeNotification(NotificationEntityTable notificationEntityTable) {
         notificationRepository.save(notificationEntityTable);
     }
 }
