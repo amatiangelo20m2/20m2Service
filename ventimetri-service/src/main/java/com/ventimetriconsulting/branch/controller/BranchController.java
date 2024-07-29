@@ -65,7 +65,7 @@ public class BranchController {
             @RequestParam String userCode,
             @RequestParam List<String> branchCodes,
             @RequestParam Role role,
-            @RequestParam String fcmToken){
+            @RequestParam String fcmToken) {
 
         List<BranchResponseEntity> branchesByUserCode = branchService
                 .linkUserToBranch(

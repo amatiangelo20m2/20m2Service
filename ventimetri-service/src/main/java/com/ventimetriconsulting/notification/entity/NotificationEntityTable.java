@@ -39,6 +39,8 @@ public class NotificationEntityTable {
 
     private String fmcToken;
 
+    private String userCode;
+
     @Enumerated(EnumType.STRING)
     private RedirectPage redirectPage;
 

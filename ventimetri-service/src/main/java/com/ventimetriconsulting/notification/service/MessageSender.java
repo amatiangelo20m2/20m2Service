@@ -14,7 +14,6 @@ import java.time.LocalDate;
 @Slf4j
 public class MessageSender {
     private final RabbitTemplate rabbitTemplate;
-
     private final NotificationService notificationService;
 
     @Autowired
@@ -32,6 +31,7 @@ public class MessageSender {
                     .title(notificationEntity.getTitle())
                     .insertionDate(LocalDate.now())
                     .fmcToken(fcmToken)
+                    .userCode()
                     .message(notificationEntity.getMessage())
                     .redirectPage(notificationEntity.getRedirectPage())
                     .notificationId(0L)

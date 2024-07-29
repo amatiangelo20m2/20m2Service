@@ -1,13 +1,11 @@
 package com.ventimetriconsulting.notification.entity.dto;
 
-
 import com.ventimetriconsulting.notification.entity.NotificationEntityTable;
 import com.ventimetriconsulting.notification.entity.RedirectPage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +20,7 @@ public class NotificationEntityDto {
     private String title;
     private String message;
     private String fmcToken;
+    private String userCode;
     private RedirectPage redirectPage;
     private LocalDate insertionDate;
 
