@@ -34,6 +34,7 @@ public class EventService {
     private EventRepository eventRepository;
     private WorkstationRepository workstationRepository;
     private CateringStorageRepository cateringStorageRepository;
+    private CateringStorageService cateringStorageService;
 
     @Transactional
     public EventDTO createEvent(EventDTO eventDto){
@@ -284,9 +285,25 @@ public class EventService {
         return WorkstationDTO.fromEntity(savedWorkstation);
     }
 
+    @Transactional
+    @Modifying
     public CateringStorageDTO createCateringStorage(CateringStorageDTO cateringStorageDTO) {
         log.info("Create catering storage {}", cateringStorageDTO);
-        return CateringStorageDTO.fromEntity(cateringStorageRepository.save(CateringStorageDTO.toEntity(cateringStorageDTO)));
+        CateringStorageDTO createdStorage
+                = CateringStorageDTO.fromEntity(cateringStorageRepository.save(CateringStorageDTO.toEntity(cateringStorageDTO)));
+
+
+        log.info("Adding products to storage van. Products {}", cateringStorageDTO.getCateringStorageProducts());
+        if(!cateringStorageDTO.getCateringStorageProducts().isEmpty()){
+            cateringStorageService.addProductsToVanStorage(createdStorage.getCateringStorageId(),
+                        new ArrayList<>(cateringStorageDTO.getCateringStorageProducts()));
+        }
+
+        CateringStorage cateringStorage = cateringStorageRepository.findById(createdStorage.getCateringStorageId()).orElseThrow(()
+                -> new NotFoundException("Storage van not found with id: "
+                + createdStorage.getCateringStorageId() + ". Cannot go over with the creation of the products"));
+
+        return CateringStorageDTO.fromEntity(cateringStorage);
     }
 
     @Transactional
@@ -432,12 +449,14 @@ public class EventService {
 
     @Transactional
     @Modifying
-    public CateringStorage loadProductIntoStorageVan(long cateringStorageId, Map<Long, Double> insertValueMapProductIdAmountToInsert) {
-        log.info("This map contain the product id and the amount to add in order to perform a load product into workstation event. " +
+    public CateringStorage loadProductIntoStorageVan(
+            long cateringStorageId,
+            Map<Long, Double> insertValueMapProductIdAmountToInsert) {
+        log.info("This map contain the product id and the amount to add in order to perform a load product into storage van event. " +
                 "MAP: {} and it will be apply to a storage van with id {}", insertValueMapProductIdAmountToInsert, cateringStorageId);
 
         CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageId).orElseThrow(()
-                -> new NotFoundException("Storage not found for id " + cateringStorageId));
+                -> new NotFoundException("Storage van not found for id " + cateringStorageId));
 
         for (Product product : cateringStorage.getCateringStorageProducts()) {
             long productId = product.getProductId();
@@ -470,5 +489,20 @@ public class EventService {
         cateringStorage.getCateringStorageProducts().clear();
 
         cateringStorageRepository.save(cateringStorage);
+    }
+
+    @Transactional
+    @Modifying
+    public CateringStorageDTO updateCateringStorage(CateringStorageDTO cateringStorageDTO) {
+
+        log.info("Update storage with id {} - New name {} - New licence plate {}", cateringStorageDTO.getCateringStorageId(), cateringStorageDTO.getName(), cateringStorageDTO.getCarLicensePlate());
+        CateringStorage cateringStorage = cateringStorageRepository.findById(cateringStorageDTO.getCateringStorageId()).orElseThrow(()
+                -> new NotFoundException("Storage not found for id " + cateringStorageDTO.getCateringStorageId()));
+
+        cateringStorage.setName(cateringStorageDTO.getName());
+        cateringStorage.setCarLicensePlate(cateringStorage.getCarLicensePlate());
+
+        return CateringStorageDTO.fromEntity(cateringStorage);
+
     }
 }

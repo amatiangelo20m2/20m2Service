@@ -111,11 +111,20 @@ public class EventController {
     }
 
     @PostMapping("/createcateringstorage")
-    public ResponseEntity<CateringStorageDTO> createCateringStorage(@RequestBody CateringStorageDTO cateringStorageDTO) {
+    public ResponseEntity<CateringStorageDTO> createCateringStorage(
+            @RequestBody CateringStorageDTO cateringStorageDTO) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(eventService
                         .createCateringStorage(cateringStorageDTO));
+    }
+
+    @PutMapping("/updatecateringstorage")
+    public ResponseEntity<CateringStorageDTO> updateCateringStorage(@RequestBody CateringStorageDTO cateringStorageDTO) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService
+                        .updateCateringStorage(cateringStorageDTO));
     }
 
     @DeleteMapping("/{branchCode}/deletecateringstorage/{cateringStorageId}")
@@ -146,7 +155,7 @@ public class EventController {
     public ResponseEntity<List<ProductDTO>> addProductToStorageCatering(@PathVariable long cateringStorageId,
                                                                         @RequestBody List<ProductDTO> productDTOList){
 
-        List<ProductDTO> productDTOS = cateringStorageService.addProducts(cateringStorageId, productDTOList);
+        List<ProductDTO> productDTOS = cateringStorageService.addProductsToVanStorage(cateringStorageId, productDTOList);
         return ResponseEntity.status(HttpStatus.OK).body(productDTOS);
     }
 

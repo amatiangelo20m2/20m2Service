@@ -27,10 +27,10 @@ public class CateringStorageService {
     }
 
     @Transactional
-    public List<ProductDTO> addProducts(long cateringStorageId,
-                            List<ProductDTO> productDTOList) {
+    public List<ProductDTO> addProductsToVanStorage(long cateringStorageId,
+                                                    List<ProductDTO> productDTOList) {
 
-        log.info("Adding products to storage with id {} - Product List: {}", cateringStorageId, productDTOList);
+        log.info("Adding products to storage van with id {} - Product List: {}", cateringStorageId, productDTOList);
 
         Optional<CateringStorage> cateringStorageOptional = cateringStorageRepository.findById(cateringStorageId);
 
