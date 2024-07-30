@@ -47,8 +47,6 @@ public class TestSuiteEvent {
     @Autowired
     private CateringStorageRepository cateringStorageRepository;
 
-    @Autowired
-    private CateringStorageService cateringStorageService;
 
     @BeforeEach
     public void init(){
