@@ -51,7 +51,7 @@ public class SupplierService {
     public ProductDTO createProduct(ProductDTO productDTO,
                                     Long supplierId) {
         try{
-            log.info("Saving product {} for supplier with id {}", productDTO, supplierId);
+                log.info("Saving product {} for supplier with id {}", productDTO, supplierId);
 
             Supplier supplier = supplierRepository
                     .findById(supplierId).orElseThrow(() -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));

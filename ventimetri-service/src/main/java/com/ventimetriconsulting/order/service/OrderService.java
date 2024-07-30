@@ -156,7 +156,6 @@ public class OrderService {
                     createOrderEntity.getUserCode());
 
 
-            fmcTokensByBranchCode.
             messageSender.enqueMessage(NotificationEntity
                     .builder()
                     .title("\uD83D\uDCE6 Ordine da " + byBranchCode.getName() +" eseguito da "
@@ -165,6 +164,7 @@ public class OrderService {
                     .fmcToken(fmcTokensByBranchCode)
                     .redirectPage(RedirectPage.ORDERS)
                     .build());
+
 
         }else if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
 
@@ -348,7 +348,7 @@ public class OrderService {
                                 .message("Ordine da consegnare il "
                                         + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
                                 .redirectPage(RedirectPage.ORDERS)
-                                .fmcToken(branchUser.getFMCToken())
+                                .fmcToken(Collections.singletonList(branchUser.getFMCToken()))
                                 .userCode(branchUser.getUserCode())
                                 .build()));
 
@@ -359,7 +359,7 @@ public class OrderService {
                                 .message("Ordine da consegnare il "
                                         + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
                                 .redirectPage(RedirectPage.ORDERS)
-                                .fmcToken(branchUser.getFMCToken())
+                                .fmcToken(Collections.singletonList(branchUser.getFMCToken()))
                                 .userCode(branchUser.getUserCode())
                                 .build()));
 
@@ -369,7 +369,7 @@ public class OrderService {
                                 .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " consegnato!")
                                 .message("Ordine consegnato. Recap ordine - \nProdotti: " + buildProductList(order.getOrderItems()))
                                 .redirectPage(RedirectPage.ORDERS)
-                                .fmcToken(branchUser.getFMCToken())
+                                .fmcToken(Collections.singletonList(branchUser.getFMCToken()))
                                 .build()));
             }
 

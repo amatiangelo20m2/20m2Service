@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -47,7 +46,7 @@ public class EventService {
 
     }
 
-    public List<EventDTO> findEventByBranchCodeAndStatus(String branchCode, EventStatus eventStatus) {
+    public List<EventDTO> findEventByBranchCodeAndStatus(String branchCode, EventStatus eventStatus, String startDate, String endDate) {
 
         log.info("Retrieve events by branch code {} with status {}", branchCode, eventStatus);
         List<Event> byBranchCodeAndEventStatus = eventRepository

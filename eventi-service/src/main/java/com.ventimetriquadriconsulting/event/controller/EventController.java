@@ -29,10 +29,14 @@ public class EventController {
 
     @GetMapping(path = "/findeventbybranchcode")
     public ResponseEntity<List<EventDTO>> retrieveEventsByBranchCode(@RequestParam("branchCode") String branchCode,
-                                                                     @RequestParam EventStatus eventStatus){
+                                                                     @RequestParam EventStatus eventStatus,
+                                                                     @RequestParam String startDate,
+                                                                     @RequestParam String endDate){
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(eventService.findEventByBranchCodeAndStatus(branchCode, eventStatus));
+                .body(eventService.findEventByBranchCodeAndStatus(branchCode, eventStatus, startDate, endDate));
+
     }
 
     @PostMapping(path = "/save")

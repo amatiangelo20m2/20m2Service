@@ -26,12 +26,12 @@ public class MessageSender {
 
         log.info("Sending notification message {}", notificationEntity);
 
-        for(String fcmToken : notificationEntity.getFmcToken()){
+        for(String fcmToken : notificationEntity.getFmcToken()) {
             notificationService.storeNotification(NotificationEntityTable.builder()
                     .title(notificationEntity.getTitle())
                     .insertionDate(LocalDate.now())
                     .fmcToken(fcmToken)
-                    .userCode()
+                    .userCode("")
                     .message(notificationEntity.getMessage())
                     .redirectPage(notificationEntity.getRedirectPage())
                     .notificationId(0L)

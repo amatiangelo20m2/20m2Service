@@ -14,7 +14,7 @@ public class NotificationEntity {
 
     private String title;
     private String message;
-    private String fmcToken;
+    private List<String> fmcToken;
     private String userCode;
     private RedirectPage redirectPage;
 

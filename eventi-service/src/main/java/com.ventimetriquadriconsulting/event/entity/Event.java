@@ -42,6 +42,7 @@ public class Event implements Serializable {
 
     private String name;
     private String createdBy;
+
     private LocalDate dateEvent;
     private LocalDate dateCreation;
 
