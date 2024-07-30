@@ -85,7 +85,8 @@ public class TestSuiteEvent {
         log.info("Worksations: {}", save.getBody().getWorkstations().toString());
         assertEquals(0, save.getBody().getExpenseEvents().size());
 
-        ResponseEntity<List<EventDTO>> eventsByBranchCode = eventController.retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO);
+        ResponseEntity<List<EventDTO>> eventsByBranchCode = eventController
+                .retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO, "", "");
 
         assertEquals(Objects.requireNonNull(eventsByBranchCode.getBody()).size(), 1);
         assertEquals(eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().size(), 1);
@@ -100,7 +101,7 @@ public class TestSuiteEvent {
 
         eventController.deleteWorkstationProduct(workstationId, productId);
 
-        eventsByBranchCode = eventController.retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO);
+        eventsByBranchCode = eventController.retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO, "", "");
 
         assertEquals(Objects.requireNonNull(eventsByBranchCode.getBody()).size(), 1);
         assertEquals(eventsByBranchCode.getBody().stream().toList().get(0).getWorkstations().size(), 1);
@@ -139,7 +140,7 @@ public class TestSuiteEvent {
         assertEquals(HttpStatusCode.valueOf(200), updateResponse.getStatusCode());
 
         // Retrieve the updated event to check the product quantities
-        ResponseEntity<List<EventDTO>> eventsByBranchCode = eventController.retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO);
+        ResponseEntity<List<EventDTO>> eventsByBranchCode = eventController.retrieveEventsByBranchCode("BASDASDASD", EventStatus.APERTO, "", "");
         assertEquals(1, Objects.requireNonNull(eventsByBranchCode.getBody()).size());
 
         // Retrieve the updated workstation
