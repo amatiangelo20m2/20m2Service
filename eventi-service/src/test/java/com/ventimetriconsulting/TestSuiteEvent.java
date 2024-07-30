@@ -47,11 +47,14 @@ public class TestSuiteEvent {
     @Autowired
     private CateringStorageRepository cateringStorageRepository;
 
+    @Autowired
+    private CateringStorageService cateringStorageService;
+
     @BeforeEach
     public void init(){
 
         CateringStorageService cateringStorageService = new CateringStorageService(cateringStorageRepository);
-        EventService eventService = new EventService(eventRepository, workstationRepository, cateringStorageRepository);
+        EventService eventService = new EventService(eventRepository, workstationRepository, cateringStorageRepository,cateringStorageService);
         eventController = new EventController(eventService, cateringStorageService);
     }
 
