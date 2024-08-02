@@ -20,6 +20,7 @@ public class Product implements Serializable {
     private double quantityInserted;
     private double quantityConsumed;
     private double price;
+    private int vat;
     private UnitMeasure unitMeasure;
 
     public Product(Product original) {
@@ -28,6 +29,7 @@ public class Product implements Serializable {
         this.quantityInserted = 0;
         this.quantityConsumed = 0;
         this.price = original.price;
+        this.vat = original.vat;
         this.unitMeasure = original.unitMeasure;
     }
 }

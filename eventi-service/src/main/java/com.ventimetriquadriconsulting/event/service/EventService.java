@@ -261,6 +261,8 @@ public class EventService {
             }
         }
 
+
+
         event.setEventStatus(EventStatus.CHIUSO);
     }
 

@@ -22,6 +22,7 @@ public class ProductDTO {
     private double quantityInserted;
     private double quantityConsumed;
     private double price;
+    private int vat;
     private UnitMeasure unitMeasure;
 
     public static ProductDTO fromEntity(Product product) {
@@ -31,6 +32,7 @@ public class ProductDTO {
                 .quantityInserted(product.getQuantityInserted())
                 .quantityConsumed(product.getQuantityConsumed())
                 .price(product.getPrice())
+                .vat(product.getVat())
                 .unitMeasure(product.getUnitMeasure())
                 .build();
     }
@@ -42,6 +44,7 @@ public class ProductDTO {
                 .quantityInserted(productDTO.getQuantityInserted())
                 .quantityConsumed(productDTO.getQuantityConsumed())
                 .price(productDTO.getPrice())
+                .vat(productDTO.getVat())
                 .unitMeasure(productDTO.getUnitMeasure())
                 .build();
     }
