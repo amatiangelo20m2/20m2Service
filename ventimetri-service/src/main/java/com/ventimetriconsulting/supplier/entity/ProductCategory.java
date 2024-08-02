@@ -4,5 +4,5 @@ public enum ProductCategory {
     ALIMENTI,
     BEVANDE,
     CARTOPLASTICA,
-    ALTRO
+    ALTRO,
 }
