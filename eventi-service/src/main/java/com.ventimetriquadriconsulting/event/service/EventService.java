@@ -507,4 +507,23 @@ public class EventService {
         return CateringStorageDTO.fromEntity(cateringStorage);
 
     }
+
+    @Transactional
+    @Modifying
+    public EventDTO updateEvent(long eventId,
+                                String name,
+                                String location) {
+
+        log.info("Update event with id {} - Name {} , Location {}", eventId, name, location);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found"));
+
+        event.setName(name);
+        event.setLocation(location);
+
+        Event save = eventRepository.save(event);
+
+
+        return EventDTO.fromEntity(save);
+    }
 }

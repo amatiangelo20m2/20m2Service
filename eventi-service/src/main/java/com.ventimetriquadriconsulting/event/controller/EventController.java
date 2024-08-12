@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -44,6 +45,15 @@ public class EventController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(eventService.createEvent(event));
+    }
+
+    @PutMapping(path = "/update")
+    public ResponseEntity<EventDTO> update(@RequestParam long eventId,
+                                           @RequestParam String name,
+                                           @RequestParam String location) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.updateEvent(eventId, name, location));
     }
 
     @PutMapping(path = "/{eventId}/createworkstation")
