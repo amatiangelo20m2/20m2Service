@@ -1,23 +1,23 @@
 package com.ventimetriquadriconsulting.event.workstations.entity;
 
 public enum UnitMeasure {
-    KG,
-    PEZZI,
-    LITRI,
-    PACCHI,
+    BARATTOLI,
     BARATTOLIPICCOLI,
+    BOTTIGLIA,
+    BOTTIGLIETTA,
     CARTONI,
     CARTONE6,
     CARTONE12,
     CARTONE24,
     CARTONE50,
-    BOTTIGLIA,
-    BARATTOLI,
-    FARDELLO,
+    COLLO,
     CT,
-    BOTTIGLIETTA,
-    UNITA,
+    FARDELLO,
+    KG,
+    LITRI,
+    PACCHI,
+    PEZZI,
     SECCHIO,
-    ALTRO,
-    COLLO;
+    UNITA,
+    ALTRO
 }

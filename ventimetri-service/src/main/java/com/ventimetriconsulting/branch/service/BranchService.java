@@ -239,7 +239,7 @@ public class BranchService {
 
         for(BranchUser branchUser : branchUserByBranchCode){
 
-            if(!Objects.equals(branchUser.getUserCode(), "0000000000")){
+            if(!Objects.equals(branchUser.getUserCode(), "0000000000")) {
                 log.info("Retrieve user details for user with code {}", branchUser.getUserCode());
                 // get user data from auth-service
                 UserResponseEntity userResponseEntity = loadBalancedWebClientBuilder.build()

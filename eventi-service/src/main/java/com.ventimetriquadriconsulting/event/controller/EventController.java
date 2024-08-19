@@ -67,6 +67,23 @@ public class EventController {
                         workstationDTO));
     }
 
+    @PutMapping(path = "/{eventId}/{workstationId}/updateworkstation")
+    public ResponseEntity<WorkstationDTO> updateWorkstation(
+            @PathVariable("eventId") long eventId,
+            @PathVariable("workstationId") long workstationId,
+            @RequestParam String workstationName,
+            @RequestParam String workstationResponsabile){
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.updateWorkstationDetails(
+                        eventId,
+                        workstationId,
+                        workstationName,
+                        workstationResponsabile));
+    }
+
+
     @DeleteMapping(path = "/delete/workstation")
     public ResponseEntity<Void> deleteWorkstation(long workstationId, long eventId){
         eventService.deleteWorkstation(workstationId, eventId);

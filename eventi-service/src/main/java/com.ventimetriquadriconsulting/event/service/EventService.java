@@ -526,4 +526,28 @@ public class EventService {
 
         return EventDTO.fromEntity(save);
     }
+
+    @Transactional
+    @Modifying
+    public WorkstationDTO updateWorkstationDetails(long eventId,
+                                                   long workstationId,
+                                                   String workstationName,
+                                                   String workstationResponsable) {
+
+        log.info("Update workstation with id {}, with name {} and responsable {}. Event id {} ",
+                workstationId,
+                workstationName,
+                workstationResponsable,
+                eventId);
+
+        Workstation workstation = workstationRepository.findById(workstationId)
+                .orElseThrow(() -> new NotFoundException("Workstation not found for id " + workstationId));
+
+        workstation.setName(workstationName);
+        workstation.setResponsable(workstationResponsable);
+
+        Workstation savedWorkstation = workstationRepository.save(workstation);
+
+        return WorkstationDTO.fromEntity(savedWorkstation);
+    }
 }
