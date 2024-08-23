@@ -30,8 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -53,6 +52,7 @@ public class OrderService {
     private StorageService storageService;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
 
     @Transactional
     public OrderDTO createOrder(CreateOrderEntity createOrderEntity) {
@@ -156,15 +156,17 @@ public class OrderService {
                     createOrderEntity.getUserCode());
 
 
-            messageSender.enqueMessage(NotificationEntity
-                    .builder()
-                    .title("\uD83D\uDCE6 Ordine da " + byBranchCode.getName() +" eseguito da "
-                            + createOrderEntity.getUserName())
-                    .message(productsForNotification.toString())
-                    .fmcToken(fmcTokensByBranchCode)
-                    .redirectPage(RedirectPage.ORDERS)
-                    .build());
-
+            fmcTokensByBranchCode.forEach((fcmToken)-> {
+                messageSender.enqueMessage(NotificationEntity
+                        .builder()
+                        .title("\uD83D\uDCE6 Ordine da " + byBranchCode.getName() +" eseguito da " + createOrderEntity.getUserName())
+                        .message(productsForNotification.toString())
+                        .fmcToken(fcmToken)
+                        .branchCode(createOrderEntity.getBranchCode())
+                        .userCode(createOrderEntity.getUserCode())
+                        .redirectPage(RedirectPage.ORDERS)
+                        .build());
+            });
 
         }else if(OrderTarget.SUPPLIER == createOrderEntity.getOrderTarget()){
 
@@ -334,7 +336,6 @@ public class OrderService {
             }
         }
 
-
         if(allItemsDoneBySupplier(order.getOrderItems().stream().toList())){
             order.setOrderStatus(status);
             orderEntityRepository.save(order);
@@ -342,35 +343,51 @@ public class OrderService {
             Optional<BranchUser> byBranchCodeAndRole = branchUserRepository.findByBranchCodeAndRole(order.getCodeTarget(), Role.FACTOTUM);
 
             if (Objects.requireNonNull(status) == OrderStatus.INVIATO) {
-                byBranchCodeAndRole.ifPresent(branchUser -> messageSender.enqueMessage(
-                        NotificationEntity.builder()
-                                .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " pronto!")
-                                .message("Ordine da consegnare il "
-                                        + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
-                                .redirectPage(RedirectPage.ORDERS)
-                                .fmcToken(Collections.singletonList(branchUser.getFMCToken()))
-                                .userCode(branchUser.getUserCode())
-                                .build()));
+
+                byBranchCodeAndRole.ifPresent(branchUser -> Collections.singletonList(branchUser.getFMCToken()).forEach((token) -> {
+
+                    messageSender.enqueMessage(
+                            NotificationEntity.builder()
+                                    .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " pronto!")
+                                    .message("Ordine da consegnare il "
+                                            + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
+                                    .redirectPage(RedirectPage.ORDERS)
+                                    .fmcToken(token)
+                                    .userCode(branchUser.getUserCode())
+                                    .branchCode(branchUser.getBranch().getBranchCode())
+                                    .build());
+                }));
 
             }else if(Objects.requireNonNull(status) == OrderStatus.PRONTO_A_PARTIRE) {
-                byBranchCodeAndRole.ifPresent(branchUser -> messageSender.enqueMessage(
-                        NotificationEntity.builder()
-                                .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " è pronto a partire!")
-                                .message("Ordine da consegnare il "
-                                        + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
-                                .redirectPage(RedirectPage.ORDERS)
-                                .fmcToken(Collections.singletonList(branchUser.getFMCToken()))
-                                .userCode(branchUser.getUserCode())
-                                .build()));
+
+                byBranchCodeAndRole.ifPresent(branchUser -> Collections.singletonList(branchUser.getFMCToken()).forEach((token) -> {
+
+                    messageSender.enqueMessage(
+                            NotificationEntity.builder()
+                                    .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " è pronto a partire!")
+                                    .message("Ordine da consegnare il "
+                                            + order.getIncomingDate() + " è pronto a partire! \nProdotti: " + buildProductList(order.getOrderItems()))
+                                    .redirectPage(RedirectPage.ORDERS)
+                                    .fmcToken(token)
+                                    .userCode(branchUser.getUserCode())
+                                    .branchCode(branchUser.getBranch().getBranchCode())
+                                    .build());
+                }));
 
             } else if(Objects.requireNonNull(status) == OrderStatus.CONSEGNATO) {
-                byBranchCodeAndRole.ifPresent(branchUser -> messageSender.enqueMessage(
-                        NotificationEntity.builder()
-                                .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " consegnato!")
-                                .message("Ordine consegnato. Recap ordine - \nProdotti: " + buildProductList(order.getOrderItems()))
-                                .redirectPage(RedirectPage.ORDERS)
-                                .fmcToken(Collections.singletonList(branchUser.getFMCToken()))
-                                .build()));
+
+                byBranchCodeAndRole.ifPresent(branchUser -> Collections.singletonList(branchUser.getFMCToken()).forEach((token) -> {
+
+                    messageSender.enqueMessage(
+                            NotificationEntity.builder()
+                                    .title("\uD83D\uDC40 Ordine di" + order.getCreatedByBranchName() + " consegnato!")
+                                    .message("Ordine consegnato. Recap ordine - \nProdotti: " + buildProductList(order.getOrderItems()))
+                                    .redirectPage(RedirectPage.ORDERS)
+                                    .fmcToken(token)
+                                    .userCode(branchUser.getUserCode())
+                                    .branchCode(branchUser.getBranch().getBranchCode())
+                                    .build());
+                }));
             }
 
         }

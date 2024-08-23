@@ -23,6 +23,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -156,16 +159,25 @@ public class BranchService {
                     .fMCToken(fcmToken)
                     .build()));
 
-            List<String> fmcTokensByBranchCodeAndRole
-                    = branchUserRepository.findFMCTokensByBranchCodeAndRole(branchCode, Role.AMMINISTRATORE);
+            List<String> fmcTokensByBranchCodeAndRole = branchUserRepository.findFMCTokensByBranchCodeAndRole(branchCode, Role.AMMINISTRATORE);
 
-            notificationEntities.add(NotificationEntity
-                    .builder()
-                    .title("\uD83E\uDEC2 " + userName + " vuole lavorare con te")
-                    .message("L'utente " + userName + " ha richiesto di essere confermato come " + role + " per " + byBranchCode.get().getName())
-                    .redirectPage(RedirectPage.EMPLOYEE)
-                    .fmcToken(fmcTokensByBranchCodeAndRole)
-                    .build());
+
+            LocalDateTime localNow = LocalDateTime.now();
+            ZonedDateTime nowInGmt = localNow.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("CET"));
+
+            fmcTokensByBranchCodeAndRole.forEach((token) -> {
+                notificationEntities.add(NotificationEntity
+                        .builder()
+                        .title("\uD83E\uDEC2 " + userName + " vuole lavorare con te")
+                        .message("L'utente " + userName + " ha richiesto di essere confermato come " + role + " per " + byBranchCode.get().getName())
+                        .redirectPage(RedirectPage.EMPLOYEE)
+                        .fmcToken(token)
+                        .userCode(userCode)
+                        .branchCode(byBranchCode.get().getBranchCode())
+//                        .timeZone(nowInGmt)
+//                        .isSentSuccessfully(false)
+                        .build());
+            });
         }
 
         for(NotificationEntity notificationEntity : notificationEntities){
@@ -385,15 +397,21 @@ public class BranchService {
 
             branchesByUserCodeAndBranchCode.get().setAuthorized(true);
 
-            messageSender.enqueMessage(NotificationEntity
-                    .builder()
-                    .fmcToken(Collections.singletonList(branchesByUserCodeAndBranchCode.get().getFMCToken()))
-                    .redirectPage(RedirectPage.DASHBOARD)
-                    .message(Objects.requireNonNull(userResponseEntity).getName()
-                            + " ha confermato il tuo ruolo come " + branchesByUserCodeAndBranchCode.get().getRole()
-                            + " in " + branchesByUserCodeAndBranchCode.get().getBranch().getName() +". Aggiorna la pagina sull\'app e buon lavoro!\uD83D\uDE0E")
-                    .title("\uD83E\uDD29 Ruolo confermato su " + branchesByUserCodeAndBranchCode.get().getBranch().getName())
-                    .build());
+            Collections.singletonList(branchesByUserCodeAndBranchCode.get().getFMCToken()).forEach((token) -> {
+                messageSender.enqueMessage(NotificationEntity
+                        .builder()
+                        .fmcToken(token)
+                        .branchCode(branchCode)
+                        .userCode(branchesByUserCodeAndBranchCode.get().getUserCode())
+                        .redirectPage(RedirectPage.DASHBOARD)
+                        .branchCode(branchCode)
+                        .userCode(userCode)
+                        .message(Objects.requireNonNull(userResponseEntity).getName()
+                                + " ha confermato il tuo ruolo come " + branchesByUserCodeAndBranchCode.get().getRole()
+                                + " in " + branchesByUserCodeAndBranchCode.get().getBranch().getName() +". Aggiorna la pagina sull\'app e buon lavoro!\uD83D\uDE0E")
+                        .title("\uD83E\uDD29 Ruolo confermato su " + branchesByUserCodeAndBranchCode.get().getBranch().getName())
+                        .build());
+            });
         }
     }
 

@@ -12,6 +12,8 @@ select * from branch_supplier;
 
 select * from order_entity;
 
+truncate table supplier;
+
 delete from order_items where order_id = 48;
 delete from order_entity where branch_id = 3;
 
@@ -34,3 +36,10 @@ select * from public.notification_entity where public.notification_entity.fmc_to
                                     AND public.notification_entity.insertion_date >= '2024-04-20' ORDER BY notification_id DESC;
 
 delete from inventario where inventario.inventario_id = 350;
+
+UPDATE order_items
+SET vat = (
+    SELECT p.vat_applied
+    FROM product p
+    WHERE order_items.product_id = p.product_id
+    );

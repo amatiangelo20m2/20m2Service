@@ -31,6 +31,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -292,14 +295,20 @@ public class StorageService {
         String branchName = branchRepository.findBranchNameByBranchCode(branchCode)
                 .orElseThrow(() -> new BranchNotFoundException("Branch name not found with code: " + branchCode + "."));;
 
+        LocalDateTime localNow = LocalDateTime.now();
+        ZonedDateTime nowInGmt = localNow.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("CET"));
 
-        messageSender.enqueMessage(
+        fmcTokensByBranchCodeAndRole.forEach((token) -> messageSender.enqueMessage(
                 NotificationEntity.builder()
                         .title("\uD83D\uDDD2" + userName + " ha modificato magazzino " + storage.getName() + " per branch " + branchName)
                         .message(messageBuilder.toString())
                         .redirectPage(RedirectPage.DASHBOARD)
-                        .fmcToken(fmcTokensByBranchCodeAndRole)
-                        .build());
+                        .fmcToken(token)
+//                        .isSentSuccessfully(false)
+//                        .timeZone(nowInGmt)
+                        .build()));
+
+
 
         return StorageDTO.fromEntity(storage);
     }

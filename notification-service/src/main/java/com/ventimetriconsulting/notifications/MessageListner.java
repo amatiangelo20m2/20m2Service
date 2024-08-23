@@ -17,15 +17,9 @@ public class MessageListner {
     }
     @RabbitListener(queues = "queue_20m2")
     public void receive(NotificationEntity notificationEntity) {
+            log.info("Send notification: {}", notificationEntity);
 
-        for(String fcmToken : notificationEntity.getFmcToken()){
-            log.info("Send notification: {}", fcmToken);
+            notificationService.sendNotification(notificationEntity);
 
-            notificationService.sendNotification(
-                    fcmToken,
-                    notificationEntity.getTitle(),
-                    notificationEntity.getMessage(),
-                    notificationEntity.getRedirectPage());
-        }
     }
 }

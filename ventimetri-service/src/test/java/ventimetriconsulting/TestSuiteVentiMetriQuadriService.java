@@ -141,7 +141,7 @@ public class TestSuiteVentiMetriQuadriService {
 
         doNothing().when(rabbitTemplate).convertAndSend(any());
 
-        messageSender = new MessageSender(rabbitTemplate, null);
+        messageSender = new MessageSender(rabbitTemplate);
 
         BranchService branchService = new BranchService(
                 branchRepository,

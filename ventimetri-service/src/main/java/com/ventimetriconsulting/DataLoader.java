@@ -219,34 +219,37 @@
 //    public static List<SupplierDTO> retrieveSupplierList() {
 //
 //        List<SupplierDTO> suppliersList = new ArrayList<>();
-//        suppliersList.add(new SupplierDTO(0, "Magazzino 20m2", "463", "", "", "", "", "", "", "", "","", null));
-//        suppliersList.add(new SupplierDTO(0, "Angelo simeone", "464", "", "", "", "", "+393388004773", "simeoneangelo1979@libero.it", "", "","Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Mattia", "466", "", "", "", "", "3803268119", "mattialiuzzi@hotmail.it", "","","Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Santoro", "467", "", "", "35480", "", "3454937840", "amati.angelo90@gmail.com", "","", "Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Fornitore Esempio", "468", "via roma 34", "Cisternino", "72014", "", "3454937077", "esempiofornitore@gmail.com", "", "","Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Piero Montenegro", "469", "", "", "", "", "+393285860885", "piero.greco.ext@montenegro.it", "", "","Italia",null));
-//        suppliersList.add(new SupplierDTO(0, "Giuseppe Martini", "470", "", "", "", "", "3459515136", "gangelillo@bacardi.com", "", "","Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Fabio gal", "471", "", "", "", "", "3339101487", "galbibite@libero.it", "","", "Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Alberto Velier", "472", "", "", "", "", "3485174174", "albertobiunno@gmail.com", "","", "Italia",null));
-//        suppliersList.add(new SupplierDTO(0, "Mimmo Sifor", "473", "", "", "", "", "3382603861", "siforsrl@libero.it", "", "","Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Gianluca sanitec", "474", "", "", "", "", "3334145027", "gianlucacasio@euroshopsrl.it", "", "","Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Andrea Taveri", "475", "", "", "", "", "3208193807", "mattialiuzzi@hotmail.it", "", "","Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Luciano Tormaresca", "476", "", "", "", "", "336274885", "carbone.luc@gmail.com", "", "","Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Deborah sagna", "477", "", "", "", "", "3398820588", "debora@agenziatres.it", "","", "Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Pastini", "478", "", "", "", "", "3929944659", "info@ipastini.it", "", "","Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Donato Panini", "479", "via clarizia", "", "72014", "05173382", "3202518517", "valelui1408@yahoo.it", "","", "Italia",null));
-//        suppliersList.add(new SupplierDTO(0, "Macelleria longo", "480", "", "", "", "", "3927043155", "angelopizzutoli87@gmail.com", "","", "Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Domenico aia", "481", "", "", "", "", "3920730621", "domenico.pace@aia-spa.it", "", "","Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Salumificio Santoro", "482", "", "", "", "", "0804431297", "ordini@salumificiodantoro.it", "","", "Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Andrea Formaggi", "483", "", "", "", "", "3803632793", "info@anticaricettamartinese.it", "", "","Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Cardone", "484", "", "", "", "", "3887350884", "Marianna.cardone@cardonevini.com", "","", "Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "giacomoko", "485", "", "", "", "", "14784845448", "amaticorporation@gmail.com", "","", "Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Fornitoreextra", "486", "", "", "", "", "3803268199", "mattialiuzzi@hotmail.it", "", "","Italia",  null));
-//        suppliersList.add(new SupplierDTO(0, "Frutta", "487", "", "", "", "", "3803268119", "toninocontinisio@libero.it", "","", "Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Pesce", "488", "", "", "", "", "3358188937", "Giovanni.mancini@leporemare.com", "", "","Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "De giorgio bevande", "489", "", "", "", "", "3495038350", "nicolanisi@degiorgiobeverage.it", "", "","Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Nicola Arnese", "490", "", "", "", "", "3200555306", "nicola695@libero.it", "","", "Italia", null));
-//        suppliersList.add(new SupplierDTO(0, "Nicola dolci", "491", "", "", "", "", "3200555306", "nicola695@libero.it", "", "","Italia", null));
+//        if(false){
+//            suppliersList.add(new SupplierDTO(0, "Magazzino 20m2", "463", "", "", "", "", "", "", "", "","", null));
+//            suppliersList.add(new SupplierDTO(0, "Angelo simeone", "464", "", "", "", "", "+393388004773", "simeoneangelo1979@libero.it", "", "","Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Mattia", "466", "", "", "", "", "3803268119", "mattialiuzzi@hotmail.it", "","","Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Santoro", "467", "", "", "35480", "", "3454937840", "amati.angelo90@gmail.com", "","", "Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Fornitore Esempio", "468", "via roma 34", "Cisternino", "72014", "", "3454937077", "esempiofornitore@gmail.com", "", "","Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Piero Montenegro", "469", "", "", "", "", "+393285860885", "piero.greco.ext@montenegro.it", "", "","Italia",null));
+//            suppliersList.add(new SupplierDTO(0, "Giuseppe Martini", "470", "", "", "", "", "3459515136", "gangelillo@bacardi.com", "", "","Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Fabio gal", "471", "", "", "", "", "3339101487", "galbibite@libero.it", "","", "Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Alberto Velier", "472", "", "", "", "", "3485174174", "albertobiunno@gmail.com", "","", "Italia",null));
+//            suppliersList.add(new SupplierDTO(0, "Mimmo Sifor", "473", "", "", "", "", "3382603861", "siforsrl@libero.it", "", "","Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Gianluca sanitec", "474", "", "", "", "", "3334145027", "gianlucacasio@euroshopsrl.it", "", "","Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Andrea Taveri", "475", "", "", "", "", "3208193807", "mattialiuzzi@hotmail.it", "", "","Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Luciano Tormaresca", "476", "", "", "", "", "336274885", "carbone.luc@gmail.com", "", "","Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Deborah sagna", "477", "", "", "", "", "3398820588", "debora@agenziatres.it", "","", "Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Pastini", "478", "", "", "", "", "3929944659", "info@ipastini.it", "", "","Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Donato Panini", "479", "via clarizia", "", "72014", "05173382", "3202518517", "valelui1408@yahoo.it", "","", "Italia",null));
+//            suppliersList.add(new SupplierDTO(0, "Macelleria longo", "480", "", "", "", "", "3927043155", "angelopizzutoli87@gmail.com", "","", "Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Domenico aia", "481", "", "", "", "", "3920730621", "domenico.pace@aia-spa.it", "", "","Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Salumificio Santoro", "482", "", "", "", "", "0804431297", "ordini@salumificiodantoro.it", "","", "Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Andrea Formaggi", "483", "", "", "", "", "3803632793", "info@anticaricettamartinese.it", "", "","Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Cardone", "484", "", "", "", "", "3887350884", "Marianna.cardone@cardonevini.com", "","", "Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "giacomoko", "485", "", "", "", "", "14784845448", "amaticorporation@gmail.com", "","", "Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Fornitoreextra", "486", "", "", "", "", "3803268199", "mattialiuzzi@hotmail.it", "", "","Italia",  null));
+//            suppliersList.add(new SupplierDTO(0, "Frutta", "487", "", "", "", "", "3803268119", "toninocontinisio@libero.it", "","", "Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Pesce", "488", "", "", "", "", "3358188937", "Giovanni.mancini@leporemare.com", "", "","Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "De giorgio bevande", "489", "", "", "", "", "3495038350", "nicolanisi@degiorgiobeverage.it", "", "","Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Nicola Arnese", "490", "", "", "", "", "3200555306", "nicola695@libero.it", "","", "Italia", null));
+//            suppliersList.add(new SupplierDTO(0, "Nicola dolci", "491", "", "", "", "", "3200555306", "nicola695@libero.it", "", "","Italia", null));
+//
+//        }
 //
 //
 //        return suppliersList;
