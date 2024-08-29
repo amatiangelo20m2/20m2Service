@@ -1,16 +1,18 @@
 package com.ventimetriconsulting.controller;
 
 
+import com.ventimetriconsulting.entity.dto.NotificationDTO;
+import com.ventimetriconsulting.service.NotificationService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/notification/")
@@ -18,16 +20,19 @@ import java.time.ZonedDateTime;
 public class NotificationController {
 
 
-    @GetMapping(path = "/checksstatus")
-    public ResponseEntity<?> getGreeating(){
+    @Autowired
+    private final NotificationService notificationService;
 
-        LocalDateTime localNow = LocalDateTime.now();
-        ZonedDateTime nowInGmt = localNow.atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(ZoneId.of("CET"));
-
-        System.out.println("Current time in GMT: " + nowInGmt);
-
-        return ResponseEntity.status(HttpStatus.OK).body("<h1>Hello, </h1>I'm Alive! - Sono le " + nowInGmt);
+    /**
+     *
+     * @param userCode
+     * @param daysInThePastToretrieveNotification - indicate how many days in the past the method will search for the notification
+     * @return
+     */
+    @GetMapping("/user/{userCode}")
+    public List<NotificationDTO> getNotificationsByUserCodeAndDateRange(
+            @PathVariable String userCode, int daysInThePastToretrieveNotification) {
+        return notificationService.getNotificationsByUserCodeAndDateRange(userCode, daysInThePastToretrieveNotification);
     }
 
 

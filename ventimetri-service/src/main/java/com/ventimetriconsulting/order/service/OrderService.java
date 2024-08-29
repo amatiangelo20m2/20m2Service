@@ -151,19 +151,20 @@ public class OrderService {
 
         if(OrderTarget.BRANCH == createOrderEntity.getOrderTarget()){
             savedOrder.setOrderStatus(OrderStatus.IN_LAVORAZIONE);
-            List<String> fmcTokensByBranchCode
+
+            List<BranchUser> branchUsers
                     = branchUserRepository.findFMCTokensByBranchCode(createOrderEntity.getBranchCodeTarget(),
                     createOrderEntity.getUserCode());
 
 
-            fmcTokensByBranchCode.forEach((fcmToken)-> {
+            branchUsers.forEach((branchUser)-> {
                 messageSender.enqueMessage(NotificationEntity
                         .builder()
                         .title("\uD83D\uDCE6 Ordine da " + byBranchCode.getName() +" eseguito da " + createOrderEntity.getUserName())
                         .message(productsForNotification.toString())
-                        .fmcToken(fcmToken)
-                        .branchCode(createOrderEntity.getBranchCode())
-                        .userCode(createOrderEntity.getUserCode())
+                        .fmcToken(branchUser.getFMCToken())
+                        .branchCode(branchUser.getBranch().getBranchCode())
+                        .userCode(branchUser.getUserCode())
                         .redirectPage(RedirectPage.ORDERS)
                         .build());
             });

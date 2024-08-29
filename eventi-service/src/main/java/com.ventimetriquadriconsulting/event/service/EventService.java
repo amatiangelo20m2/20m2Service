@@ -7,6 +7,9 @@ import com.ventimetriquadriconsulting.event.entity.ExpenseEvent;
 import com.ventimetriquadriconsulting.event.entity.dto.CateringStorageDTO;
 import com.ventimetriquadriconsulting.event.entity.dto.EventDTO;
 import com.ventimetriquadriconsulting.event.entity.dto.ExpenseEventDTO;
+import com.ventimetriquadriconsulting.event.notification.entity.NotificationEntity;
+import com.ventimetriquadriconsulting.event.notification.entity.RedirectPage;
+import com.ventimetriquadriconsulting.event.notification.service.MessageSender;
 import com.ventimetriquadriconsulting.event.repository.CateringStorageRepository;
 import com.ventimetriquadriconsulting.event.repository.EventRepository;
 import com.ventimetriquadriconsulting.event.utils.EventStatus;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -36,22 +40,53 @@ public class EventService {
     private CateringStorageRepository cateringStorageRepository;
     private CateringStorageService cateringStorageService;
 
+    private MessageSender messageSender;
+
+    private WebClient.Builder loadBalancedWebClientBuilder;
+
     @Transactional
     public EventDTO createEvent(EventDTO eventDto){
 
         Event entity = EventDTO.toEntity(eventDto);
-        log.info("Store event {}", entity);
-
+        log.info("Create event {}", entity);
         Event save = eventRepository.save(EventDTO.toEntity(eventDto));
+
+//        sendNotification(eventDto);
+
+//        messageSender.enqueMessage(NotificationEntity
+//                .builder()
+//                        .title("" + eventDto.getCreatedBy() + " ha creato un evento")
+//                        .message("")
+//                        .redirectPage(RedirectPage.CATERING)
+//                        .
+//                .build());
+
         return EventDTO.fromEntity(save);
 
     }
 
+//    private void sendNotification(EventDTO eventDto) {
+//        try{
+//            UserResponseEntity userResponseEntity = loadBalancedWebClientBuilder.build()
+//                    .get()
+//                    .uri("http://auth-service/ventimetriauth/api/auth/retrievebyusercode",
+//                            uriBuilder -> uriBuilder.queryParam("userCode", branchUser.getUserCode())
+//                                    .build())
+//                    .retrieve()
+//                    .bodyToMono(UserResponseEntity.class)
+//                    .block();
+//        }catch (Exception e){
+//            log.error("Error - problems during sending notification while the following exception happen [{}]", e.toString());
+//        }
+//    }
+
     public List<EventDTO> findEventByBranchCodeAndStatus(String branchCode, EventStatus eventStatus, String startDate, String endDate) {
 
         log.info("Retrieve events by branch code {} with status {}", branchCode, eventStatus);
+
         List<Event> byBranchCodeAndEventStatus = eventRepository
                 .findByBranchCodeAndEventStatusOrderByDateEventDesc(branchCode, eventStatus);
+
         if(byBranchCodeAndEventStatus.isEmpty()){
             return new ArrayList<>();
         } else {
