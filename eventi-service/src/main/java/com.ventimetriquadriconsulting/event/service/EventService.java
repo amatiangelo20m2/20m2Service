@@ -40,9 +40,9 @@ public class EventService {
     private CateringStorageRepository cateringStorageRepository;
     private CateringStorageService cateringStorageService;
 
-    private MessageSender messageSender;
-
-    private WebClient.Builder loadBalancedWebClientBuilder;
+//    private MessageSender messageSender;
+//
+//    private WebClient.Builder loadBalancedWebClientBuilder;
 
     @Transactional
     public EventDTO createEvent(EventDTO eventDto){

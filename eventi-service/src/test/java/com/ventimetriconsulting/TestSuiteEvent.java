@@ -203,6 +203,7 @@ public class TestSuiteEvent {
                     .quantityConsumed(0)
                     .price(random.nextDouble() * 1000)
                     .unitMeasure(getRandomUnitMeasure())
+                    .vat(22)
                     .build();
             workstationProducts.add(product);
         }
