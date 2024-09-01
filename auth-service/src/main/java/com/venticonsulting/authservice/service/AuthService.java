@@ -30,7 +30,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponseEntity signUp(Credentials credentials) {
-        log.info("Save user: " + credentials.getEmail());
+        log.info("Save user: " + credentials);
 
         if(userRepository.findByEmail(credentials.getEmail()).isPresent()){
             log.error("Exception saving user. Mail " + credentials.getEmail() + " is already been used.");
@@ -39,12 +39,13 @@ public class AuthService {
         UserEntity userEntityBuild = UserEntity
                 .builder()
                 .name(credentials.getName())
-                .phone(null)
+                .phone(credentials.getPhone())
                 .password(passwordEncoder.encode(credentials.getPassword()))
                 .email(credentials.getEmail())
+                .fmcToken(credentials.getFmcToken())
                 .profileStatus(ProfileStatus.ONLINE)
                 .signInMethod(SignInMethod.PASSWORD)
-                .avatar("")
+                .avatar(credentials.getAvatar())
                 .id(0)
                 .build();
 

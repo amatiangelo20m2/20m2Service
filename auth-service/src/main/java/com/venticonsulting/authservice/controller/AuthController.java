@@ -18,8 +18,9 @@ public class AuthController {
 
     @PostMapping(path = "/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthResponseEntity save(@RequestBody Credentials credentials) {
+    public AuthResponseEntity signUp(@RequestBody Credentials credentials) {
         return userService.signUp(credentials);
+
     }
 
     @PostMapping(path = "/google/sign-in")

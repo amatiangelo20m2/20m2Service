@@ -252,30 +252,35 @@ public class BranchService {
         for(BranchUser branchUser : branchUserByBranchCode){
 
             if(!Objects.equals(branchUser.getUserCode(), "0000000000")) {
-                log.info("Retrieve user details for user with code {}", branchUser.getUserCode());
-                // get user data from auth-service
-                UserResponseEntity userResponseEntity = loadBalancedWebClientBuilder.build()
-                        .get()
-                        .uri("http://auth-service/ventimetriauth/api/auth/retrievebyusercode",
-                                uriBuilder -> uriBuilder.queryParam("userCode", branchUser.getUserCode())
-                                        .build())
-                        .retrieve()
-                        .bodyToMono(UserResponseEntity.class)
-                        .block();
-                log.info("User details {}", userResponseEntity);
-                employeeEntities.add(EmployeeEntity
-                        .builder()
-                        .avatar(Objects.requireNonNull(userResponseEntity).getAvatar())
-                        .branchCode(branchCode)
-                        .userCode(userResponseEntity.getUserCode())
-                        .email(userResponseEntity.getEmail())
-                        .phone(userResponseEntity.getPhone())
-                        .fcmToken(branchUser.getFMCToken())
-                        .name(userResponseEntity.getName())
-                        .branchName(branchUser.getBranch().getName())
-                        .role(branchUser.getRole())
-                        .authorized(branchUser.isAuthorized())
-                        .build());
+                try{
+                    log.info("Retrieve user details for user with code {}", branchUser.getUserCode());
+                    // get user data from auth-service
+                    UserResponseEntity userResponseEntity = loadBalancedWebClientBuilder.build()
+                            .get()
+                            .uri("http://auth-service/ventimetriauth/api/auth/retrievebyusercode",
+                                    uriBuilder -> uriBuilder.queryParam("userCode", branchUser.getUserCode())
+                                            .build())
+                            .retrieve()
+                            .bodyToMono(UserResponseEntity.class)
+                            .block();
+                    log.info("User details {}", userResponseEntity);
+                    employeeEntities.add(EmployeeEntity
+                            .builder()
+                            .avatar(Objects.requireNonNull(userResponseEntity).getAvatar())
+                            .branchCode(branchCode)
+                            .userCode(userResponseEntity.getUserCode())
+                            .email(userResponseEntity.getEmail())
+                            .phone(userResponseEntity.getPhone())
+                            .fcmToken(branchUser.getFMCToken())
+                            .name(userResponseEntity.getName())
+                            .branchName(branchUser.getBranch().getName())
+                            .role(branchUser.getRole())
+                            .authorized(branchUser.isAuthorized())
+                            .build());
+                }catch (Exception e){
+                    log.error(e.toString());
+                }
+
             }
         }
 
