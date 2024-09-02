@@ -1,18 +1,24 @@
 package com.ventimetriconsulting.branch.service;
 
 import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.BranchResponseEntity;
-import com.ventimetriconsulting.branch.entity.*;
+import com.ventimetriconsulting.branch.entity.Branch;
+import com.ventimetriconsulting.branch.entity.BranchUser;
+import com.ventimetriconsulting.branch.entity.Role;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
 import com.ventimetriconsulting.branch.entity.dto.BranchType;
+import com.ventimetriconsulting.branch.entity.dto.CounterEntity;
+import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
 import com.ventimetriconsulting.branch.exception.customexceptions.GlobalException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
-import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
-import com.ventimetriconsulting.storage.entity.Storage;
-import com.ventimetriconsulting.storage.entity.dto.StorageDTO;
+import com.ventimetriconsulting.notification.entity.NotificationEntity;
 import com.ventimetriconsulting.notification.entity.RedirectPage;
 import com.ventimetriconsulting.notification.service.MessageSender;
-import com.ventimetriconsulting.notification.entity.NotificationEntity;
+import com.ventimetriconsulting.order.entIty.OrderStatus;
+import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
+import com.ventimetriconsulting.order.service.OrderService;
+import com.ventimetriconsulting.storage.entity.Storage;
+import com.ventimetriconsulting.storage.entity.dto.StorageDTO;
 import com.ventimetriconsulting.supplier.dto.SupplierDTO;
 import com.ventimetriconsulting.user.EmployeeEntity;
 import com.ventimetriconsulting.user.UserResponseEntity;
@@ -35,12 +41,10 @@ import java.util.stream.Collectors;
 public class BranchService {
 
     private BranchRepository branchRepository;
-
     private BranchUserRepository branchUserRepository;
-
     private MessageSender messageSender;
-
     private WebClient.Builder loadBalancedWebClientBuilder;
+    private OrderService orderService;
 
     @Transactional
     public BranchResponseEntity createBranch(BranchCreationEntity branchCreationEntity) {
@@ -510,5 +514,25 @@ public class BranchService {
         if (!Objects.equals(branchCreationEntity.getCity(), "") && branchCreationEntity.getCity() != null) {
             branch.setCity(branchCreationEntity.getCity());
         }
+    }
+
+    public CounterEntity retrieveBranchCounters(String branchCode) {
+        log.info("Calculate counters for branch with code {} in order to populate a mask on app mobile/ backoffice. ", branchCode);
+
+        List<OrderDTO> ordersToConfirm = orderService.retrieveOrdersByStatus(branchCode, OrderStatus.DA_CONFERMARE);
+        List<OrderDTO> ordersConsegnato = orderService.retrieveOrdersByStatus(branchCode, OrderStatus.CONSEGNATO);
+        List<OrderDTO> ordersProntoAPartire = orderService.retrieveOrdersByStatus(branchCode, OrderStatus.PRONTO_A_PARTIRE);
+
+
+        return CounterEntity.builder()
+                .ordersCounter(CounterEntity.OrdersCounter
+                        .builder()
+                        .orderToConfirm(ordersToConfirm.size() + ordersConsegnato.size())
+                        .orderIncoming(ordersProntoAPartire.size())
+                        .build())
+                .reservationCounter(CounterEntity.ReservationCounter.builder()
+                        .reservationToday(999)
+                        .build())
+                .build();
     }
 }

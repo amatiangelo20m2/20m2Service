@@ -16,4 +16,5 @@ public interface OrderEntityRepository extends JpaRepository<Order, Long> {
     List<Order> findByBranchBranchCodeAndIncomingDateBetweenAndOrderStatus(String branchCode, LocalDate startDate, LocalDate endDate, OrderStatus orderStatus);
     List<Order> findByCodeTargetAndIncomingDateBetween(String branchCodeTarget, LocalDate startDate, LocalDate endDate);
     List<Order> findByOrderTargetAndIncomingDateAndOrderStatus(OrderTarget orderTarget, LocalDate date, OrderStatus orderStatus);
+    List<Order> findByBranchBranchCodeAndOrderStatus(String branchCode, OrderStatus orderStatus);
 }

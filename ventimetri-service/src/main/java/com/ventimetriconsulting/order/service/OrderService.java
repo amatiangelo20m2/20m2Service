@@ -215,6 +215,19 @@ public class OrderService {
         }
     }
 
+    public List<OrderDTO> retrieveOrdersByStatus(String branchCode, OrderStatus orderStatus){
+        log.info("Retrieve orders for branch with code {} and status in {}",
+                branchCode,
+                orderStatus);
+        List<Order> byBranchBranchCodeAndOrderStatus = orderEntityRepository.findByBranchBranchCodeAndOrderStatus(branchCode, orderStatus);
+
+        if(byBranchBranchCodeAndOrderStatus.isEmpty()){
+            log.warn("No orders found for branch with code {} in status {}", branchCode, orderStatus);
+            return new ArrayList<>();
+        }else{
+            return OrderDTO.toDTOList(byBranchBranchCodeAndOrderStatus);
+        }
+    }
 
     public List<OrderDTO> retrieveOrders(String branchCode,
                                          LocalDate initialDate,
@@ -257,6 +270,8 @@ public class OrderService {
                         (existing, replacement) -> existing)) // In case of key collision, keep the existing value
                 .values());
     }
+
+
 
     @Transactional
     @Modifying

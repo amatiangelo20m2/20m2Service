@@ -140,14 +140,32 @@ public class TestSuiteVentiMetriQuadriService {
     public void init(){
 
         doNothing().when(rabbitTemplate).convertAndSend(any());
-
         messageSender = new MessageSender(rabbitTemplate);
+
+        StorageService storageService = new StorageService(storageRepository,
+                supplierRepository,
+                branchRepository,
+                inventarioRepository,
+                productRepository,
+                messageSender,
+                branchUserRepository);
+
+        OrderService orderService = new OrderService(
+                orderEntityRepository,
+                branchRepository,
+                supplierRepository,
+                productRepository,
+                branchUserRepository,
+                messageSender,
+                storageService);
+
 
         BranchService branchService = new BranchService(
                 branchRepository,
                 branchUserRepository,
                 messageSender,
-                loadBalancedWebClientBuilder);
+                loadBalancedWebClientBuilder,
+                orderService);
 
         branchController = new BranchController(branchService);
 
@@ -166,25 +184,11 @@ public class TestSuiteVentiMetriQuadriService {
                 branchRepository);
         supplierController = new SupplierController(supplierService);
 
-        StorageService storageService = new StorageService(storageRepository,
-                supplierRepository,
-                branchRepository,
-                inventarioRepository,
-                productRepository,
-                messageSender,
-                branchUserRepository);
+
 
         storageController = new StorageController(storageService, branchService);
 
 
-        OrderService orderService = new OrderService(
-                orderEntityRepository,
-                branchRepository,
-                supplierRepository,
-                productRepository,
-                branchUserRepository,
-                messageSender,
-                storageService);
 
         orderController = new OrderController(orderService);
     }

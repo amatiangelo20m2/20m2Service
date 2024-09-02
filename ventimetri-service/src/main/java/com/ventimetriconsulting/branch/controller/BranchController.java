@@ -3,10 +3,12 @@ package com.ventimetriconsulting.branch.controller;
 import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.BranchResponseEntity;
 import com.ventimetriconsulting.branch.entity.Role;
 import com.ventimetriconsulting.branch.entity.dto.BranchType;
+import com.ventimetriconsulting.branch.entity.dto.CounterEntity;
 import com.ventimetriconsulting.branch.entity.dto.VentiMetriQuadriData;
 import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
 import com.ventimetriconsulting.user.EmployeeEntity;
+import jakarta.ws.rs.QueryParam;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -176,4 +178,14 @@ public class BranchController {
                 .status(HttpStatus.OK)
                 .body(null);
     }
+
+    @GetMapping(path = "/retrievebranchcounters/{branchCode}")
+    public ResponseEntity<CounterEntity> retrieveBranchCounters(@PathVariable String branchCode){
+        CounterEntity counterEntity = branchService.retrieveBranchCounters(branchCode);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(counterEntity);
+    }
+
+
 }

@@ -18,6 +18,27 @@ services:
     container_name: zipkin
     ports:
       - "9411:9411"
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: mongo
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
   db20m2:
     container_name: db20m2
     image: postgres:alpine
@@ -105,6 +126,7 @@ services:
 #      - zipkin
 #      - discovery-server
 #      - api-gw
+#      - mongo
 #  ventimetri-service:
 #    image: amatiangelo1990/20m2:ventimetri-service
 #    container_name: ventimetri-service
@@ -129,6 +151,10 @@ services:
 #      - api-gw
 #      - notification-service
 #      - db20m2event
+
+
+
+
 #  customer-service:
 #    image: amatiangelo1990/20m2:customer-service
 #    container_name: customer-service
@@ -143,6 +169,8 @@ services:
 #      - db20m2
 
 volumes:
+  mongo-data:
+    driver: local
   data: {}
   pg_data:
   rabbitmq_data:
