@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class CounterEntity {
     private OrdersCounter ordersCounter;
     private ReservationCounter reservationCounter;
-
+    private int inventarioItemsIntoCurrentStorage;
 
 
     @Data
@@ -21,8 +21,12 @@ public class CounterEntity {
     @NoArgsConstructor
     @Builder
     public static class OrdersCounter {
-        private int orderIncoming;
-        private int orderToConfirm;
+        private int ordersInLavorazione;
+        private int orderDaConfermare;
+        private int ordersInviato;
+        private int ordersConsegnato;
+        private int ordersProntoAPartire;
+
     }
 
     @Data

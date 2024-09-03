@@ -1,5 +1,6 @@
 package com.ventimetriconsulting.supplier.controller;
 
+import com.ventimetriconsulting.storage.service.StorageService;
 import com.ventimetriconsulting.supplier.dto.ProductDTO;
 import com.ventimetriconsulting.supplier.dto.SupplierDTO;
 import com.ventimetriconsulting.supplier.service.SupplierService;
@@ -41,9 +42,12 @@ public class SupplierController {
 
     @PostMapping(path = "/product/add")
     public ResponseEntity<ProductDTO> insertProduct(
-            @RequestBody ProductDTO productDTO, @RequestParam("supplierId") Long supplierId) {
+            @RequestBody ProductDTO productDTO,
+            @RequestParam("supplierId") Long supplierId,
+            @RequestParam("storageId") Long storageId) {
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(supplierService.createProduct(productDTO, supplierId));
+                .body(supplierService.createProduct(productDTO, supplierId, storageId));
     }
 
     @PostMapping(path = "/product/insertlist")

@@ -6,6 +6,7 @@ import com.ventimetriconsulting.branch.exception.customexceptions.CreateProductE
 import com.ventimetriconsulting.branch.exception.customexceptions.ProductNotFoundException;
 import com.ventimetriconsulting.branch.exception.customexceptions.SupplierNotFoundException;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
+import com.ventimetriconsulting.storage.service.StorageService;
 import com.ventimetriconsulting.supplier.dto.ProductDTO;
 import com.ventimetriconsulting.supplier.dto.SupplierDTO;
 import com.ventimetriconsulting.supplier.entity.Product;
@@ -29,6 +30,7 @@ public class SupplierService {
     private final ProductRepository productRepository;
     private final SupplierRepository supplierRepository;
     private final BranchRepository branchRepository;
+    private final StorageService storageService;
 
     @Transactional
     public SupplierDTO createSupplier(SupplierDTO supplierDTO, String branchCode) {
@@ -49,9 +51,10 @@ public class SupplierService {
     @Transactional
     @Modifying
     public ProductDTO createProduct(ProductDTO productDTO,
-                                    Long supplierId) {
+                                    Long supplierId,
+                                    Long storageId) {
         try{
-                log.info("Saving product {} for supplier with id {}", productDTO, supplierId);
+                log.info("Saving product {} for supplier with id {}. The product will be added to storage with id {}", productDTO, supplierId, storageId);
 
             Supplier supplier = supplierRepository
                     .findById(supplierId).orElseThrow(() -> new SupplierNotFoundException("Supplier not found with code: " + supplierId + ". Cannot create any product"));
@@ -65,6 +68,11 @@ public class SupplierService {
 
             ProductDTO dto = ProductDTO.toDTO(savedProduct);
             log.info("Saved prod (dto): " + dto);
+
+            if(storageId != null){
+                storageService.insertProductToStorage(dto.getProductId(), storageId, "", 0L);
+            }
+
             return dto;
         }catch (Exception e){
             log.error(e.getMessage());
@@ -151,7 +159,7 @@ public class SupplierService {
 
             } else {
                 log.info("Save brand new prod: {}", productDTO);
-                createProduct(productDTO, supplierId);
+                createProduct(productDTO, supplierId, null);
             }
         }
 

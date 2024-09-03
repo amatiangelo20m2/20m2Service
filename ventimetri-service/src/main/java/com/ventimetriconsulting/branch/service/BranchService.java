@@ -14,8 +14,8 @@ import com.ventimetriconsulting.branch.repository.BranchUserRepository;
 import com.ventimetriconsulting.notification.entity.NotificationEntity;
 import com.ventimetriconsulting.notification.entity.RedirectPage;
 import com.ventimetriconsulting.notification.service.MessageSender;
+import com.ventimetriconsulting.order.entIty.Order;
 import com.ventimetriconsulting.order.entIty.OrderStatus;
-import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
 import com.ventimetriconsulting.order.service.OrderService;
 import com.ventimetriconsulting.storage.entity.Storage;
 import com.ventimetriconsulting.storage.entity.dto.StorageDTO;
@@ -519,20 +519,33 @@ public class BranchService {
     public CounterEntity retrieveBranchCounters(String branchCode) {
         log.info("Calculate counters for branch with code {} in order to populate a mask on app mobile/ backoffice. ", branchCode);
 
-        List<OrderDTO> ordersToConfirm = orderService.retrieveOrdersByStatus(branchCode, OrderStatus.DA_CONFERMARE);
-        List<OrderDTO> ordersConsegnato = orderService.retrieveOrdersByStatus(branchCode, OrderStatus.CONSEGNATO);
-        List<OrderDTO> ordersProntoAPartire = orderService.retrieveOrdersByStatus(branchCode, OrderStatus.PRONTO_A_PARTIRE);
+        List<StorageDTO> storageDTOS = retrieveStoragesByBranchCode(branchCode);
+        int inventarioItemsIntoCurrentStorage = 0;
 
+        if(!storageDTOS.isEmpty()){
+            inventarioItemsIntoCurrentStorage = storageDTOS.get(0).getInventarioDTOS().size();
+        }
+
+        List<Order> orders = orderService.findByBranchBranchCodeAndOrderStatusNot(branchCode, OrderStatus.ARCHIVIATO);
 
         return CounterEntity.builder()
+                .inventarioItemsIntoCurrentStorage(inventarioItemsIntoCurrentStorage)
                 .ordersCounter(CounterEntity.OrdersCounter
                         .builder()
-                        .orderToConfirm(ordersToConfirm.size() + ordersConsegnato.size())
-                        .orderIncoming(ordersProntoAPartire.size())
+                        .ordersConsegnato(getNumberOfOrderFromListAndStatus(orders, OrderStatus.CONSEGNATO))
+                        .orderDaConfermare(getNumberOfOrderFromListAndStatus(orders, OrderStatus.DA_CONFERMARE))
+                        .ordersInviato(getNumberOfOrderFromListAndStatus(orders, OrderStatus.INVIATO))
+                        .ordersProntoAPartire(getNumberOfOrderFromListAndStatus(orders, OrderStatus.PRONTO_A_PARTIRE))
+                        .ordersInLavorazione(getNumberOfOrderFromListAndStatus(orders, OrderStatus.IN_LAVORAZIONE))
                         .build())
+                //TODO: when a reservation service will be ready we need to put it here the reservatin number
                 .reservationCounter(CounterEntity.ReservationCounter.builder()
-                        .reservationToday(999)
+                        .reservationToday(0)
                         .build())
                 .build();
+    }
+
+    private int getNumberOfOrderFromListAndStatus(List<Order> orders, OrderStatus orderStatus) {
+        return orders.stream().filter(order -> order.getOrderStatus() == orderStatus).toList().size();
     }
 }

@@ -200,6 +200,7 @@ public class OrderService {
     @Modifying
     public void retrieveSupplierOrderByDateStillToUpdateToConsegnato(){
         log.info("Retrieve all orders in INVIATO status for All Suppliers. Change the status to CONSEGNATO in order to make possible to move into storage");
+
         List<Order> byOrderTargetAndIncomingDateAndOrderStatus = orderEntityRepository
                 .findByOrderTargetAndIncomingDateAndOrderStatus(OrderTarget.SUPPLIER,
                         LocalDate.now(),
@@ -215,19 +216,24 @@ public class OrderService {
         }
     }
 
-    public List<OrderDTO> retrieveOrdersByStatus(String branchCode, OrderStatus orderStatus){
-        log.info("Retrieve orders for branch with code {} and status in {}",
-                branchCode,
-                orderStatus);
-        List<Order> byBranchBranchCodeAndOrderStatus = orderEntityRepository.findByBranchBranchCodeAndOrderStatus(branchCode, orderStatus);
-
-        if(byBranchBranchCodeAndOrderStatus.isEmpty()){
-            log.warn("No orders found for branch with code {} in status {}", branchCode, orderStatus);
-            return new ArrayList<>();
-        }else{
-            return OrderDTO.toDTOList(byBranchBranchCodeAndOrderStatus);
-        }
+    public List<Order> findByBranchBranchCodeAndOrderStatusNot(String branchCode, OrderStatus orderStatus){
+        return orderEntityRepository.findByBranchBranchCodeAndOrderStatusNot(branchCode, orderStatus);
     }
+//    public List<OrderDTO> retrieveOrdersByStatus(String branchCode, OrderStatus orderStatus) {
+//        log.info("Retrieve orders for branch with code {} and status in {}",
+//                branchCode,
+//                orderStatus);
+//        List<Order> byBranchBranchCodeAndOrderStatus = orderEntityRepository.findByBranchBranchCodeAndOrderStatus(branchCode, orderStatus);
+//
+//        if(byBranchBranchCodeAndOrderStatus.isEmpty()) {
+//
+//            log.warn("No orders found for branch with code {} in status {}", branchCode, orderStatus);
+//            return new ArrayList<>();
+//
+//        }else{
+//            return OrderDTO.toDTOList(byBranchBranchCodeAndOrderStatus);
+//        }
+//    }
 
     public List<OrderDTO> retrieveOrders(String branchCode,
                                          LocalDate initialDate,

@@ -181,7 +181,8 @@ public class TestSuiteVentiMetriQuadriService {
 
         SupplierService supplierService = new SupplierService(productRepository,
                 supplierRepository,
-                branchRepository);
+                branchRepository,
+                storageService);
         supplierController = new SupplierController(supplierService);
 
 
@@ -407,7 +408,7 @@ public class TestSuiteVentiMetriQuadriService {
 
         ResponseEntity<ProductDTO> productDTOResponseEntity = supplierController
                 .insertProduct(createRandomInstance("Product Name"),
-                        Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId());
+                        Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId(), null);
 
         assertEquals("Product Name", Objects.requireNonNull(productDTOResponseEntity.getBody()).getName() );
         Optional<Product> productOptional = productRepository.findById(productDTOResponseEntity.getBody().getProductId());
@@ -531,11 +532,11 @@ public class TestSuiteVentiMetriQuadriService {
 
                 ResponseEntity<ProductDTO> prod1 = supplierController
                         .insertProduct(createRandomInstance("Product1"),
-                                Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId());
+                                Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId(), null);
 
                 ResponseEntity<ProductDTO> prod2 = supplierController
                         .insertProduct(createRandomInstance("Product2"),
-                                Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId());
+                                Objects.requireNonNull(supplierDTOResponseEntity.getBody()).getSupplierId(), null);
 
                 Map<Long, Double> integerDoubleMap = new HashMap<>();
 
