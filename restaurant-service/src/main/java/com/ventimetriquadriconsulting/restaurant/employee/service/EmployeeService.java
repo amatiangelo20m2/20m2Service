@@ -1,6 +1,5 @@
 package com.ventimetriquadriconsulting.restaurant.employee.service;
 
-import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriquadriconsulting.restaurant.employee.entity.Employee;
 import com.ventimetriquadriconsulting.restaurant.employee.entity.dto.EmployeeDTO;
 import com.ventimetriquadriconsulting.restaurant.employee.repository.EmployeeRepository;
@@ -12,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
