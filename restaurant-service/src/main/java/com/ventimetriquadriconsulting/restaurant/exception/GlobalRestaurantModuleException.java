@@ -1,6 +1,5 @@
 package com.ventimetriquadriconsulting.restaurant.exception;
 
-import com.ventimetriconsulting.branch.exception.customexceptions.BranchNotFoundException;
 import com.ventimetriquadriconsulting.restaurant.exception.customexception.EmailAlreadyInUserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
