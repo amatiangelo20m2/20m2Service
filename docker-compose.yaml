@@ -71,6 +71,22 @@ services:
       - "5436:5436"
     command: -p 5436
     restart: always
+  db20m2restaurant:
+    container_name: db20m2restaurant
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: db20m2restaurant
+      POSTGRES_USER: ItXNrDG1fNRQ4yd
+      POSTGRES_PASSWORD: o3YOUyfQH1kFq0
+      PGDATA: /data/postgresrestaurant
+    volumes:
+      - ./db20m2datarestaurant:/data/postgresrestaurant
+    expose:
+      - "5437"
+    ports:
+      - "5437:5437"
+    command: -p 5437
+    restart: always
   pgadmin20m2:
     container_name: pgadmin20m2
     image: dpage/pgadmin4
@@ -81,6 +97,7 @@ services:
     depends_on:
       - db20m2
       - db20m2event
+      - db20m2restaurant
     ports:
       - "5050:80"
 
@@ -151,13 +168,9 @@ services:
 #      - api-gw
 #      - notification-service
 #      - db20m2event
-
-
-
-
-#  customer-service:
-#    image: amatiangelo1990/20m2:customer-service
-#    container_name: customer-service
+#  restaurant-service:
+#    image: amatiangelo1990/20m2:restaurant-service
+#    container_name: restaurant-service
 #    environment:
 #      - SPRING_PROFILES_ACTIVE=docker
 #      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
@@ -167,6 +180,9 @@ services:
 #      - api-gw
 #      - notification-service
 #      - db20m2
+#      - db20m2restaurant
+
+
 
 volumes:
   mongo-data:

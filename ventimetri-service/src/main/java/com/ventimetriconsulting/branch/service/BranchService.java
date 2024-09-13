@@ -122,7 +122,7 @@ public class BranchService {
 
         List<BranchUser> branchesByUserCode = branchUserRepository
                 .findBranchesByUserCode(userCode).orElseThrow(()
-                        -> new BranchNotFoundException("Exception throwed while getting data for user with code : " + userCode + ". Cannot associate the storage" ));;
+                        -> new BranchNotFoundException("Exception throwed while getting data for user with code : " + userCode + ". Cannot associate the storage" ));
 
         if(branchesByUserCode.isEmpty()) {
             return new ArrayList<>();
