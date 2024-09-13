@@ -24,7 +24,10 @@ public class EmployeePresenceReportDTO {
     private ZonedDateTime date;
     private boolean isPresentAtLunch;
     private boolean isPresentAtDinner;
+    private boolean isHoliday;
+    private boolean isIllness;
     private int workedHours;
+    private String note;
 
     // Conversion from Entity to DTO
     public static EmployeePresenceReportDTO fromEntity(EmployeePresenceReport report) {
@@ -35,7 +38,10 @@ public class EmployeePresenceReportDTO {
                 .branchCode(report.getBranchCode())
                 .isPresentAtLunch(report.isPresentAtLunch())
                 .isPresentAtDinner(report.isPresentAtDinner())
+                .isIllness(report.isIllness())
+                .isHoliday(report.isHoliday())
                 .workedHours(report.getWorkedHours())
+                .note(report.getNote())
                 .build();
     }
 
@@ -49,6 +55,9 @@ public class EmployeePresenceReportDTO {
                 .isPresentAtLunch(this.isPresentAtLunch)
                 .isPresentAtDinner(this.isPresentAtDinner)
                 .workedHours(this.workedHours)
+                .isHoliday(this.isHoliday)
+                .isIllness(this.isIllness)
+                .note(this.note)
                 .build();
     }
 

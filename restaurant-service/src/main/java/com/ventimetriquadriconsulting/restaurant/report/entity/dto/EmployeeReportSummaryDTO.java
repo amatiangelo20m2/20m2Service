@@ -36,5 +36,6 @@ public class EmployeeReportSummaryDTO {
     private Long totalWorkedHours;
     private Long lunchCount;
     private Long dinnerCount;
-
+    private Long totalHolidays;
+    private Long totalIllnessDays;
 }

@@ -46,7 +46,9 @@ public class ReportService {
                 existingReport.setPresentAtLunch(employeePresenceReport.isPresentAtLunch());
                 existingReport.setPresentAtDinner(employeePresenceReport.isPresentAtDinner());
                 existingReport.setWorkedHours(employeePresenceReport.getWorkedHours());
-
+                existingReport.setIllness(employeePresenceReport.isIllness());
+                existingReport.setHoliday(employeePresenceReport.isHoliday());
+                existingReport.setNote(employeePresenceReport.getNote());
 
                 log.info("Updating existing report {}", existingReport);
                 EmployeePresenceReport updatedReport = reportRepository.save(existingReport);

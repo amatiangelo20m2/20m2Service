@@ -40,10 +40,18 @@ public class EmployeePresenceReport {
     @Column(name = "is_present_at_dinner", nullable = false)
     private boolean isPresentAtDinner;
 
+    @Column(name = "is_holiday", nullable = false)
+    private boolean isHoliday;
+
+    @Column(name = "is_illness", nullable = false)
+    private boolean isIllness;
+
     @Column(name = "worked_hours", nullable = false)
     private int workedHours;
 
     @Column(name = "branch_code", length = 10, nullable = false)
     private String branchCode;
 
+    @Column(name = "note")
+    private String note;
 }
