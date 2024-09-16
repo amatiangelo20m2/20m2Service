@@ -23,7 +23,7 @@ public class Restaurant {
     @Column(name = "restaurant_id", updatable = false)
     private Long restaurantId;
 
-    @Column(name = "branch_code", length = 10)
+    @Column(name = "branch_code", length = 10, unique = true)
     private String branchCode;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

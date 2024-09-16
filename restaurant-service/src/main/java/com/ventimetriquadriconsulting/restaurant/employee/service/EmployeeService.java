@@ -34,7 +34,8 @@ public class EmployeeService {
             throw new EmailAlreadyInUserException("Email '" + employeeDTO.getEmail() + "' already in use");
 
         }else{
-            RestaurantDTO restaurantDTO = restaurantService.retrieveRestaurantConfiguration(branchCode);
+            RestaurantDTO restaurantDTO = restaurantService
+                    .retrieveRestaurantConfiguration(branchCode);
 
             log.info("Create following employee {}" , employeeDTO);
             Employee employee = employeeDTO.toEntity();
