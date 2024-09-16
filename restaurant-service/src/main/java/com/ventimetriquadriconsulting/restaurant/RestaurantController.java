@@ -37,6 +37,11 @@ public class RestaurantController {
         return ResponseEntity.ok(employeeService.saveEmployee(branchCode, employeeDto));
     }
 
+    @PutMapping(path = "/employee/update/{branchCode}")
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable String branchCode, @RequestBody EmployeeDTO employeeDto) {
+        return ResponseEntity.ok(employeeService.updateEmployee(branchCode, employeeDto));
+    }
+
     @GetMapping("/getemployee/{id}")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
         Optional<EmployeeDTO> employeeById = employeeService.getEmployeeById(id);

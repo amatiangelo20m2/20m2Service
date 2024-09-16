@@ -7,6 +7,7 @@ import com.ventimetriquadriconsulting.restaurant.exception.customexception.Email
 import com.ventimetriquadriconsulting.restaurant.restaurant.entity.dto.RestaurantDTO;
 import com.ventimetriquadriconsulting.restaurant.restaurant.service.RestaurantService;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Modifying;
@@ -46,6 +47,37 @@ public class EmployeeService {
             return EmployeeDTO.fromEntity(savedEmployee);
         }
 
+    }
+
+    @Modifying
+    @Transactional
+    public EmployeeDTO updateEmployee(String branchCode,
+                                      EmployeeDTO employeeDto) {
+
+        log.info("Update employee with email {} for branch with code {}. New configuration: {}", employeeDto.getEmail(), branchCode, employeeDto);
+        Employee existingEmployee = employeeRepository.findByEmployeeId(employeeDto.getEmployeeId()).orElseThrow(()
+                -> new NotFoundException("Employee not found with id " + employeeDto.getEmployeeId()));
+
+        existingEmployee.setFirstName(employeeDto.getFirstName());
+        existingEmployee.setLastName(employeeDto.getLastName());
+        existingEmployee.setEmail(employeeDto.getEmail());
+        existingEmployee.setPhone(employeeDto.getPhone());
+        existingEmployee.setGender(employeeDto.getGender());
+
+        existingEmployee.setJobDescription(employeeDto.getJobDescription());
+        existingEmployee.setContractType(employeeDto.getContractType());
+        existingEmployee.setRemuneration(employeeDto.getRemuneration());
+        existingEmployee.setDob(employeeDto.getDob());
+        existingEmployee.setHireDate(employeeDto.getHireDate());
+
+        existingEmployee.setStartDateInduction(employeeDto.getStartDateInduction());
+        existingEmployee.setEndDate(employeeDto.getEndDate());
+        existingEmployee.setCostReference(employeeDto.getCostReference());
+
+        Employee savedEmployee = employeeRepository.save(existingEmployee);
+
+
+        return EmployeeDTO.fromEntity(savedEmployee);
     }
 
     // Retrieve an employee by ID and return the corresponding DTO

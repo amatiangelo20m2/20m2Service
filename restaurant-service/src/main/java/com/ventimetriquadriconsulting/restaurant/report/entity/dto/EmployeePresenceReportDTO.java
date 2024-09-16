@@ -26,6 +26,7 @@ public class EmployeePresenceReportDTO {
     private boolean isPresentAtDinner;
     private boolean isHoliday;
     private boolean isIllness;
+    private boolean isRest;
     private int workedHours;
     private String note;
 
@@ -40,6 +41,7 @@ public class EmployeePresenceReportDTO {
                 .isPresentAtDinner(report.isPresentAtDinner())
                 .isIllness(report.isIllness())
                 .isHoliday(report.isHoliday())
+                .isRest(report.isRest())
                 .workedHours(report.getWorkedHours())
                 .note(report.getNote())
                 .build();
@@ -56,6 +58,7 @@ public class EmployeePresenceReportDTO {
                 .isPresentAtDinner(this.isPresentAtDinner)
                 .workedHours(this.workedHours)
                 .isHoliday(this.isHoliday)
+                .isRest(this.isRest)
                 .isIllness(this.isIllness)
                 .note(this.note)
                 .build();

@@ -46,6 +46,9 @@ public class EmployeePresenceReport {
     @Column(name = "is_illness", nullable = false)
     private boolean isIllness;
 
+    @Column(name = "is_rest", nullable = false)
+    private boolean isRest;
+
     @Column(name = "worked_hours", nullable = false)
     private int workedHours;
 
