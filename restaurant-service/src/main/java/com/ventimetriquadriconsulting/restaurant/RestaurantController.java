@@ -1,20 +1,24 @@
 package com.ventimetriquadriconsulting.restaurant;
 
-import com.ventimetriquadriconsulting.restaurant.employee.entity.dto.EmployeeDTO;
-import com.ventimetriquadriconsulting.restaurant.employee.service.EmployeeService;
-import com.ventimetriquadriconsulting.restaurant.report.entity.dto.EmployeePresenceReportDTO;
-import com.ventimetriquadriconsulting.restaurant.report.entity.dto.EmployeeReportSummaryDTO;
-import com.ventimetriquadriconsulting.restaurant.report.service.ReportService;
-import com.ventimetriquadriconsulting.restaurant.restaurant.entity.dto.RestaurantDTO;
-import com.ventimetriquadriconsulting.restaurant.restaurant.service.RestaurantService;
+import com.ventimetriquadriconsulting.restaurant.manage_restaurant.employee.entity.dto.EmployeeDTO;
+import com.ventimetriquadriconsulting.restaurant.manage_restaurant.employee.service.EmployeeService;
+import com.ventimetriquadriconsulting.restaurant.manage_restaurant.report.entity.dto.EmployeePresenceReportDTO;
+import com.ventimetriquadriconsulting.restaurant.manage_restaurant.report.entity.dto.EmployeeReportSummaryDTO;
+import com.ventimetriquadriconsulting.restaurant.manage_restaurant.report.service.ReportService;
+
+
+
+import com.ventimetriquadriconsulting.restaurant.restaurant.configuration.entity.dto.RestaurantDTO;
+import com.ventimetriquadriconsulting.restaurant.restaurant.configuration.service.RestaurantService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.ZonedDateTime;
 import java.util.List;
+
 import java.util.Optional;
 
 @RestController
@@ -30,7 +34,6 @@ public class RestaurantController {
     public ResponseEntity<RestaurantDTO> retrieveConfiguration(@PathVariable String branchCode) {
         return ResponseEntity.ok(restaurantService.retrieveRestaurantConfiguration(branchCode));
     }
-
 
     @PostMapping(path = "/employee/create/{branchCode}")
     public ResponseEntity<EmployeeDTO> createEmployee(@PathVariable String branchCode, @RequestBody EmployeeDTO employeeDto) {
@@ -93,7 +96,9 @@ public class RestaurantController {
     @PostMapping(path = "/create/reports")
     public ResponseEntity<List<EmployeePresenceReportDTO>> createReports(
             @RequestBody List<EmployeePresenceReportDTO> employeePresenceReportDTOS) {
+
         return ResponseEntity.ok(reportService.saveReports(employeePresenceReportDTOS));
+
     }
 
     @GetMapping(path = "/retrievereports/{branchCode}")
@@ -107,4 +112,3 @@ public class RestaurantController {
                         endRangeDate));
     }
 }
-

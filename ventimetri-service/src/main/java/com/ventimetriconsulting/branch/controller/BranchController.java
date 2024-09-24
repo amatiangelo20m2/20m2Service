@@ -1,6 +1,6 @@
 package com.ventimetriconsulting.branch.controller;
 
-import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.BranchResponseEntity;
+import com.ventimetriconsulting.branch.entity.dto.BranchResponseEntity;
 import com.ventimetriconsulting.branch.entity.Role;
 import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.branch.entity.dto.CounterEntity;
@@ -8,7 +8,6 @@ import com.ventimetriconsulting.branch.entity.dto.VentiMetriQuadriData;
 import com.ventimetriconsulting.branch.service.BranchService;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
 import com.ventimetriconsulting.user.EmployeeEntity;
-import jakarta.ws.rs.QueryParam;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +31,7 @@ public class BranchController {
     }
 
     @GetMapping(path = "/retrievedata")
-    public ResponseEntity<VentiMetriQuadriData> retrieveData(@RequestParam String userCode, @RequestParam String fcmToken){
+    public ResponseEntity<VentiMetriQuadriData> retrieveData(@RequestParam String userCode, @RequestParam(required = false) String fcmToken){
         List<BranchResponseEntity> branchesByUserCode = branchService.getBranchesByUserCode(userCode, fcmToken);
 
         return ResponseEntity.status(HttpStatus.OK)

@@ -1,23 +1,22 @@
 package ventimetriconsulting;
 
 import com.ventimetriconsulting.VentiMetriServiceApplication;
-import com.ventimetriconsulting.branch.configuration.bookingconf.controller.BookingController;
-import com.ventimetriconsulting.branch.configuration.bookingconf.entity.FormTag;
-import com.ventimetriconsulting.branch.configuration.bookingconf.entity.booking.Customer;
-import com.ventimetriconsulting.branch.configuration.bookingconf.entity.booking.dto.BookingDTO;
-import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.*;
-import com.ventimetriconsulting.branch.configuration.bookingconf.repository.*;
-import com.ventimetriconsulting.branch.configuration.bookingconf.service.BookingService;
-import com.ventimetriconsulting.branch.configuration.bookingconf.service.BranchConfigurationService;
-import com.ventimetriconsulting.branch.configuration.waapiconf.service.WaApiService;
 import com.ventimetriconsulting.branch.controller.BranchController;
 import com.ventimetriconsulting.branch.entity.Branch;
 import com.ventimetriconsulting.branch.entity.Role;
 import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
+import com.ventimetriconsulting.branch.entity.dto.BranchResponseEntity;
 import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.branch.repository.BranchRepository;
 import com.ventimetriconsulting.branch.repository.BranchUserRepository;
 import com.ventimetriconsulting.branch.service.BranchService;
+import com.ventimetriconsulting.notification.service.MessageSender;
+import com.ventimetriconsulting.order.controller.OrderController;
+import com.ventimetriconsulting.order.entIty.OrderTarget;
+import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
+import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
+import com.ventimetriconsulting.order.repository.OrderEntityRepository;
+import com.ventimetriconsulting.order.service.OrderService;
 import com.ventimetriconsulting.storage.controller.StorageController;
 import com.ventimetriconsulting.storage.entity.dto.InventarioDTO;
 import com.ventimetriconsulting.storage.entity.dto.StorageDTO;
@@ -26,13 +25,6 @@ import com.ventimetriconsulting.storage.entity.extra.OperationType;
 import com.ventimetriconsulting.storage.repository.InventarioRepository;
 import com.ventimetriconsulting.storage.repository.StorageRepository;
 import com.ventimetriconsulting.storage.service.StorageService;
-import com.ventimetriconsulting.notification.service.MessageSender;
-import com.ventimetriconsulting.order.controller.OrderController;
-import com.ventimetriconsulting.order.entIty.OrderTarget;
-import com.ventimetriconsulting.order.entIty.dto.CreateOrderEntity;
-import com.ventimetriconsulting.order.entIty.dto.OrderDTO;
-import com.ventimetriconsulting.order.repository.OrderEntityRepository;
-import com.ventimetriconsulting.order.service.OrderService;
 import com.ventimetriconsulting.supplier.controller.SupplierController;
 import com.ventimetriconsulting.supplier.dto.ProductDTO;
 import com.ventimetriconsulting.supplier.dto.SupplierDTO;
@@ -50,7 +42,6 @@ import org.mockito.Mock;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -63,12 +54,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
-import static com.ventimetriconsulting.branch.configuration.bookingconf.entity.BookingForm.FormType.BOOKING_FORM;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @ContextConfiguration(classes = VentiMetriServiceApplication.class)
@@ -87,26 +75,18 @@ public class TestSuiteVentiMetriQuadriService {
     @Autowired
     private BranchUserRepository branchUserRepository;
 
-    @MockBean
-    private WaApiService waApiServiceMock;
+//    @MockBean
+//    private BranchConfigurationService branchConfigurationService;
 
-    @MockBean
-    private BranchConfigurationService branchConfigurationService;
 
-    @Autowired
-    private BookingRepository bookingRepository;
+//    @Autowired
+//    private BranchConfigurationRepository branchConfigurationRepository;
 
-    @Autowired
-    private BookingFormRepository bookingFormRepository;
+//    @Autowired
+//    private BranchTimeRangeRepository branchTimeRangeRepository;
 
-    @Autowired
-    private BranchConfigurationRepository branchConfigurationRepository;
-
-    @Autowired
-    private BranchTimeRangeRepository branchTimeRangeRepository;
-
-    @Autowired
-    private CustomerRepository customerRepository;
+//    @Autowired
+//    private CustomerRepository customerRepository;
 
     @Autowired
     private SupplierRepository supplierRepository;
@@ -120,7 +100,7 @@ public class TestSuiteVentiMetriQuadriService {
     @Autowired
     private OrderEntityRepository orderEntityRepository;
 
-    private BookingController bookingController;
+//    private BookingController bookingController;
     private BranchController  branchController;
 
     private StorageController storageController;
@@ -169,15 +149,15 @@ public class TestSuiteVentiMetriQuadriService {
 
         branchController = new BranchController(branchService);
 
-        BookingService bookingService = new BookingService(
-                branchRepository,
-                branchConfigurationRepository,
-                branchTimeRangeRepository,
-                bookingRepository,
-                customerRepository,
-                waApiServiceMock,
-                branchConfigurationService);
-        bookingController = new BookingController(bookingService);
+//        BookingService bookingService = new BookingService(
+//                branchRepository,
+//                branchConfigurationRepository,
+//                branchTimeRangeRepository,
+//                bookingRepository,
+//                customerRepository,
+//                waApiServiceMock,
+//                branchConfigurationService);
+//        bookingController = new BookingController(bookingService);
 
         SupplierService supplierService = new SupplierService(productRepository,
                 supplierRepository,
@@ -211,194 +191,194 @@ public class TestSuiteVentiMetriQuadriService {
         assertEquals(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getName(), "Test Branch");
         assertEquals(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getBranchCode().length(), 10 );
         assertNotNull(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getBranchCode());
-        assertNull(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getBranchConfigurationDTO());
+//        assertNull(Objects.requireNonNull(saveBranchResponseEntityResponseEntity.getBody()).getBranchConfigurationDTO());
 
         BranchResponseEntity branchResponseEntity = saveBranchResponseEntityResponseEntity.getBody();
 
-        when(waApiServiceMock.createInstance()).thenReturn(TestUtils.convertJsonToCreateUpdateResponse(getCreateInstanceResponseOK));
-        when(waApiServiceMock.retrieveClientInfo(INSTANCE_CODE)).thenReturn(TestUtils.convertMeResponse(getRetrieveBasicClientInfoErrorQrCodeStatus));
-
-        when(waApiServiceMock.retrieveQrCode(INSTANCE_CODE)).thenReturn(TestUtils.convertQrResponse(retrieveQrCodeResponse));
-
-        ResponseEntity<BranchConfigurationDTO> branchConfigurationDTOEntity = bookingController.configureNumberForWhatsAppMessaging(
-                saveBranchResponseEntityResponseEntity.getBody().getBranchCode()
-        );
+//        when(waApiServiceMock.createInstance()).thenReturn(TestUtils.convertJsonToCreateUpdateResponse(getCreateInstanceResponseOK));
+//        when(waApiServiceMock.retrieveClientInfo(INSTANCE_CODE)).thenReturn(TestUtils.convertMeResponse(getRetrieveBasicClientInfoErrorQrCodeStatus));
+//
+//        when(waApiServiceMock.retrieveQrCode(INSTANCE_CODE)).thenReturn(TestUtils.convertQrResponse(retrieveQrCodeResponse));
+//
+//        ResponseEntity<BranchConfigurationDTO> branchConfigurationDTOEntity = bookingController.configureNumberForWhatsAppMessaging(
+//                saveBranchResponseEntityResponseEntity.getBody().getBranchCode()
+//        );
 
         Optional<Branch> byBranchCode = branchRepository.findByBranchCode(saveBranchResponseEntityResponseEntity
                 .getBody()
                 .getBranchCode());
 
-        assertEquals("instance has to be in ready status to perform this request", byBranchCode.get().getBranchConfiguration().getExplanation());
-        assertNotNull(byBranchCode.get().getBranchConfiguration());
-        assertEquals("qr", byBranchCode.get().getBranchConfiguration().getInstanceStatus());
-        assertEquals("amati.angelo90@gmail.com", byBranchCode.get().getBranchConfiguration().getOwner());
-        assertEquals("", byBranchCode.get().getBranchConfiguration().getContactId());
-        assertEquals("", byBranchCode.get().getBranchConfiguration().getDisplayName());
-
-        assertEquals(7, byBranchCode.get().getBranchConfiguration().getBookingForms().get(0).getBranchTimeRanges().size());
-        assertEquals(2, byBranchCode.get().getBranchConfiguration().getTags().size());
+//        assertEquals("instance has to be in ready status to perform this request", byBranchCode.get().getBranchConfiguration().getExplanation());
+//        assertNotNull(byBranchCode.get().getBranchConfiguration());
+//        assertEquals("qr", byBranchCode.get().getBranchConfiguration().getInstanceStatus());
+//        assertEquals("amati.angelo90@gmail.com", byBranchCode.get().getBranchConfiguration().getOwner());
+//        assertEquals("", byBranchCode.get().getBranchConfiguration().getContactId());
+//        assertEquals("", byBranchCode.get().getBranchConfiguration().getDisplayName());
+//
+//        assertEquals(7, byBranchCode.get().getBranchConfiguration().getBookingForms().get(0).getBranchTimeRanges().size());
+//        assertEquals(2, byBranchCode.get().getBranchConfiguration().getTags().size());
 
 
         //simuliamo scan qr code from whats'app
-        when(waApiServiceMock.retrieveClientInfo(INSTANCE_CODE)).thenReturn(TestUtils.convertMeResponse(getGetRetrieveBasicClientInfoAfterQrScan));
+//        when(waApiServiceMock.retrieveClientInfo(INSTANCE_CODE)).thenReturn(TestUtils.convertMeResponse(getGetRetrieveBasicClientInfoAfterQrScan));
 
         String branchCode = byBranchCode.get().getBranchCode();
+//
+//        BranchConfigurationDTO branchConfigurationDTOAfterScanQR = bookingController.checkWaApiStatus(branchCode);
 
-        BranchConfigurationDTO branchConfigurationDTOAfterScanQR = bookingController.checkWaApiStatus(branchCode);
-
-        assertEquals("", branchConfigurationDTOAfterScanQR.getExplanation());
-        assertEquals("success", branchConfigurationDTOAfterScanQR.getInstanceStatus());
-        assertFalse(branchConfigurationDTOAfterScanQR.isReservationConfirmedManually());
-        assertEquals(1, branchConfigurationDTOAfterScanQR.getBookingFormList().size());
-        assertEquals("amati.angelo90@gmail.com", branchConfigurationDTOAfterScanQR.getOwner());
-        assertEquals("393454937047@c.us", branchConfigurationDTOAfterScanQR.getContactId());
-        assertEquals("+39 345 493 7047", branchConfigurationDTOAfterScanQR.getFormattedNumber());
-        assertEquals("Angelo Amati", branchConfigurationDTOAfterScanQR.getDisplayName());
-        assertEquals(BOOKING_FORM, branchConfigurationDTOAfterScanQR.getBookingFormList().get(0).getFormType());
-        assertEquals(7, branchConfigurationDTOAfterScanQR.getBookingFormList().get(0).getBranchTimeRanges().size());
-        assertEquals(2, branchConfigurationDTOAfterScanQR.getTags().size());
-
-        List<Long> timeRangeIds = new ArrayList<>();
-
-        for(BranchTimeRangeDTO branchTimeRangeDTO : branchConfigurationDTOAfterScanQR.getBookingFormList().get(0).getBranchTimeRanges()){
-
-            timeRangeIds.add(branchTimeRangeDTO.getId());
-
-            assertEquals(0, branchTimeRangeDTO.getTimeRanges().size());
-            assertEquals(true, branchTimeRangeDTO.isClosed());
-
-        }
+//        assertEquals("", branchConfigurationDTOAfterScanQR.getExplanation());
+//        assertEquals("success", branchConfigurationDTOAfterScanQR.getInstanceStatus());
+//        assertFalse(branchConfigurationDTOAfterScanQR.isReservationConfirmedManually());
+//        assertEquals(1, branchConfigurationDTOAfterScanQR.getBookingFormList().size());
+//        assertEquals("amati.angelo90@gmail.com", branchConfigurationDTOAfterScanQR.getOwner());
+//        assertEquals("393454937047@c.us", branchConfigurationDTOAfterScanQR.getContactId());
+//        assertEquals("+39 345 493 7047", branchConfigurationDTOAfterScanQR.getFormattedNumber());
+//        assertEquals("Angelo Amati", branchConfigurationDTOAfterScanQR.getDisplayName());
+//        assertEquals(BOOKING_FORM, branchConfigurationDTOAfterScanQR.getBookingFormList().get(0).getFormType());
+//        assertEquals(7, branchConfigurationDTOAfterScanQR.getBookingFormList().get(0).getBranchTimeRanges().size());
+//        assertEquals(2, branchConfigurationDTOAfterScanQR.getTags().size());
+//
+//        List<Long> timeRangeIds = new ArrayList<>();
+//
+//        for(BranchTimeRangeDTO branchTimeRangeDTO : branchConfigurationDTOAfterScanQR.getBookingFormList().get(0).getBranchTimeRanges()){
+//
+//            timeRangeIds.add(branchTimeRangeDTO.getId());
+//
+//            assertEquals(0, branchTimeRangeDTO.getTimeRanges().size());
+//            assertEquals(true, branchTimeRangeDTO.isClosed());
+//
+//        }
 
         //now lets create a UpdateBranchConfigurationRequest
 
-        BranchConfigurationDTO branchConfigurationDTO1 = bookingController.updateTimeRange(UpdateBranchTimeRanges.builder()
-                .listConfIds(timeRangeIds)
-                .branchCode(branchCode)
-                .timeRanges(buildDefaultTimeRangeList())
-                .build());
+//        BranchConfigurationDTO branchConfigurationDTO1 = bookingController.updateTimeRange(UpdateBranchTimeRanges.builder()
+//                .listConfIds(timeRangeIds)
+//                .branchCode(branchCode)
+//                .timeRanges(buildDefaultTimeRangeList())
+//                .build());
+//
+//        log.info("Added time ranges");
+//
+//        assertEquals("Form Default", branchConfigurationDTO1.getBookingFormList().get(0).getFormName());
+//        assertTrue(branchConfigurationDTO1.getBookingFormList().get(0).isDefaultForm());
+//
+//        for(BranchTimeRangeDTO branchTimeRangeDTO : branchConfigurationDTO1.getBookingFormList().get(0).getBranchTimeRanges()){
+//            assertEquals(1, branchTimeRangeDTO.getTimeRanges().size());
+//            assertEquals(LocalTime.of(2, 30), branchTimeRangeDTO.getTimeRanges().get(0).getStartTime());
+//            assertEquals(LocalTime.of(23, 30), branchTimeRangeDTO.getTimeRanges().get(0).getEndTime());
+//        }
+//
+//        BranchConfigurationDTO branchConfigurationAfterConfigureOpening = bookingController.updateConfiguration(BranchGeneralConfigurationEditRequest.builder()
+//                .guests(13)
+//                .bookingSlotInMinutes(30)
+//                .maxTableNumber(30)
+//                .isReservationConfirmedManually(true)
+//                .branchCode(branchCode)
+//                .dogsAllowed(15)
+//                .guestReceivingAuthConfirm(20)
+//                .minBeforeSendConfirmMessage(30)
+//                .build());
 
-        log.info("Added time ranges");
-
-        assertEquals("Form Default", branchConfigurationDTO1.getBookingFormList().get(0).getFormName());
-        assertTrue(branchConfigurationDTO1.getBookingFormList().get(0).isDefaultForm());
-
-        for(BranchTimeRangeDTO branchTimeRangeDTO : branchConfigurationDTO1.getBookingFormList().get(0).getBranchTimeRanges()){
-            assertEquals(1, branchTimeRangeDTO.getTimeRanges().size());
-            assertEquals(LocalTime.of(2, 30), branchTimeRangeDTO.getTimeRanges().get(0).getStartTime());
-            assertEquals(LocalTime.of(23, 30), branchTimeRangeDTO.getTimeRanges().get(0).getEndTime());
-        }
-
-        BranchConfigurationDTO branchConfigurationAfterConfigureOpening = bookingController.updateConfiguration(BranchGeneralConfigurationEditRequest.builder()
-                .guests(13)
-                .bookingSlotInMinutes(30)
-                .maxTableNumber(30)
-                .isReservationConfirmedManually(true)
-                .branchCode(branchCode)
-                .dogsAllowed(15)
-                .guestReceivingAuthConfirm(20)
-                .minBeforeSendConfirmMessage(30)
-                .build());
-
-        assertEquals("", branchConfigurationAfterConfigureOpening.getExplanation());
-        assertEquals("success", branchConfigurationAfterConfigureOpening.getInstanceStatus());
-        assertEquals(1, branchConfigurationAfterConfigureOpening.getBookingFormList().size());
-        assertEquals("amati.angelo90@gmail.com", branchConfigurationAfterConfigureOpening.getOwner());
-        assertEquals("393454937047@c.us", branchConfigurationAfterConfigureOpening.getContactId());
-        assertEquals("+39 345 493 7047", branchConfigurationAfterConfigureOpening.getFormattedNumber());
-        assertEquals(15, branchConfigurationAfterConfigureOpening.getDogsAllowed());
-        assertEquals("Angelo Amati", branchConfigurationAfterConfigureOpening.getDisplayName());
-        assertEquals(BOOKING_FORM, branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getFormType());
-        assertEquals(7, branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getBranchTimeRanges().size());
-
-        // prepare here a list of BranchTime entity, i will use to update to isClosed=false (in order to open it). After that i will check if is been opened
-
-        List<Long> branchTimeIds = new ArrayList<>();
-
-        for( BranchTimeRangeDTO branchTimeRangeDTO : branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getBranchTimeRanges()){
-            assertTrue(branchTimeRangeDTO.isClosed());
-            branchTimeIds.add(branchTimeRangeDTO.getId());
-            bookingController.switchIsClosedBranchTime(branchTimeRangeDTO.getId());
-        }
-
-        branchConfigurationAfterConfigureOpening = bookingController.checkWaApiStatus(branchCode);
-
-        for( BranchTimeRangeDTO branchTimeRangeDTO : branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getBranchTimeRanges()){
-            assertFalse(branchTimeRangeDTO.isClosed());
-        }
-
-        assertEquals(2, branchConfigurationAfterConfigureOpening.getTags().size());
-        assertEquals(13, branchConfigurationAfterConfigureOpening.getGuests());
-        assertEquals(20, branchConfigurationAfterConfigureOpening.getGuestReceivingAuthConfirm());
-        assertEquals(30, branchConfigurationAfterConfigureOpening.getMinBeforeSendConfirmMessage());
-        assertEquals(30, branchConfigurationAfterConfigureOpening.getMaxTableNumber());
-        assertTrue(branchConfigurationAfterConfigureOpening.isReservationConfirmedManually());
-
-        BranchResponseEntity mockResponse = BranchResponseEntity.builder()
-                .branchId(0)
-                .branchCode(branchCode)
-                .address("Via dal cazzo")
-                .name("Coglionazzo")
-                .email("amati.angelo90@gmail.com")
-                .phone("34532134234")
-                .logoImage(null)
-                .authorized(false)
-                .role(Role.AMMINISTRATORE)
-                .storageDTOS(new ArrayList<>())
-                .build();
-
-        when(branchConfigurationService.retrieveBranchResponseEntity(branchCode)).thenReturn(mockResponse);
-        when(waApiServiceMock.retrievePhoto(anyString(), anyString())).thenReturn("https://pps.whatsapp.net/v/t61.24694-24/414551696_646621444157815_2604241172986211136_n.jpg?ccb=11-4&oh=01_AdR6nKB4IW_e2zzis8nAKK2cMg0iDHlmLaEB441dTIvL9w&oe=65CC6C26&_nc_sid=e6ed6c&_nc_cat=103");
-
-
-        CustomerResult customerResult = bookingController.retrieveCustomerAndSendOtp(branchCode, "39", "3454937047");
-
-        assertFalse(customerResult.isCustomerFound());
-        assertEquals(4,customerResult.getOpt().length());
-        assertNull(customerResult.getCustomer());
-
-        bookingController
-                .registerCustomer(branchCode, "Angelo", "Amati",
-                        "amati.angeloooo@gmail.com", "39",
-                        "3454937047", LocalDate.of(1990,
-                                5, 19), true,
-                        "https://pps.whatsapp.net/v/t61.24694-24/414551696_646621444157815_2604241172986211136_n.jpg?ccb=11-4&oh=01_AdR6nKB4IW_e2zzis8nAKK2cMg0iDHlmLaEB441dTIvL9w&oe=65CC6C26&_nc_sid=e6ed6c&_nc_cat=103");
-
-        List<Customer> allCustomers = customerRepository.findAll();
-        assertEquals(1, allCustomers.size());
-        CustomerResult newCustomerRes = bookingController.retrieveCustomerAndSendOtp(branchCode, "39", "3454937047");
-
-        assertTrue(newCustomerRes.isCustomerFound());
-        assertEquals("amati.angeloooo@gmail.com", newCustomerRes.getCustomer().getEmail());
-        assertEquals("Angelo", newCustomerRes.getCustomer().getName());
-        assertNotNull(newCustomerRes.getCustomer().getImageProfile());
-        assertEquals("Amati", newCustomerRes.getCustomer().getLastname());
-        assertEquals("39", newCustomerRes.getCustomer().getPrefix());
-        assertEquals("3454937047", newCustomerRes.getCustomer().getPhone());
-
-        CustomerFormData customerFormData = bookingController.retrieveFormData(branchCode,
-                branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getFormCode());
-
-        log.info("Customer Form data {}", customerFormData );
-
-        bookingController.createBooking(CreateBookingRequest.builder()
-                .branchAddress("Via dal cazzo 12")
-                .branchCode(branchCode)
-                .branchName("20m2 Cisternino")
-                .dogsAllowed(4)
-                .guests(24)
-                .customerId(newCustomerRes.getCustomer().getCustomerId())
-                .child(0)
-                .particularRequests("particular requests")
-                .time("12:30")
-                .date("20240404")
-                .build());
-
-        List<BookingDTO> listResponseEntity = bookingController.retrieveBookingsByBranchCode(branchCode, LocalDate.now(), null);
-
-        assertEquals(1, listResponseEntity.size());
-        assertEquals("https://pps.whatsapp.net/v/t61.24694-24/414551696_646621444157815_2604241172986211136_n.jpg?ccb=11-4&oh=01_AdR6nKB4IW_e2zzis8nAKK2cMg0iDHlmLaEB441dTIvL9w&oe=65CC6C26&_nc_sid=e6ed6c&_nc_cat=103", listResponseEntity.get(0).getCustomer().getImageProfile());
-
-        //Create supplier and products
+//        assertEquals("", branchConfigurationAfterConfigureOpening.getExplanation());
+//        assertEquals("success", branchConfigurationAfterConfigureOpening.getInstanceStatus());
+//        assertEquals(1, branchConfigurationAfterConfigureOpening.getBookingFormList().size());
+//        assertEquals("amati.angelo90@gmail.com", branchConfigurationAfterConfigureOpening.getOwner());
+//        assertEquals("393454937047@c.us", branchConfigurationAfterConfigureOpening.getContactId());
+//        assertEquals("+39 345 493 7047", branchConfigurationAfterConfigureOpening.getFormattedNumber());
+//        assertEquals(15, branchConfigurationAfterConfigureOpening.getDogsAllowed());
+//        assertEquals("Angelo Amati", branchConfigurationAfterConfigureOpening.getDisplayName());
+//        assertEquals(BOOKING_FORM, branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getFormType());
+//        assertEquals(7, branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getBranchTimeRanges().size());
+//
+//         prepare here a list of BranchTime entity, i will use to update to isClosed=false (in order to open it). After that i will check if is been opened
+//
+//        List<Long> branchTimeIds = new ArrayList<>();
+//
+//        for( BranchTimeRangeDTO branchTimeRangeDTO : branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getBranchTimeRanges()){
+//            assertTrue(branchTimeRangeDTO.isClosed());
+//            branchTimeIds.add(branchTimeRangeDTO.getId());
+//            bookingController.switchIsClosedBranchTime(branchTimeRangeDTO.getId());
+//        }
+//
+//        branchConfigurationAfterConfigureOpening = bookingController.checkWaApiStatus(branchCode);
+//
+//        for( BranchTimeRangeDTO branchTimeRangeDTO : branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getBranchTimeRanges()){
+//            assertFalse(branchTimeRangeDTO.isClosed());
+//        }
+//
+//        assertEquals(2, branchConfigurationAfterConfigureOpening.getTags().size());
+//        assertEquals(13, branchConfigurationAfterConfigureOpening.getGuests());
+//        assertEquals(20, branchConfigurationAfterConfigureOpening.getGuestReceivingAuthConfirm());
+//        assertEquals(30, branchConfigurationAfterConfigureOpening.getMinBeforeSendConfirmMessage());
+//        assertEquals(30, branchConfigurationAfterConfigureOpening.getMaxTableNumber());
+//        assertTrue(branchConfigurationAfterConfigureOpening.isReservationConfirmedManually());
+//
+//        BranchResponseEntity mockResponse = BranchResponseEntity.builder()
+//                .branchId(0)
+//                .branchCode(branchCode)
+//                .address("Via dal cazzo")
+//                .name("Coglionazzo")
+//                .email("amati.angelo90@gmail.com")
+//                .phone("34532134234")
+//                .logoImage(null)
+//                .authorized(false)
+//                .role(Role.AMMINISTRATORE)
+//                .storageDTOS(new ArrayList<>())
+//                .build();
+//
+//        when(branchConfigurationService.retrieveBranchResponseEntity(branchCode)).thenReturn(mockResponse);
+//        when(waApiServiceMock.retrievePhoto(anyString(), anyString())).thenReturn("https://pps.whatsapp.net/v/t61.24694-24/414551696_646621444157815_2604241172986211136_n.jpg?ccb=11-4&oh=01_AdR6nKB4IW_e2zzis8nAKK2cMg0iDHlmLaEB441dTIvL9w&oe=65CC6C26&_nc_sid=e6ed6c&_nc_cat=103");
+//
+//
+//        CustomerResult customerResult = bookingController.retrieveCustomerAndSendOtp(branchCode, "39", "3454937047");
+//
+//        assertFalse(customerResult.isCustomerFound());
+//        assertEquals(4,customerResult.getOpt().length());
+//        assertNull(customerResult.getCustomer());
+//
+//        bookingController
+//                .registerCustomer(branchCode, "Angelo", "Amati",
+//                        "amati.angeloooo@gmail.com", "39",
+//                        "3454937047", LocalDate.of(1990,
+//                                5, 19), true,
+//                        "https://pps.whatsapp.net/v/t61.24694-24/414551696_646621444157815_2604241172986211136_n.jpg?ccb=11-4&oh=01_AdR6nKB4IW_e2zzis8nAKK2cMg0iDHlmLaEB441dTIvL9w&oe=65CC6C26&_nc_sid=e6ed6c&_nc_cat=103");
+//
+//        List<Customer> allCustomers = customerRepository.findAll();
+//        assertEquals(1, allCustomers.size());
+//        CustomerResult newCustomerRes = bookingController.retrieveCustomerAndSendOtp(branchCode, "39", "3454937047");
+//
+//        assertTrue(newCustomerRes.isCustomerFound());
+//        assertEquals("amati.angeloooo@gmail.com", newCustomerRes.getCustomer().getEmail());
+//        assertEquals("Angelo", newCustomerRes.getCustomer().getName());
+//        assertNotNull(newCustomerRes.getCustomer().getImageProfile());
+//        assertEquals("Amati", newCustomerRes.getCustomer().getLastname());
+//        assertEquals("39", newCustomerRes.getCustomer().getPrefix());
+//        assertEquals("3454937047", newCustomerRes.getCustomer().getPhone());
+//
+//        CustomerFormData customerFormData = bookingController.retrieveFormData(branchCode,
+//                branchConfigurationAfterConfigureOpening.getBookingFormList().get(0).getFormCode());
+//
+//        log.info("Customer Form data {}", customerFormData );
+//
+//        bookingController.createBooking(CreateBookingRequest.builder()
+//                .branchAddress("Via dal cazzo 12")
+//                .branchCode(branchCode)
+//                .branchName("20m2 Cisternino")
+//                .dogsAllowed(4)
+//                .guests(24)
+//                .customerId(newCustomerRes.getCustomer().getCustomerId())
+//                .child(0)
+//                .particularRequests("particular requests")
+//                .time("12:30")
+//                .date("20240404")
+//                .build());
+//
+//        List<BookingDTO> listResponseEntity = bookingController.retrieveBookingsByBranchCode(branchCode, LocalDate.now(), null);
+//
+//        assertEquals(1, listResponseEntity.size());
+//        assertEquals("https://pps.whatsapp.net/v/t61.24694-24/414551696_646621444157815_2604241172986211136_n.jpg?ccb=11-4&oh=01_AdR6nKB4IW_e2zzis8nAKK2cMg0iDHlmLaEB441dTIvL9w&oe=65CC6C26&_nc_sid=e6ed6c&_nc_cat=103", listResponseEntity.get(0).getCustomer().getImageProfile());
+//
+//        Create supplier and products
 
 
         ResponseEntity<SupplierDTO> supplierDTOResponseEntity = supplierController.addSupplier(createTestSupplierDTO("supplier"), branchCode);
@@ -702,17 +682,17 @@ public class TestSuiteVentiMetriQuadriService {
 
 
 
-    private List<TimeRangeUpdateRequest> buildDefaultTimeRangeList() {
-        List<TimeRangeUpdateRequest> timeRangeUpdateRequestList = new ArrayList<>();
-        timeRangeUpdateRequestList.add(TimeRangeUpdateRequest.builder()
-                .startTimeHour(2)
-                .startTimeMinutes(30)
-                .endTimeHour(23)
-                .endTimeMinutes(30).
-                build());
-
-        return timeRangeUpdateRequestList;
-    }
+//    private List<TimeRangeUpdateRequest> buildDefaultTimeRangeList() {
+//        List<TimeRangeUpdateRequest> timeRangeUpdateRequestList = new ArrayList<>();
+//        timeRangeUpdateRequestList.add(TimeRangeUpdateRequest.builder()
+//                .startTimeHour(2)
+//                .startTimeMinutes(30)
+//                .endTimeHour(23)
+//                .endTimeMinutes(30).
+//                build());
+//
+//        return timeRangeUpdateRequestList;
+//    }
 
 
     String getCreateInstanceResponseOK = "{\n" +
@@ -773,16 +753,16 @@ public class TestSuiteVentiMetriQuadriService {
             "  \"status\": \"success\"\n" +
             "}";
 
-    private List<FormTag> buildDefaultTagsList() {
-        List<FormTag> tags = new ArrayList<>();
-        FormTag formTag = new FormTag();
-        formTag.setTitle("Cena");
-        FormTag formTag1 = new FormTag();
-        formTag1.setTitle("Pranzo");
-        tags.add(formTag);
-        tags.add(formTag1);
-        return tags;
-    }
+//    private List<FormTag> buildDefaultTagsList() {
+//        List<FormTag> tags = new ArrayList<>();
+//        FormTag formTag = new FormTag();
+//        formTag.setTitle("Cena");
+//        FormTag formTag1 = new FormTag();
+//        formTag1.setTitle("Pranzo");
+//        tags.add(formTag);
+//        tags.add(formTag1);
+//        return tags;
+//    }
 
 
     public static List<SupplierDTO> retrieveSupplierList(String userCode) {

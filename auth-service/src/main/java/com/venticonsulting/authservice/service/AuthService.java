@@ -1,17 +1,16 @@
 package com.venticonsulting.authservice.service;
 
-import com.venticonsulting.authservice.entity.JwtEntity;
-import com.venticonsulting.authservice.entity.ProfileStatus;
-import com.venticonsulting.authservice.entity.SignInMethod;
-import com.venticonsulting.authservice.entity.UserEntity;
+import com.venticonsulting.authservice.entity.*;
 import com.venticonsulting.authservice.entity.dto.*;
 import com.venticonsulting.authservice.exception.customexceptions.BadCredentialsException;
 import com.venticonsulting.authservice.exception.customexceptions.UserAlreadyExistException;
 import com.venticonsulting.authservice.exception.customexceptions.UserNotFoundException;
 import com.venticonsulting.authservice.repository.AuthRepository;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,17 +21,46 @@ import java.util.Optional;
 @AllArgsConstructor
 public class AuthService {
 
-    private final AuthRepository userRepository;
+    private final AuthRepository authRepository;
 
     private PasswordEncoder passwordEncoder;
 
     private JwtService jwtService;
 
+    public AuthResponseEntity signIn(Credentials credentials) {
+
+        log.info("Sign in user with email : " + credentials.getEmail());
+
+        UserEntity userEntity
+                = authRepository.findByEmail(credentials.getEmail()).orElseThrow(()
+                -> new UserNotFoundException("Utente non trovato con la seguente mail [" + credentials.getEmail() + "]"));
+
+            if (passwordEncoder.matches(credentials.getPassword(), userEntity.getPassword())) {
+                return AuthResponseEntity.builder()
+                        .user(UserResponseEntity
+                                .builder()
+                                .email(userEntity.getEmail())
+                                .name(userEntity.getName())
+                                .phone(userEntity.getPhone())
+                                .avatar(userEntity.getAvatar())
+                                .status(userEntity.getProfileStatus())
+                                .userCode(userEntity.getUserCode())
+                                .build())
+                        .accessToken(jwtService.generateToken(credentials.getEmail(), userEntity.getUserCode()))
+                        .build();
+
+            }else{
+                log.error("Password errata per mail [" + credentials.getEmail() + "]");
+                throw new BadCredentialsException("Password errata per mail [" + credentials.getEmail() + "]");
+            }
+    }
+
     @Transactional
     public AuthResponseEntity signUp(Credentials credentials) {
+
         log.info("Save user: " + credentials);
 
-        if(userRepository.findByEmail(credentials.getEmail()).isPresent()){
+        if(authRepository.findByEmail(credentials.getEmail()).isPresent()){
             log.error("Exception saving user. Mail " + credentials.getEmail() + " is already been used.");
             throw new UserAlreadyExistException("Mail " + credentials.getEmail() + " is already been used");
         }
@@ -49,7 +77,7 @@ public class AuthService {
                 .id(0)
                 .build();
 
-        UserEntity userEntity = userRepository.save(userEntityBuild);
+        UserEntity userEntity = authRepository.save(userEntityBuild);
 
         return AuthResponseEntity.builder()
                 .user(UserResponseEntity
@@ -67,10 +95,37 @@ public class AuthService {
     }
 
     @Transactional
+    public AuthResponseEntity signInWithUserCode(UserCodeCredential userCodeCredential) {
+        log.info("Sign in user by user code: " + userCodeCredential.getUserCode());
+
+        UserEntity userEntity = authRepository.findByUserCode(userCodeCredential.getUserCode())
+                .orElseThrow(() -> new UserNotFoundException("User not found for code " + userCodeCredential.getUserCode()));
+
+        if (passwordEncoder.matches(userCodeCredential.getPassword(), userEntity.getPassword())) {
+            return AuthResponseEntity.builder()
+                    .user(UserResponseEntity
+                            .builder()
+                            .email(userEntity.getEmail())
+                            .name(userEntity.getName())
+                            .phone(userEntity.getPhone())
+                            .avatar(userEntity.getAvatar())
+                            .status(userEntity.getProfileStatus())
+                            .userCode(userEntity.getUserCode())
+                            .build())
+                    .accessToken(jwtService.generateToken(userEntity.getEmail(), userEntity.getUserCode()))
+                    .build();
+
+        }else{
+            log.error("Password errata per utente con codice [" + userCodeCredential.getUserCode() + "]");
+            throw new BadCredentialsException("Password errata per utente con codice [" + userCodeCredential.getUserCode() + "]");
+        }
+    }
+
+    @Transactional
     public AuthResponseEntity signInWithGoogle(Credentials credentials) {
         log.info("Sign in user by google: " + credentials.getEmail());
-        Optional<UserEntity> userByEmail = userRepository.findByEmail(credentials.getEmail());
-        if(userByEmail.isPresent()){
+        Optional<UserEntity> userByEmail = authRepository.findByEmail(credentials.getEmail());
+        if(userByEmail.isPresent()) {
             log.info("Refresh token for user: {}. New Token [{}]", userByEmail.get(), credentials.getFmcToken());
             userByEmail.get().setFmcToken(credentials.getFmcToken());
 
@@ -101,7 +156,7 @@ public class AuthService {
                     .id(0)
                     .build();
 
-            UserEntity userEntity = userRepository.save(userEntityBuild);
+            UserEntity userEntity = authRepository.save(userEntityBuild);
             return AuthResponseEntity.builder()
                     .user(UserResponseEntity
                             .builder()
@@ -129,11 +184,11 @@ public class AuthService {
     public void updateUser(UpdateUserEntity updateUserEntity) {
         log.info("Update user with id {} : {}", updateUserEntity.getUserId(), updateUserEntity);
 
-        Optional<UserEntity> existingUserOpt = userRepository.findById(updateUserEntity.getUserId());
+        Optional<UserEntity> existingUserOpt = authRepository.findById(updateUserEntity.getUserId());
 
         if (existingUserOpt.isPresent()) {
             UserEntity existingUser = getUserEntity(updateUserEntity, existingUserOpt);
-            userRepository.save(existingUser);
+            authRepository.save(existingUser);
         } else {
             throw new UserNotFoundException("User not found with the following id: " + updateUserEntity.getUserId());
         }
@@ -160,7 +215,7 @@ public class AuthService {
     public UserResponseEntity retrieveUserByEmail(String email) {
         log.info("Retrieve user by id : {}", email);
 
-        Optional<UserEntity> userOpt = userRepository.findByEmail(email);
+        Optional<UserEntity> userOpt = authRepository.findByEmail(email);
         if(userOpt.isPresent()){
             return UserResponseEntity
                     .builder()
@@ -180,7 +235,7 @@ public class AuthService {
     public UserResponseEntity retrieveUserByUserCode(String userCode) {
         log.info("Retrieve user by code : {}", userCode);
 
-        Optional<UserEntity> userOpt = userRepository.findByUserCode(userCode);
+        Optional<UserEntity> userOpt = authRepository.findByUserCode(userCode);
         if(userOpt.isPresent()){
             return UserResponseEntity
                     .builder()
@@ -198,49 +253,21 @@ public class AuthService {
     }
     public void deleteUserByEmail(String email) {
         log.info("Delete user by email : {}", email);
-        if(userRepository.findByEmail(email).isPresent()){
-            userRepository.deleteByEmail(email);
+        if(authRepository.findByEmail(email).isPresent()){
+            authRepository.deleteByEmail(email);
         }else{
             log.error("User not found with the following email [{}] ", email);
             throw new UserNotFoundException("User not found with the following email: " + email);
         }
     }
 
-    public AuthResponseEntity signIn(Credentials credentials) {
 
-        log.info("Sign in user with email : " + credentials.getEmail());
-
-        Optional<UserEntity> existingUserOpt = userRepository.findByEmail(credentials.getEmail());
-        if (existingUserOpt.isPresent()) {
-            if (passwordEncoder.matches(credentials.getPassword(), existingUserOpt.get().getPassword())) {
-                return AuthResponseEntity.builder()
-                        .user(UserResponseEntity
-                                .builder()
-                                .email(existingUserOpt.get().getEmail())
-                                .name(existingUserOpt.get().getName())
-                                .phone(existingUserOpt.get().getPhone())
-                                .avatar(existingUserOpt.get().getAvatar())
-                                .status(existingUserOpt.get().getProfileStatus())
-                                .userCode(existingUserOpt.get().getUserCode())
-                                .build())
-                        .accessToken(jwtService.generateToken(credentials.getEmail(), existingUserOpt.get().getUserCode()))
-                        .build();
-
-            }else{
-                log.error("Password errata per mail [" + credentials.getEmail() + "]");
-                throw new BadCredentialsException("Password errata per mail [" + credentials.getEmail() + "]");
-            }
-        }else{
-            log.error("Utente non trovato con la seguente mail [" + credentials.getEmail() + "]");
-            throw new UserNotFoundException("Utente non trovato con la seguente mail [" + credentials.getEmail() + "]");
-        }
-    }
 
 
     public AuthResponseEntity signInWithAccessToken(JwtEntity accessToken) {
         log.info("Token: " + accessToken.getAccessToken());
 
-        Optional<UserEntity> existingUserOpt = userRepository.findByEmail(jwtService.extractUsername(accessToken.getAccessToken()));
+        Optional<UserEntity> existingUserOpt = authRepository.findByEmail(jwtService.extractUsername(accessToken.getAccessToken()));
 
         if(existingUserOpt.isPresent()){
             return AuthResponseEntity.builder()
@@ -265,11 +292,26 @@ public class AuthService {
     public String retrieveFcmTokenByUserCode(String email) {
         log.info("Retrieve FCM Token by user with email: " + email);
 
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(()
+        UserEntity userEntity = authRepository.findByEmail(email).orElseThrow(()
                 -> new UserNotFoundException("Utente non trovato con la seguente mail [" + email + "]"));
 
         return userEntity.getFmcToken();
     }
+
+    @Transactional
+    @Modifying
+    public void resetPassword(String userCode, String password) {
+
+        log.info("Retrieve password for user with code: "
+                + userCode);
+
+        UserEntity userEntity = authRepository.findByUserCode(userCode).orElseThrow(()
+                -> new UserNotFoundException("Utente non trovato con il seguente codice [" + userCode + "]"));
+
+        userEntity.setPassword(passwordEncoder.encode(password));
+    }
+
+
 
 
 }

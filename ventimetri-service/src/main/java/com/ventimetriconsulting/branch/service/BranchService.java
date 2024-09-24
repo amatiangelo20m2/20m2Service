@@ -1,6 +1,6 @@
 package com.ventimetriconsulting.branch.service;
 
-import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.BranchResponseEntity;
+import com.ventimetriconsulting.branch.entity.dto.BranchResponseEntity;
 import com.ventimetriconsulting.branch.entity.Branch;
 import com.ventimetriconsulting.branch.entity.BranchUser;
 import com.ventimetriconsulting.branch.entity.Role;
@@ -128,9 +128,9 @@ public class BranchService {
             return new ArrayList<>();
         }else{
             for(BranchUser branchByUserCode : branchesByUserCode){
-//                if(!Objects.equals(branchByUserCode.getFMCToken(), fcmToken)){
-                branchByUserCode.setFMCToken(fcmToken);
-//                }
+                if(!Objects.equals(fcmToken, "")){
+                    branchByUserCode.setFMCToken(fcmToken);
+                }
             }
 
             return branchesByUserCode.stream()
@@ -517,6 +517,7 @@ public class BranchService {
     }
 
     public CounterEntity retrieveBranchCounters(String branchCode) {
+
         log.info("Calculate counters for branch with code {} in order to populate a mask on app mobile/ backoffice. ", branchCode);
 
         List<StorageDTO> storageDTOS = retrieveStoragesByBranchCode(branchCode);

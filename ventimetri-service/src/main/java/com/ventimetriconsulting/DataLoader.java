@@ -1,6 +1,6 @@
 //package com.ventimetriconsulting;
 //
-//import com.ventimetriconsulting.branch.configuration.bookingconf.entity.dto.BranchResponseEntity;
+//import com.ventimetriconsulting.branch.entity.dto.BranchResponseEntity;
 //import com.ventimetriconsulting.branch.controller.BranchController;
 //import com.ventimetriconsulting.branch.entity.dto.BranchCreationEntity;
 //import com.ventimetriconsulting.branch.entity.dto.BranchType;
@@ -336,7 +336,6 @@
 //                listProduct.add(new ProductDTO(0, "Bombay dry", "", UnitMeasure.LITRI, "", 0, 10.5, "", ""));
 //                listProduct.add(new ProductDTO(0, "Bacardi blanco", "", UnitMeasure.LITRI, "", 0, 10.37, "", ""));
 //                listProduct.add(new ProductDTO(0, "Grey goose", "", UnitMeasure.LITRI, "", 0, 23.15, "", ""));
-//                listProduct.add(new ProductDTO(0, "Bombay saphire 70", "", UnitMeasure.LITRI, "", 0, 13.22, "", ""));
 //                listProduct.add(new ProductDTO(0, "Patron silver", "", UnitMeasure.LITRI, "", 0, 33, "", ""));
 //                listProduct.add(new ProductDTO(0, "Patron reposado", "", UnitMeasure.LITRI, "", 0, 39.72, "", ""));
 //                listProduct.add(new ProductDTO(0, "Patron anejo", "", UnitMeasure.LITRI, "", 0, 41.24, "", ""));

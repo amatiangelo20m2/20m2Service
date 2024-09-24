@@ -1,7 +1,7 @@
 package com.ventimetriconsulting.branch.entity;
 
-import com.ventimetriconsulting.branch.configuration.bookingconf.entity.BranchConfiguration;
-import com.ventimetriconsulting.branch.configuration.bookingconf.entity.booking.Booking;
+//import com.ventimetriconsulting.branch.configuration.bookingconf.entity.BranchConfiguration;
+//import com.ventimetriconsulting.branch.configuration.bookingconf.entity.booking.Booking;
 import com.ventimetriconsulting.branch.entity.dto.BranchType;
 import com.ventimetriconsulting.storage.entity.Storage;
 import com.ventimetriconsulting.order.entIty.Order;
@@ -62,16 +62,16 @@ public class Branch {
             columnDefinition = "bytea")
     private byte[] logoImage;
 
-    @OneToOne(mappedBy = "branch",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            optional = true)
-    private BranchConfiguration branchConfiguration;
-
-    @OneToMany(mappedBy = "branch",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY)
-    private Set<Booking> bookings;
+//    @OneToOne(mappedBy = "branch",
+//            cascade = CascadeType.ALL,
+//            fetch = FetchType.LAZY,
+//            optional = true)
+//    private BranchConfiguration branchConfiguration;
+//
+//    @OneToMany(mappedBy = "branch",
+//            cascade = CascadeType.ALL,
+//            fetch = FetchType.LAZY)
+//    private Set<Booking> bookings;
 
     @OneToMany(mappedBy = "branch",
             cascade = CascadeType.ALL,

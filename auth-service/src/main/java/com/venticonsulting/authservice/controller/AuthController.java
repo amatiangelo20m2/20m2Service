@@ -1,6 +1,7 @@
 package com.venticonsulting.authservice.controller;
 
 import com.venticonsulting.authservice.entity.JwtEntity;
+import com.venticonsulting.authservice.entity.UserCodeCredential;
 import com.venticonsulting.authservice.entity.dto.*;
 import com.venticonsulting.authservice.service.AuthService;
 import lombok.AllArgsConstructor;
@@ -24,43 +25,43 @@ public class AuthController {
     }
 
     @PostMapping(path = "/google/sign-in")
-    @ResponseStatus(HttpStatus.OK)
     public AuthResponseEntity signInWithGoogle(@RequestBody Credentials credentials) {
         return userService.signInWithGoogle(credentials);
     }
 
     @GetMapping(path = "/retrieve")
-    @ResponseStatus(HttpStatus.OK)
     public UserResponseEntity retrieveUserByEmail(@RequestParam String email){
         return userService.retrieveUserByEmail(email);
     }
 
     @GetMapping(path = "/retrievebyusercode")
-    @ResponseStatus(HttpStatus.OK)
     public UserResponseEntity retrieveUserByUserCode(@RequestParam(name="userCode") String userCode){
         return userService.retrieveUserByUserCode(userCode);
     }
 
     @PostMapping(path = "/sign-in")
-    @ResponseStatus(HttpStatus.OK)
     public AuthResponseEntity signIn(@RequestBody Credentials credentials){
         return userService.signIn(credentials);
     }
 
+    @PostMapping(path = "/sign-in-with-user-code")
+    public ResponseEntity<AuthResponseEntity> signInWithUserCode(@RequestBody UserCodeCredential userCodeCredential){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.signInWithUserCode(userCodeCredential));
+    }
+
     @PostMapping(path = "/sign-in-with-token")
-    @ResponseStatus(HttpStatus.OK)
     public AuthResponseEntity signInWithToken(@RequestBody JwtEntity jwtEntity){
         return userService.signInWithAccessToken(jwtEntity);
     }
 
     @DeleteMapping(path = "/delete")
-    @ResponseStatus(HttpStatus.OK)
     public void deleteUserByEmail(@RequestParam String email){
         userService.deleteUserByEmail(email);
     }
 
     @PutMapping(path = "/update")
-    @ResponseStatus(HttpStatus.OK)
     public void updateUser(@RequestBody UpdateUserEntity userEntity){
         userService.updateUser(userEntity);
     }
@@ -71,6 +72,15 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(userService.retrieveFcmTokenByUserCode(userCode));
     }
+
+    @PutMapping(path = "/reset/password")
+    public ResponseEntity<Void> resetPassword(@RequestParam String userCode,
+                                               @RequestParam String password){
+
+        userService.resetPassword(userCode, password);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 
 }

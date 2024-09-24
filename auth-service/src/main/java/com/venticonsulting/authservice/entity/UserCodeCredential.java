@@ -1,0 +1,15 @@
+package com.venticonsulting.authservice.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserCodeCredential {
+    private String userCode;
+    private String password;
+}
