@@ -13,6 +13,7 @@ public class RouteValidator {
             "/api/auth/sign-up",
             "/api/auth/retrieve",
             "/api/auth/sign-in",
+            "/api/auth/sign-in-with-user-code",
             "/api/auth/sign-in-with-token",
             "/api/auth/delete",
             "/api/auth/update",

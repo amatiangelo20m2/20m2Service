@@ -93,6 +93,5 @@ public class Employee {
     @Column(name = "remuneration")
     @Enumerated(EnumType.STRING)
     private RemunerationType remunerationType;
-
 }
 

@@ -96,6 +96,18 @@ public class EmployeeService {
         }
     }
 
+    public List<EmployeeDTO> findFiredEmployeeByBranchCode(String branchCode) {
+
+        log.info("Retrieve FIRED employee by branchCode {}", branchCode );
+
+        Optional<List<Employee>> employees = employeeRepository.findFiredEmployeeByBranchCode(branchCode);
+        if(employees.isPresent()){
+            return EmployeeDTO.fromEntityList(employees.get());
+        }else{
+            return Collections.emptyList();
+        }
+    }
+
     @Transactional
     @Modifying
     public void hideEmployee(Long employeeId) {
@@ -103,5 +115,14 @@ public class EmployeeService {
 
         Optional<Employee> byEmployeeId = employeeRepository.findByEmployeeId(employeeId);
         byEmployeeId.ifPresent(employee -> employee.setVisible(!employee.isVisible()));
+    }
+
+    @Transactional
+    @Modifying
+    public void fireEmployee(Long employeeId) {
+        log.info("Fire employee with id {}", employeeId );
+
+        Optional<Employee> byEmployeeId = employeeRepository.findByEmployeeId(employeeId);
+        byEmployeeId.ifPresent(employee -> employee.setFired(!employee.isFired()));
     }
 }

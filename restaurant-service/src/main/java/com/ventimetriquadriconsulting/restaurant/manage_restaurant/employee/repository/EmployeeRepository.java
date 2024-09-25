@@ -11,9 +11,13 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    @Query("SELECT employee FROM Employee employee WHERE employee.restaurant.branchCode = ?1 ORDER BY employee.lastName ASC")
+    @Query("SELECT employee FROM Employee employee WHERE employee.restaurant.branchCode = ?1 AND employee.isFired = false ORDER BY employee.lastName ASC")
     Optional<List<Employee>> findByBranchCode(String branchCode);
 
+    @Query("SELECT employee FROM Employee employee WHERE employee.restaurant.branchCode = ?1 AND employee.isFired = true ORDER BY employee.lastName ASC")
+    Optional<List<Employee>> findFiredEmployeeByBranchCode(String branchCode);
+
     Optional<Employee> findByEmail(String email);
+
     Optional<Employee> findByEmployeeId(Long employeeId);
 }

@@ -58,6 +58,12 @@ public class RestaurantController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PutMapping(path = "/fireemployee/{employeeId}")
+    public ResponseEntity<Void> fireEmployee(@PathVariable Long employeeId) {
+        employeeService.fireEmployee(employeeId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
     @GetMapping(path = "/employee/getall")
     public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
@@ -92,13 +98,18 @@ public class RestaurantController {
         return ResponseEntity.ok(employeeByBranchCode);
     }
 
+    @GetMapping(path = "/getfiredemployeebybranchcode/{branchCode}")
+    public ResponseEntity<List<EmployeeDTO>> findFiredEmployeeByBranchCode(@PathVariable String branchCode) {
+        List<EmployeeDTO> employeeByBranchCode = employeeService.findFiredEmployeeByBranchCode(branchCode);
+        return ResponseEntity.ok(employeeByBranchCode);
+    }
+
 
     @PostMapping(path = "/create/reports")
     public ResponseEntity<List<EmployeePresenceReportDTO>> createReports(
             @RequestBody List<EmployeePresenceReportDTO> employeePresenceReportDTOS) {
 
         return ResponseEntity.ok(reportService.saveReports(employeePresenceReportDTOS));
-
     }
 
     @GetMapping(path = "/retrievereports/{branchCode}")
