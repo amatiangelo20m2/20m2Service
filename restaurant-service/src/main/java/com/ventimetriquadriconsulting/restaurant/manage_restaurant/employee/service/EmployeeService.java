@@ -27,27 +27,19 @@ public class EmployeeService {
 
     public EmployeeDTO saveEmployee(String branchCode, EmployeeDTO employeeDTO) {
 
-        Optional<Employee> byEmail = employeeRepository.findByEmail(employeeDTO.getEmail());
-        if(byEmail.isPresent()){
-            log.error("Email already in use {}", employeeDTO.getEmail());
+        RestaurantDTO restaurantDTO = restaurantService
+                .retrieveRestaurantConfiguration(branchCode);
 
-            throw new EmailAlreadyInUserException("Email '" + employeeDTO.getEmail() + "' already in use");
+        log.info("Create following employee {}" , employeeDTO);
+        Employee employee = EmployeeDTO.toEntity(employeeDTO);
 
-        }else{
-            RestaurantDTO restaurantDTO = restaurantService
-                    .retrieveRestaurantConfiguration(branchCode);
+        employee.setRestaurant(RestaurantDTO.toEntity(restaurantDTO));
+        employee.setBranchCode(restaurantDTO.getBranchCode());
 
-            log.info("Create following employee {}" , employeeDTO);
-            Employee employee = EmployeeDTO.toEntity(employeeDTO);
+        Employee savedEmployee = employeeRepository.save(employee);
+        log.info("Saved data {}" , savedEmployee);
 
-            employee.setRestaurant(RestaurantDTO.toEntity(restaurantDTO));
-            employee.setBranchCode(restaurantDTO.getBranchCode());
-
-            Employee savedEmployee = employeeRepository.save(employee);
-            log.info("Saved data {}" , savedEmployee);
-
-            return EmployeeDTO.fromEntity(savedEmployee);
-        }
+        return EmployeeDTO.fromEntity(savedEmployee);
 
     }
 
