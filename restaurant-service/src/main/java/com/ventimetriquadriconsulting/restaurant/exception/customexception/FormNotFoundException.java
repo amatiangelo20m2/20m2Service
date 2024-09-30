@@ -1,4 +1,4 @@
-package com.ventimetriconsulting.branch.exception.customexceptions;
+package com.ventimetriquadriconsulting.restaurant.exception.customexception;
 
 public class FormNotFoundException extends RuntimeException {
     public FormNotFoundException(String message) {

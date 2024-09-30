@@ -12,7 +12,7 @@ public class GlobalRestaurantModuleException {
     @ExceptionHandler(EmailAlreadyInUserException.class)
     public ResponseEntity<String> handleEmailAlreadyInUserException(EmailAlreadyInUserException exception) {
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.CONFLICT)
                 .body(exception.getMessage());
     }
 

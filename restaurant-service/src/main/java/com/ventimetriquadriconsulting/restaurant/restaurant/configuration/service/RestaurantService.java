@@ -41,4 +41,8 @@ public class RestaurantService {
         }
 
     }
+
+    public Optional<Restaurant> findByBrancCode(String branchCode) {
+        return restaurantRepository.findByBranchCode(branchCode);
+    }
 }

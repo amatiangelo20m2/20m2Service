@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="MavenProjectsManager">
@@ -17,6 +18,7 @@
         <option value="$PROJECT_DIR$/app-service/pom.xml" />
         <option value="$PROJECT_DIR$/booking-service/pom.xml" />
         <option value="$PROJECT_DIR$/bookingreserve-service/pom.xml" />
+        <option value="$PROJECT_DIR$/customer-service/pom.xml" />
         <option value="$PROJECT_DIR$/environment-composer/pom.xml" />
         <option value="$PROJECT_DIR$/event-service/pom.xml" />
         <option value="$PROJECT_DIR$/inventory-service/pom.xml" />

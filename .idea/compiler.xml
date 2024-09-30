@@ -20,7 +20,6 @@
         <module name="restaurant-service" />
         <module name="ventimetri-service" />
         <module name="eventi-service" />
-        <module name="customer-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>
@@ -29,6 +28,7 @@
       <module name="api-geteway" target="17" />
       <module name="booking-service" target="17" />
       <module name="bookingreserve-service" target="17" />
+      <module name="customer-service" target="17" />
       <module name="environment-composer" target="17" />
       <module name="event-service" target="17" />
       <module name="inventory-service" target="17" />

@@ -2,6 +2,7 @@ package com.ventimetriquadriconsulting.restaurant.restaurant.configuration.entit
 
 import com.ventimetriquadriconsulting.restaurant.manage_restaurant.employee.entity.Employee;
 import com.ventimetriquadriconsulting.restaurant.restaurant.booking.entity.Booking;
+import com.ventimetriquadriconsulting.restaurant.restaurant.configuration.opening_configuration.entity.OpeningConfiguration;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,9 @@ public class Restaurant {
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Booking> bookings;
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<OpeningConfiguration> openingConfigurations;
 
     @PrePersist
     protected void onCreate() {
