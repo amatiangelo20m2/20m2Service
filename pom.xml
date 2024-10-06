@@ -29,7 +29,7 @@
     <springdoc.openapi.version>2.0.3</springdoc.openapi.version>
     <jwt.token.version>0.11.5</jwt.token.version>
     <hibernate.validator.version>7.0.1.Final</hibernate.validator.version>
-<!--    <jackson.datatype.version>2.15.2</jackson.datatype.version>-->
+<!--    <jackson.datatype.version>2.15.2</jackson.datatype.version>   -->
   </properties>
 
   <modules>
@@ -40,6 +40,7 @@
     <module>notification-service</module>
     <module>eventi-service</module>
     <module>restaurant-service</module>
+    <module>communication-service</module>
   </modules>
 
   <dependencyManagement>

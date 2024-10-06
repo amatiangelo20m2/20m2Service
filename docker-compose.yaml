@@ -18,27 +18,27 @@ services:
     container_name: zipkin
     ports:
       - "9411:9411"
-  mongo:
-    image: mongo:latest
-    container_name: mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-  mongo-express:
-    image: mongo-express:latest
-    container_name: mongo-express
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: password
-      ME_CONFIG_MONGODB_SERVER: mongo
-    ports:
-      - "8081:8081"
-    depends_on:
-      - mongo
+  #  mongo:
+  #    image: mongo:latest
+  #    container_name: mongodb
+  #    environment:
+  #      MONGO_INITDB_ROOT_USERNAME: admin
+  #      MONGO_INITDB_ROOT_PASSWORD: password
+  #    ports:
+  #      - "27017:27017"
+  #    volumes:
+  #      - mongo-data:/data/db
+  #  mongo-express:
+  #    image: mongo-express:latest
+  #    container_name: mongo-express
+  #    environment:
+  #      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+  #      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+  #      ME_CONFIG_MONGODB_SERVER: mongo
+  #    ports:
+  #      - "8081:8081"
+  #    depends_on:
+  #      - mongo
   db20m2:
     container_name: db20m2
     image: postgres:alpine
@@ -86,6 +86,22 @@ services:
     ports:
       - "5437:5437"
     command: -p 5437
+    restart: always
+  db20m2communication:
+    container_name: db20m2communication
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: db20m2communication
+      POSTGRES_USER: TIJE0nNlxmqSKxm
+      POSTGRES_PASSWORD: o3YOUyfQH1kFq0
+      PGDATA: /data/postgrescommunication
+    volumes:
+      - ./db20m2communication:/data/postgrescommunication
+    expose:
+      - "5438"
+    ports:
+      - "5438:5438"
+    command: -p 5438
     restart: always
   pgadmin20m2:
     container_name: pgadmin20m2

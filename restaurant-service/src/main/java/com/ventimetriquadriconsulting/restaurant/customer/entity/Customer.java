@@ -80,13 +80,13 @@ public class Customer {
     private Boolean privacyConsent; // Privacy
 
     @Column
-    private Boolean marketingConsent; // Consenso Marketing
+    private Boolean marketingConsent;
 
     @Column
-    private Boolean profilingConsent; // Profilazione
+    private Boolean profilingConsent;
 
     @Column
-    private Boolean emailSpamOptOut; // Email spam (opt-out)
+    private Boolean emailSpamOptOut;
 
     @Column(length = 200)
     private String tags; // Tags
@@ -104,5 +104,6 @@ public class Customer {
     protected void onCreate() {
         ZonedDateTime nowInItaly = ZonedDateTime.now(ZoneId.of("CET"));
         this.registrationDate = nowInItaly.toLocalDateTime();
+        this.presenceCount = 0;
     }
 }

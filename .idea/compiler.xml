@@ -20,6 +20,7 @@
         <module name="restaurant-service" />
         <module name="ventimetri-service" />
         <module name="eventi-service" />
+        <module name="communication-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>
@@ -45,6 +46,7 @@
       <module name="auth-service" options="-parameters" />
       <module name="booking-service" options="-parameters" />
       <module name="bookingreserve-service" options="-parameters" />
+      <module name="communication-service" options="-parameters" />
       <module name="customer-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="environment-composer" options="-parameters" />

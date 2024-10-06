@@ -14,7 +14,7 @@ public interface FormRepository extends JpaRepository<Form, Long> {
     @Query("SELECT form FROM Form form where form.formCode = ?1")
     Optional<Form> findByFormCode(String formCode);
 
-    @Query("SELECT form FROM Form form where form.branchCode = ?1")
+    @Query("SELECT form FROM Form form where form.branchCode = ?1 ORDER BY form.formId DESC")
     Optional<List<Form>> findByBranchCode(String branchCode);
 
 }
