@@ -8,10 +8,13 @@ import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.service.WaApi
 import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machine.entity.WaApiConfigEvent;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machine.entity.WaApiConfState;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machine.services.WaApiConfigServiceInterfaceImpl;
+import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
@@ -20,7 +23,11 @@ import org.springframework.statemachine.config.builders.StateMachineStateConfigu
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -52,18 +59,18 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<WaApiConfS
                 .event(WaApiConfigEvent.CREATE_INSTANCE)
                 .action(createNewConfiguration())
 
-                .and()
-                .withExternal()
-                .source(WaApiConfState.INSTANCE_NOT_CREATED)
-                .target(WaApiConfState.INSTANCE_CREATED)
-                .event(WaApiConfigEvent.CREATE_INSTANCE)
-                .action(createNewConfiguration())
+//                .and()
+//                .withExternal()
+//                .source(WaApiConfState.INSTANCE_NOT_CREATED)
+//                .target(WaApiConfState.INSTANCE_CREATED)
+//                .event(WaApiConfigEvent.CREATE_INSTANCE)
+//                .action(createNewConfiguration())
 
                 .and()
                 .withExternal()
                 .source(WaApiConfState.INSTANCE_CREATED)
                 .target(WaApiConfState.QR)
-                .event(WaApiConfigEvent.RETRIEVE_QR_CODE)
+                .event(WaApiConfigEvent.RETRIEVE_QR)
                 .action(retrieveQrCode())
 
                 .and()
@@ -73,9 +80,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<WaApiConfS
                 .event(WaApiConfigEvent.RETRIEVE_INSTANCE_STATUS)
                 .action(checkWaApiConfStatus())
 
-
-                .and()
-                .withExternal().source(WaApiConfState.QR).target(WaApiConfState.NOT_READY).event(WaApiConfigEvent.REBOOT)
+//                .and()
+//                .withExternal()
+//                .source(WaApiConfState.QR)
+//                .target(WaApiConfState.NOT_READY)
+//                .event(WaApiConfigEvent.REBOOT)
         ;
     }
 
@@ -93,13 +102,13 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<WaApiConfS
         config.withConfiguration()
                 .listener(adapter);
     }
-
+    @Transactional
     public Action<WaApiConfState, WaApiConfigEvent> createNewConfiguration() {
         return context -> {
             //TODO: do the logic to retrieve the instance - if exist and is in QR status go in QR, if not give back not create
 //            if(new Random().nextInt(10) < 8) {
             log.info("Create new configuration..");
-            String branchCode = String.valueOf(context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER));
+            String branchCode = String.valueOf(context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE));
             try{
                 CreateUpdateResponse instance = waApiService.createInstance();
 
@@ -114,15 +123,15 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<WaApiConfS
                                         branchCode);
 
                         context.getStateMachine().sendEvent(MessageBuilder.withPayload(WaApiConfigEvent.CREATE_INSTANCE)
-                                .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER,
-                                        context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER)).build());
+                                .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE,
+                                        context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE)).build());
 
                 }
-            }catch (Exception e){
-
+            } catch (Exception e){
+                log.info("Errore: " + e);
                 context.getStateMachine().sendEvent(MessageBuilder.withPayload(WaApiConfigEvent.REBOOT)
-                        .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER,
-                                context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER)).build());
+                        .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE,
+                                context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE)).build());
                 whatsAppConfigurationRepository
                         .updateIntanceCodeToBranch(
                                 "",
@@ -132,65 +141,77 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<WaApiConfS
         };
     }
 
-    private Action<WaApiConfState, WaApiConfigEvent> retrieveQrCode() {
+    @Transactional
+    public Action<WaApiConfState, WaApiConfigEvent> retrieveQrCode() {
         return context -> {
             log.info("retrieve qr code..");
             String branchCode
                     = String.valueOf(context
-                    .getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER));
+                    .getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE));
 
-            WhatsAppConfiguration byBranchCode
-                    = whatsAppConfigurationRepository.findByBranchCode(branchCode);
+            WhatsAppConfiguration byBranchCode = whatsAppConfigurationRepository
+                    .findByBranchCode(branchCode)
+                    .orElseThrow(() -> new NotFoundException("Branch conf not found with code " + branchCode));
 
+            try{
 
-            QrCodeResponse qrCodeResponse = null;
+                QrCodeResponse qrCodeResponse = null;
 
-            long startTime = System.currentTimeMillis();
-            long maxRetryTime = 60000;
-
-
-            do {
-                // Retrieve the QR code from the service
-                qrCodeResponse = waApiService.retrieveQrCode(byBranchCode.getWaApiInstanceId());
-
-                // Check if the response is valid and successful
-                if (qrCodeResponse != null
-                        && Objects.equals(qrCodeResponse.getQrCode().getStatus(), "success")
-                        && !qrCodeResponse.getQrCode().getData().getQrCode().isEmpty()) {
-
-                    // Set the QR code into the database
-                    byBranchCode.setQrCode(qrCodeResponse.getQrCode().getData().getQrCode());
-
-                    // Exit the loop since we have a valid QR code
-                    break;
-                }
-
-                // Check if we've exceeded the maximum retry time
-                if (System.currentTimeMillis() - startTime >= maxRetryTime) {
-                    // Optionally, handle the case where the maximum retry time has been reached
-                    System.out.println("Maximum retry time reached without obtaining a valid QR code.");
-                    break;
-                }
-
-                // Sleep for 2 seconds before the next retry
-               haveSomeSleep();
-
-            } while (qrCodeResponse == null
-                    || qrCodeResponse.getQrCode() == null
-                    || !Objects.equals(qrCodeResponse.getQrCode().getStatus(), "success")
-                    || qrCodeResponse.getQrCode().getData().getQrCode().isEmpty());
+                long startTime = System.currentTimeMillis();
+                long maxRetryTime = 60000;
 
 
+                do {
+                    // Retrieve the QR code from the service
+                    qrCodeResponse = waApiService.retrieveQrCode(byBranchCode.getWaApiInstanceId());
 
-//            if(new Random().nextInt(10) < 8) {
-            context.getStateMachine().sendEvent(MessageBuilder.withPayload(WaApiConfigEvent.RETRIEVE_QR_CODE)
-                    .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER,
-                            context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER)).build());
-//            }else{
-//                System.out.println("Declined - SEI UN MINCHIONE");
-//                context.getStateMachine().sendEvent(MessageBuilder.withPayload(WaApiConfigEvent.REBOOT)
-//                        .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER, context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER)).build());
-//            }
+                    // Check if the response is valid and successful
+                    if (qrCodeResponse != null
+                            && Objects.equals(qrCodeResponse.getQrCode().getStatus(), "success")
+                            && !qrCodeResponse.getQrCode().getData().getQrCode().isEmpty()) {
+
+                        log.info("Current state before sending event: " + context.getStateMachine().getState().getId());
+                        log.info("Sending event with header: " + context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE));
+
+                        context.getStateMachine().sendEvent(MessageBuilder.withPayload(WaApiConfigEvent.RETRIEVE_QR)
+                                .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE,
+                                        context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE)).build());
+                        // Set the QR code into the database
+                        byBranchCode.setQrCode(qrCodeResponse.getQrCode().getData().getQrCode());
+                        byBranchCode.setWaApiConfState(WaApiConfState.QR);
+                        // Exit the loop since we have a valid QR code
+                        break;
+                    }
+
+                    // Check if we've exceeded the maximum retry time
+                    if (System.currentTimeMillis() - startTime >= maxRetryTime) {
+
+                        log.error("Maximum retry time reached without obtaining a valid QR code.");
+                        context.getStateMachine().sendEvent(MessageBuilder.withPayload(WaApiConfigEvent.REBOOT)
+                                .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE,
+                                        context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE)).build());
+
+                        byBranchCode.setWaApiConfState(WaApiConfState.NOT_READY);
+                        break;
+                    }
+
+                    // Sleep for 2 seconds before the next retry
+                    haveSomeSleep();
+
+                } while (qrCodeResponse == null
+                        || qrCodeResponse.getQrCode() == null
+                        || !Objects.equals(qrCodeResponse.getQrCode().getStatus(), "success")
+                        || qrCodeResponse.getQrCode().getData().getQrCode().isEmpty());
+
+            }catch(Exception e){
+                log.info("SEI UN MINCHIONE: " + e);
+                context.getStateMachine().sendEvent(MessageBuilder.withPayload(WaApiConfigEvent.REBOOT)
+                        .setHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE,
+                                context.getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE)).build());
+
+                byBranchCode.setWaApiConfState(WaApiConfState.NOT_READY);
+            }
+
         };
     }
 
@@ -201,10 +222,10 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<WaApiConfS
             log.info("Check Api conf status..");
             String branchCode
                     = String.valueOf(context
-                    .getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_CONFIG_ID_HEADER));
+                    .getMessageHeader(WaApiConfigServiceInterfaceImpl.WA_API_BRANCH_CODE));
 
             WhatsAppConfiguration byBranchCode
-                    = whatsAppConfigurationRepository.findByBranchCode(branchCode);
+                    = whatsAppConfigurationRepository.findByBranchCode(branchCode).orElseThrow(() -> new NotFoundException("Branch conf not found with code " + branchCode));;
 
 
         };

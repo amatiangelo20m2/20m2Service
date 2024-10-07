@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface WhatsAppConfigurationRepository extends JpaRepository<WhatsAppConfiguration, Long> {
 
-    WhatsAppConfiguration findByBranchCode(String branchCode);
+    Optional<WhatsAppConfiguration> findByBranchCode(String branchCode);
 
     @Transactional
     @Modifying

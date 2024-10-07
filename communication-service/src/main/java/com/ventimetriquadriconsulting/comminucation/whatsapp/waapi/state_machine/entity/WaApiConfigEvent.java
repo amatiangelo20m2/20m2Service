@@ -2,5 +2,5 @@ package com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machin
 
 public enum WaApiConfigEvent {
 
-    CREATE_INSTANCE, RETRIEVE_QR_CODE, RETRIEVE_INSTANCE_STATUS, REBOOT
+    CREATE_INSTANCE, RETRIEVE_QR, RETRIEVE_INSTANCE_STATUS, REBOOT
 }

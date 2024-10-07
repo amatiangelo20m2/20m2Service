@@ -8,5 +8,5 @@ import org.springframework.statemachine.StateMachine;
 public interface WaApiConfigServiceInterface {
     WhatsAppConfigurationDTO createAndSaveConfig(String branchCode);
     WhatsAppConfigurationDTO retrieveQrCode(String branchCode);
-    StateMachine<WaApiConfState, WaApiConfigEvent> retrieveWaApiConfStatus(String branchCode);
+    WhatsAppConfigurationDTO retrieveWaApiConfStatus(String branchCode);
 }

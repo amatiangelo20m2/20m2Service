@@ -49,7 +49,8 @@ public class WhatsAppConfiguration {
     @Column(name = "last_error")
     private String lastError;
 
-    @Column(name = "qr_code")
+    @Lob
+    @Column(name = "qr_code", columnDefinition = "TEXT")
     private String qrCode;
 
     @Column
