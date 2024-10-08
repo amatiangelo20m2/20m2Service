@@ -1,5 +1,6 @@
-package com.ventimetriquadriconsulting.comminucation.whatsapp.exception;
+package com.ventimetriquadriconsulting.comminucation.conf.whatsapp.exception;
 
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.exception.customexception.*;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.exception.customexception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.entity;
+package com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
