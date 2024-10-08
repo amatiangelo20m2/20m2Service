@@ -1,15 +1,16 @@
 package com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machine.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.ventimetriapi.controller.WhatsAppConfigurationController;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.ventimetriapi.entity.dto.WhatsAppConfigurationDTO;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.ventimetriapi.repository.WhatsAppConfigurationRepository;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.entity.CreateUpdateResponse;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.entity.MeResponse;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.entity.QrCodeResponse;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.service.WaApiService;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machine.entity.WaApiConfState;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machine.entity.WaApiConfigEvent;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.ventimetriapi.controller.WhatsAppConfigurationController;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.ventimetriapi.entity.dto.WhatsAppConfigurationDTO;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.ventimetriapi.repository.WhatsAppConfigurationRepository;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.entity.CreateUpdateResponse;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.entity.MeResponse;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.entity.QrCodeResponse;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.service.WaApiService;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.state_machine.entity.WaApiConfState;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.state_machine.entity.WaApiConfigEvent;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.state_machine.services.WaApiConfigServiceInterfaceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -128,6 +129,21 @@ class WaApiConfigServiceInterfaceImplTest {
             "  },\n" +
             "  \"links\": {\n" +
             "    \"self\": \"https://waapi.app/api/v1/instances/22507/client/status\"\n" +
+            "  },\n" +
+            "  \"status\": \"success\"\n" +
+            "}";
+
+    String happyPathStatus = "{\n" +
+            "  \"clientStatus\": {\n" +
+            "    \"status\": \"success\",\n" +
+            "    \"instanceId\": \"" + INSTANCE_CODE + "\",\n" +
+            "    \"data\": null,\n" +
+            "    \"instanceStatus\": \"ready\",\n" +
+            "    \"instanceWebhook\": \"https://waapi.app/api/v1/webhooks/nodes/client/22583/webhook\",\n" +
+            "    \"instanceEvents\": []\n" +
+            "  },\n" +
+            "  \"links\": {\n" +
+            "    \"self\": \"https://waapi.app/api/v1/instances/22583/client/status\"\n" +
             "  },\n" +
             "  \"status\": \"success\"\n" +
             "}";
