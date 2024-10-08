@@ -1,7 +1,6 @@
 package com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.service;
 
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.entity.*;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.entity.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

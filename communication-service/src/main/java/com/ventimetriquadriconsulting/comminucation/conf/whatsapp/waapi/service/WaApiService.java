@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.entity.*;
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.exception.customexception.ConfWhatsAppError;
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.exception.customexception.QrNotFoundException;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
