@@ -65,8 +65,15 @@ class WaApiConfigServiceInterfaceImplTest {
 
         assertEquals(whatsAppConfigurationDTOResponseEntity.getStatusCode(), HttpStatusCode.valueOf(200));
         assertEquals(Objects.requireNonNull(whatsAppConfigurationDTOResponseEntity.getBody()).getBranchCode(), branchCode);
-        assertTrue(whatsAppConfigurationDTOResponseEntity.getBody().getQrCode().contains("BORw0KGgoAAAANSUhEUgAAARQAAAEUCAYAAADqcMl5AAAAAklEQVR4A"));
-        assertEquals(whatsAppConfigurationDTOResponseEntity.getBody().getWaApiState(), WaApiConfState.QR);
+
+        ResponseEntity<WhatsAppConfigurationDTO> whatsAppConfWithQrCode = whatsAppConfigurationController.retrieveQr(branchCode);
+
+        assertTrue(Objects.requireNonNull(whatsAppConfWithQrCode.getBody()).getQrCode().contains("BORw0KGgoAAAANSUhEUgAAARQAAAEUCAYAAADqcMl5AAAAAklEQVR4A"));
+//        assertEquals(whatsAppConfigurationDTOResponseEntity.getBody().getWaApiState(), WaApiConfState.QR);
+
+
+
+//        when(waApiService.retrieveInstanceStatus(INSTANCE_CODE)).thenReturn(convertMeResponse(getGetRetrieveBasicClientInfoAfterQrScan));
 
     }
 
@@ -109,6 +116,21 @@ class WaApiConfigServiceInterfaceImplTest {
     }
 
     String getCreateInstanceKO = "You reached your instance limit. Please update your subscription to create instances.";
+
+    String statusDisconnected = "{\n" +
+            "  \"clientStatus\": {\n" +
+            "    \"status\": \"success\",\n" +
+            "    \"instanceId\": \"" + INSTANCE_CODE + "\",\n" +
+            "    \"data\": null,\n" +
+            "    \"instanceStatus\": \"disconnected\",\n" +
+            "    \"instanceWebhook\": \"https://waapi.app/api/v1/webhooks/nodes/client/22507/webhook\",\n" +
+            "    \"instanceEvents\": []\n" +
+            "  },\n" +
+            "  \"links\": {\n" +
+            "    \"self\": \"https://waapi.app/api/v1/instances/22507/client/status\"\n" +
+            "  },\n" +
+            "  \"status\": \"success\"\n" +
+            "}";
 
     String getRetrieveBasicClientInfoErrorQrCodeStatus = "{\n" +
             "  \"me\": {\n" +

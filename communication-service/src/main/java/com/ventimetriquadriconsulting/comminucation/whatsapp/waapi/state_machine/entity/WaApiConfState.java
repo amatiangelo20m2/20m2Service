@@ -2,5 +2,5 @@ package com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machin
 
 public enum WaApiConfState {
 
-    NEW, INSTANCE_CREATED, INSTANCE_NOT_CREATED, QR, READY, NOT_READY
+    NEW, INSTANCE_CREATED, READY, NOT_READY
 }

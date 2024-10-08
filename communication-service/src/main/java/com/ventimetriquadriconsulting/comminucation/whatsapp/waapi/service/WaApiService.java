@@ -2,6 +2,8 @@ package com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ventimetriquadriconsulting.comminucation.whatsapp.exception.customexception.ConfWhatsAppError;
+import com.ventimetriquadriconsulting.comminucation.whatsapp.exception.customexception.QrNotFoundException;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +79,7 @@ public class WaApiService extends WaApiInterface {
     }
     @Override
     public QrCodeResponse retrieveQrCode(String instanceId) {
+
         log.info("Retrieve QR code for a instance {}" , instanceId);
 
         return waapiWebClient
@@ -85,11 +88,19 @@ public class WaApiService extends WaApiInterface {
                 .retrieve()
                 .onStatus(
                         HttpStatusCode::is4xxClientError,
-                        clientResponse -> Mono.error(new Exception("Client Error"))
+                        clientResponse -> clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    log.error("Client Error: {}", errorBody);
+                                    return Mono.error(new QrNotFoundException("Client Error: " + errorBody));
+                                })
                 )
                 .onStatus(
                         HttpStatusCode::is5xxServerError,
-                        clientResponse -> Mono.error(new Exception("Server Error"))
+                        clientResponse -> clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    log.error("Server Error: {}", errorBody);
+                                    return Mono.error(new QrNotFoundException("Server Error: " + errorBody));
+                                })
                 )
                 .bodyToMono(String.class)
                 .map(responseBody -> {
@@ -105,6 +116,7 @@ public class WaApiService extends WaApiInterface {
                 })
                 .block();
     }
+
     @Override
     public void deleteInstance(String instanceCode) {
         waapiWebClient.delete()
@@ -242,11 +254,19 @@ public class WaApiService extends WaApiInterface {
                 .retrieve()
                 .onStatus(
                         HttpStatusCode::is4xxClientError,
-                        clientResponse -> Mono.error(new Exception("Client Error"))
+                        clientResponse -> clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    log.error("Client Error: {}", errorBody);
+                                    return Mono.error(new ConfWhatsAppError("Client Error: " + errorBody));
+                                })
                 )
                 .onStatus(
                         HttpStatusCode::is5xxServerError,
-                        clientResponse -> Mono.error(new Exception("Server Error"))
+                        clientResponse -> clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    log.error("Server Error: {}", errorBody);
+                                    return Mono.error(new ConfWhatsAppError("Server Error: " + errorBody));
+                                })
                 )
                 .bodyToMono(String.class)
                 .map(responseBody -> {
@@ -257,7 +277,7 @@ public class WaApiService extends WaApiInterface {
                         return objectMapper.readValue(responseBody, CreateUpdateResponse.class);
                     } catch (Exception e) {
                         log.error("Exception during creation instance. " + e.toString());
-                        throw new RuntimeException(e);
+                        throw new ConfWhatsAppError("Errore: " + e);
                     }
                 })
                 .block();

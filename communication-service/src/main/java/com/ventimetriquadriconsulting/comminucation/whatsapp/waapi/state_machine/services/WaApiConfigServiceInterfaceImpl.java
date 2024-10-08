@@ -4,6 +4,7 @@ import com.ventimetriquadriconsulting.comminucation.whatsapp.exception.customexc
 import com.ventimetriquadriconsulting.comminucation.whatsapp.ventimetriapi.entity.WhatsAppConfiguration;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.ventimetriapi.entity.dto.WhatsAppConfigurationDTO;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.ventimetriapi.repository.WhatsAppConfigurationRepository;
+import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.entity.QrCodeResponse;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.service.WaApiService;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machine.entity.WaApiConfigEvent;
 import com.ventimetriquadriconsulting.comminucation.whatsapp.waapi.state_machine.entity.WaApiConfState;
@@ -73,18 +74,17 @@ public class WaApiConfigServiceInterfaceImpl implements WaApiConfigServiceInterf
     @Override
     @Transactional
     public WhatsAppConfigurationDTO retrieveQrCode(String branchCode) {
-        StateMachine<WaApiConfState, WaApiConfigEvent> stateMachine = build(branchCode);
-
-        log.info("Send event to branch code: {}, Event State machine {}, stateMachine actual state {}",
-                branchCode,
-                WaApiConfigEvent.RETRIEVE_QR,
-                stateMachine.getState().getId()
-        );
-
-        sendEvent(branchCode, stateMachine, WaApiConfigEvent.RETRIEVE_QR);
 
         WhatsAppConfiguration byBranchCode = whatsAppConfigurationRepository
                 .findByBranchCode(branchCode).orElseThrow(() -> new WhatsAppConfigurationNotFoundException("Branch conf not found with code " + branchCode));
+
+        log.info("Retrieve QR code for instance{} - Branch code{}",
+                byBranchCode.getWaApiInstanceId(),
+                branchCode
+        );
+
+        QrCodeResponse qrCodeResponse = waApiService.retrieveQrCode(byBranchCode.getWaApiInstanceId());
+        byBranchCode.setQrCode(qrCodeResponse.getQrCode().getData().getQrCode());
 
         return WhatsAppConfigurationDTO.fromEntity(byBranchCode);
     }
@@ -132,7 +132,8 @@ public class WaApiConfigServiceInterfaceImpl implements WaApiConfigServiceInterf
                 .findByBranchCode(branchCode)
                 .orElseThrow(() -> new WhatsAppConfigurationNotFoundException("Branch conf not found with code " + branchCode));
 
-        StateMachine<WaApiConfState, WaApiConfigEvent> sm = stateMachineFactory.getStateMachine(Long.toString(whatsAppConfigurationDTO.getId()));
+        StateMachine<WaApiConfState, WaApiConfigEvent> sm = stateMachineFactory.getStateMachine(
+                Long.toString(whatsAppConfigurationDTO.getId()));
 
         sm.stop();
 

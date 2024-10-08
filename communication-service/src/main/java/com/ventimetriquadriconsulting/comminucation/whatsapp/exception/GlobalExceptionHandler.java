@@ -1,8 +1,6 @@
 package com.ventimetriquadriconsulting.comminucation.whatsapp.exception;
 
-import com.ventimetriquadriconsulting.comminucation.whatsapp.exception.customexception.WhatsAppConfigurationAlreadyPresentException;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.exception.customexception.WhatsAppConfigurationNotFoundException;
-import com.ventimetriquadriconsulting.comminucation.whatsapp.exception.customexception.WhatsAppErrorConfiguration;
+import com.ventimetriquadriconsulting.comminucation.whatsapp.exception.customexception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,8 +18,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(ConfWhatsAppError.class)
+    public ResponseEntity<String> handleCreationConfWhatsAppError(ConfWhatsAppError exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(WhatsAppConfigurationAlreadyPresentException.class)
     public ResponseEntity<String> handleWhatsAppConfigurationAlreadyPresentException(WhatsAppConfigurationAlreadyPresentException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(QrNotFoundException.class)
+    public ResponseEntity<String> handleWhatsAppConfigurationAlreadyPresentException(QrNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
 

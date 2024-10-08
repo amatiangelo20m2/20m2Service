@@ -37,13 +37,13 @@ public class WhatsAppConfiguration {
     @Column(name = "branch_code", length = 10, nullable = false, unique = true)
     private String branchCode;
 
-    @Column(name= "phone", unique = true)
+    @Column(name= "phone")
     private String phone;
 //
     @Enumerated(EnumType.STRING)
     private WaApiConfState waApiConfState;
 
-    @Column(name= "waapi_istance_id", unique = true)
+    @Column(name= "waapi_istance_id")
     private String waApiInstanceId;
 
     @Column(name = "last_error")
