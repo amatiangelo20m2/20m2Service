@@ -1,0 +1,33 @@
+package com.ventimetriconsulting.branch.entity.dto;
+
+import com.ventimetriconsulting.branch.entity.Role;
+import com.ventimetriconsulting.storage.entity.dto.StorageDTO;
+import com.ventimetriconsulting.supplier.dto.SupplierDTO;
+import lombok.*;
+
+import java.util.List;
+
+@AllArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
+@ToString
+public class BranchResponseEntity {
+
+    private long branchId;
+    private String name;
+    private String address;
+    private String email;
+    private String phone;
+    private String vat;
+    private BranchType type;
+    private String branchCode;
+    private Role role;
+    private byte[] logoImage;
+    private boolean authorized;
+
+//    private BranchConfigurationDTO branchConfigurationDTO;
+    private List<SupplierDTO> supplierDTOList;
+    private List<StorageDTO> storageDTOS;
+
+}

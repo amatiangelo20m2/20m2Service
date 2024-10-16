@@ -1,115 +1,122 @@
 version: "3.8"
 services:
-  ## Keycloak Config with Mysql database
-  keycloak-postgres:
-    container_name: db_20m2_keycloak_postgres
-    image: postgres:alpine
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: zLw473vAW8ELDkV
+      RABBITMQ_DEFAULT_PASS: QyuhTTLOCOWfdFu
+      RABBITMQ_DEFAULT_VHOST: "/"
     volumes:
-      - ./postgres_keycloak_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: keycloak-postgres
-      POSTGRES_USER: amati.angelo@20m2.it
-      POSTGRES_PASSWORD: 5Gv94E4uefK8qm92
-    ports:
-      - "5433:5432"
-  keycloak:
-    container_name: keycloak
-    image: quay.io/keycloak/keycloak:18.0.0
-    command: [ "start-dev", "--import-realm" ]
-    environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: keycloak-postgres
-      DB_DATABASE: keycloak-postgres
-      DB_USER: amati.angelo@20m2.it
-      DB_PASSWORD: 5Gv94E4uefK8qm92
-      KEYCLOAK_ADMIN: amati.angelo@20m2.it
-      KEYCLOAK_ADMIN_PASSWORD: 5Gv94E4uefK8qm92
-    ports:
-      - "8181:8080"
-    volumes:
-      - ./realms/:/opt/jboss/keycloak/standalone/data/imports/
-    depends_on:
-      - keycloak-postgres
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-  broker:
-    image: confluentinc/cp-kafka:7.0.1
-    container_name: broker
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_log:/var/log/rabbitmq
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
       - "9411:9411"
-  postgres:
-    container_name: postgres_20m2
+  #  mongo:
+  #    image: mongo:latest
+  #    container_name: mongodb
+  #    environment:
+  #      MONGO_INITDB_ROOT_USERNAME: admin
+  #      MONGO_INITDB_ROOT_PASSWORD: password
+  #    ports:
+  #      - "27017:27017"
+  #    volumes:
+  #      - mongo-data:/data/db
+  #  mongo-express:
+  #    image: mongo-express:latest
+  #    container_name: mongo-express
+  #    environment:
+  #      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+  #      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+  #      ME_CONFIG_MONGODB_SERVER: mongo
+  #    ports:
+  #      - "8081:8081"
+  #    depends_on:
+  #      - mongo
+  db20m2:
+    container_name: db20m2
     image: postgres:alpine
     environment:
-      POSTGRES_DB: postgres_20m2
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db20m2
+      POSTGRES_USER: zLw473vAW8ELDkV
+      POSTGRES_PASSWORD: QyuhTTLOCOWfdFu
       PGDATA: /data/postgres
     volumes:
-      - ./postgres-20m2:/data/postgres
+      - ./db20m2data:/data/postgres
     expose:
-      - "5431"
+      - "5435"
     ports:
-      - "5431:5431"
-    command: -p 5431
+      - "5435:5435"
+    command: -p 5435
     restart: always
-  postgres-pgadmin:
-    container_name: postgres-pgadmin
+  db20m2event:
+    container_name: db20m2event
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: db20m2event
+      POSTGRES_USER: WU8lVfADRqrOCFc
+      POSTGRES_PASSWORD: 6pGKe4PXo88bk2i
+      PGDATA: /data/postgresevent
+    volumes:
+      - ./db20m2dataeventi:/data/postgresevent
+    expose:
+      - "5436"
+    ports:
+      - "5436:5436"
+    command: -p 5436
+    restart: always
+  db20m2restaurant:
+    container_name: db20m2restaurant
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: db20m2restaurant
+      POSTGRES_USER: ItXNrDG1fNRQ4yd
+      POSTGRES_PASSWORD: o3YOUyfQH1kFq0
+      PGDATA: /data/postgresrestaurant
+    volumes:
+      - ./db20m2datarestaurant:/data/postgresrestaurant
+    expose:
+      - "5437"
+    ports:
+      - "5437:5437"
+    command: -p 5437
+    restart: always
+  db20m2communication:
+    container_name: db20m2communication
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: db20m2communication
+      POSTGRES_USER: TIJE0nNlxmqSKxm
+      POSTGRES_PASSWORD: o3YOUyfQH1kFq0
+      PGDATA: /data/postgrescommunication
+    volumes:
+      - ./db20m2communication:/data/postgrescommunication
+    expose:
+      - "5438"
+    ports:
+      - "5438:5438"
+    command: -p 5438
+    restart: always
+  pgadmin20m2:
+    container_name: pgadmin20m2
     image: dpage/pgadmin4
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: amati.angelo90@gmail.com
       PGADMIN_DEFAULT_PASSWORD: EM6MbK55bpHUtgVN
     depends_on:
-      - postgres
+      - db20m2
+      - db20m2event
+      - db20m2restaurant
     ports:
       - "5050:80"
-#  mongodb:
-#    image: mongo
-#    container_name: ventimetri_mongo_db
-#    ports:
-#      - "27017:27017"
-#    volumes:
-#      - data:/data
-#    environment:
-#      - MONGO_INITDB_ROOT_USERNAME=mongo
-#      - MONGO_INITDB_ROOT_PASSWORD=3QuHPncVSq
-#      - MONGO_INITDB_DATABASE=ventimetri_mongo_db
-#    networks:
-#      - mongodb_network
-#  mongo-express:
-#    image: mongo-express
-#    container_name: mongodb_express
-#    restart: always
-#    ports:
-#      - "8081:8081"
-#    environment:
-#      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongodbuser20m2
-#      - ME_CONFIG_MONGODB_ADMINPASSWORD=mongodbpassword20m2
-#      - ME_CONFIG_MONGODB_SERVER=mongodb
-#    networks:
-#      - mongodb_network
+
 #  discovery-server:
 #    image: amatiangelo1990/20m2:discovery-server
 #    container_name: discovery-server
@@ -123,48 +130,85 @@ services:
 #    image: amatiangelo1990/20m2:api-gw
 #    container_name: api-gw
 #    ports:
-#      - "8080:8080"
+#      - "8088:8088"
 #    expose:
-#      - "8080"
+#      - "8088"
 #    environment:
 #      - SPRING_PROFILES_ACTIVE=docker
-#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
 #    depends_on:
 #      - zipkin
 #      - discovery-server
-#      - keycloak
-#  user-service:
-#    image: amatiangelo1990/20m2:user-service
-#    container_name: user-service
+#  auth-service:
+#    image: amatiangelo1990/20m2:auth-service
+#    container_name: auth-service
 #    environment:
 #      - SPRING_PROFILES_ACTIVE=docker
-##      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5431/postgres
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
 #    depends_on:
 #      - zipkin
 #      - discovery-server
-#      - postgres
-#  customer-service:
-#    image: amatiangelo1990/20m2:customer-service
-#    container_name: customer-service
+#      - api-gw
+#  notification-service:
+#    image: amatiangelo1990/20m2:notification-service
+#    container_name: notification-service
 #    environment:
 #      - SPRING_PROFILES_ACTIVE=docker
-#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
 #    depends_on:
 #      - zipkin
 #      - discovery-server
-#  inventory-service:
-#    image: amatiangelo1990/20m2:inventory-service
-#    container_name: inventory-service
+#      - api-gw
+#      - mongo
+#  ventimetri-service:
+#    image: amatiangelo1990/20m2:ventimetri-service
+#    container_name: ventimetri-service
 #    environment:
 #      - SPRING_PROFILES_ACTIVE=docker
-#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
 #    depends_on:
 #      - zipkin
 #      - discovery-server
+#      - api-gw
+#      - notification-service
+#      - db20m2
+#  eventi-service:
+#    image: amatiangelo1990/20m2:eventi-service
+#    container_name: eventi-service
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#      - api-gw
+#      - notification-service
+#      - db20m2event
+#  restaurant-service:
+#    image: amatiangelo1990/20m2:restaurant-service
+#    container_name: restaurant-service
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+#    depends_on:
+#      - zipkin
+#      - discovery-server
+#      - api-gw
+#      - notification-service
+#      - db20m2
+#      - db20m2restaurant
+
+
 
 volumes:
+  mongo-data:
+    driver: local
   data: {}
   pg_data:
-
-networks:
-  mongodb_network:
+  rabbitmq_data:
+  rabbitmq_log:
+#networks:
+#  default:
+#    driver: bridge
+#networks:
+#  db20m2:

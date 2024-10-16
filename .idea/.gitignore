@@ -6,3 +6,6 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+/db20m2data/
+/db20m2dataeventi/
+/db20m2datarestaurant/

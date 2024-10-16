@@ -14,5 +14,4 @@ public class SecurityConfig {
     httpSecurity.csrf().ignoringRequestMatchers("/eureka/**");
     return httpSecurity.build();
   }
-
 }
