@@ -6,15 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.security.SecureRandom;
-import java.time.LocalDate;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 @Entity
 @Table(name = "forms")
@@ -40,13 +37,25 @@ public class Form {
     )
     private Long formId;
 
+
+    @Column(name = "form_code", unique = true)
     private String formCode;
 
     private String formName;
 
+    //name to display for the customers
+    private String outputNameForCustomer;
+
+    @Column(name = "branch_code", length = 10, nullable = false)
+    private String branchCode;
+
+    private String branchName;
+
+    private String branchAddress;
+
     private String redirectPage;
 
-    private LocalDateTime creationDate;
+    private ZonedDateTime creationDate;
 
     @Enumerated(EnumType.STRING)
     private FormType formType;
@@ -54,12 +63,25 @@ public class Form {
     @Enumerated(EnumType.STRING)
     private FormStatus formStatus;
 
-//    @Lob  // Large Object annotation for binary data
-//    @Column(name = "image_data", columnDefinition = "BYTEA")
-//    private byte[] imageData;
+    @Lob
+    @Column(name = "logo",
+            columnDefinition = "TEXT")
+    private byte[] logo;
 
-    @Column(name = "branch_code", length = 10, nullable = false)
-    private String branchCode;
+    @OneToMany(mappedBy = "form",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private List<OpeningHours> regularOpeningHours = new ArrayList<>();
+
+    @OneToMany(mappedBy = "form",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private List<SpecialDay> specialDays = new ArrayList<>();
+
+    @OneToMany(mappedBy = "form",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private List<Holidays> holidays = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "form_tags", joinColumns = @JoinColumn(name = "form_id"))
@@ -67,23 +89,10 @@ public class Form {
     private List<String> tag;
 
     @PrePersist
-    public void generateUniqueCode() {
-
-        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        final int CODE_LENGTH = 8;
-        Random random = new SecureRandom();
-
-        StringBuilder code = new StringBuilder(CODE_LENGTH);
-        for (int i = 0; i < CODE_LENGTH; i++) {
-            code.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
-        }
-        this.formCode = code.toString();
-
-
+    public void prePersist() {
         this.tag = new ArrayList<>();
-        ZonedDateTime nowInItaly = ZonedDateTime.now(ZoneId.of("CET"));
-        this.creationDate = nowInItaly.toLocalDateTime();
-        this.setFormStatus(FormStatus.ATTIVO);
 
+        this.creationDate = ZonedDateTime.now(ZoneId.of("CET"));
+        this.setFormStatus(FormStatus.ATTIVO);
     }
 }

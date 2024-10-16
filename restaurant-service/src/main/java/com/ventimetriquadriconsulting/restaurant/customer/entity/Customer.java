@@ -1,6 +1,5 @@
 package com.ventimetriquadriconsulting.restaurant.customer.entity;
 
-import com.ventimetriquadriconsulting.restaurant.restaurant.booking.entity.Booking;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,11 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "customer")
@@ -96,9 +93,6 @@ public class Customer {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime registrationDate;
-
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Booking> bookings;
 
     @PrePersist
     protected void onCreate() {

@@ -6,4 +6,5 @@ public interface WaApiConfigServiceInterface {
     WhatsAppConfigurationDTO createAndSaveConfig(String branchCode);
     WhatsAppConfigurationDTO retrieveQrCode(String branchCode);
     WhatsAppConfigurationDTO retrieveWaApiConfStatus(String branchCode);
+    void sendMessage(String instanceId, String message, String number);
 }

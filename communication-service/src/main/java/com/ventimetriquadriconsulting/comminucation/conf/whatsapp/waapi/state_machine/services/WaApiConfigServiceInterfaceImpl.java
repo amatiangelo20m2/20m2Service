@@ -5,6 +5,7 @@ import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.ventimetriapi.
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.ventimetriapi.entity.dto.WhatsAppConfigurationDTO;
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.ventimetriapi.repository.WhatsAppConfigurationRepository;
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.entity.QrCodeResponse;
+import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.service.WaApiInterface;
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.service.WaApiService;
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.state_machine.entity.WaApiConfigEvent;
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.state_machine.entity.WaApiConfState;
@@ -12,6 +13,7 @@ import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.waapi.state_ma
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -33,7 +35,8 @@ public class WaApiConfigServiceInterfaceImpl implements WaApiConfigServiceInterf
 
     private final StateMachineFactory<WaApiConfState, WaApiConfigEvent> stateMachineFactory;
 
-    private final WaApiService waApiService;
+//    @Qualifier("waApiService")
+    private final WaApiInterface waApiService;
 
     @Override
     public WhatsAppConfigurationDTO createAndSaveConfig(String branchCode) {
@@ -112,6 +115,12 @@ public class WaApiConfigServiceInterfaceImpl implements WaApiConfigServiceInterf
             throw new WhatsAppConfigurationNotFoundException("Branch conf not found with code " + branchCode);
         }
 
+    }
+
+    @Override
+    public void sendMessage(String instanceId, String number, String messageToSend) {
+        log.info("Send message to {} - Message {} - Instance in use {}", number, messageToSend, instanceId);
+        waApiService.sendMessage(instanceId, number, messageToSend);
     }
 
 

@@ -4,4 +4,5 @@ public enum FormStatus {
     ATTIVO,
     SOSPESO,
     CANCELLATO
+
 }

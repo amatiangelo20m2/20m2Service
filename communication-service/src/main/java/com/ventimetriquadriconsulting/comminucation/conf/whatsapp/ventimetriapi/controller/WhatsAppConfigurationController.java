@@ -41,6 +41,15 @@ public class WhatsAppConfigurationController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PostMapping(path = "/sendmessage/{instanceId}")
+    public ResponseEntity<Void> sendMessage(@PathVariable String instanceId,
+                                            @RequestParam String message,
+                                            @RequestParam String number){
+
+        waApiConfigService.sendMessage(instanceId, number, message);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 //    @ExceptionHandler(WhatsAppConfigurationNotFoundException.class)
 //    public ResponseEntity<Void> handleWhatsAppConfigurationNotFoundException(WhatsAppConfigurationNotFoundException ex) {
 //        // Return 204 No Content

@@ -7,6 +7,7 @@ import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.exception.cust
 import com.ventimetriquadriconsulting.comminucation.conf.whatsapp.exception.customexception.QrNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 @AllArgsConstructor
+@Primary
 public class WaApiService extends WaApiInterface {
 
     private final WebClient waapiWebClient;
